@@ -31,7 +31,7 @@ public class BattleUnit : MonoBehaviour
     
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
-    public int Attack => attack;
+    public int Attack;
     public int MaxEnergy => maxEnergy;
     public int CurrentEnergy => currentEnergy;
     public Team UnitTeam => team;
