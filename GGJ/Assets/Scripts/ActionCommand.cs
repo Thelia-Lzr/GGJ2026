@@ -3,7 +3,6 @@ using System.Collections.Generic;
 public enum ActionType
 {
     Attack,
-    Skill,
     SwitchMask,
     UseItem,
     Defend,
@@ -16,7 +15,6 @@ public class ActionCommand
     public BattleUnit Target { get; set; }
     public List<BattleUnit> Targets { get; set; }
     public ActionType ActionType { get; set; }
-    public Skill SkillData { get; set; }
     public Mask MaskData { get; set; }
     public int ResourceCost { get; set; }
     
@@ -40,7 +38,7 @@ public class ActionCommand
         if (Initiator == null || Initiator.BoundUnit == null || !Initiator.BoundUnit.IsAlive())
             return false;
         
-        if (ActionType == ActionType.Attack || ActionType == ActionType.Skill)
+        if (ActionType == ActionType.Attack)
         {
             if (Target == null || !Target.IsAlive())
                 return false;

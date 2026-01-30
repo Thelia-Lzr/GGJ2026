@@ -1,13 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum EquipmentType
-{
-    Mask,
-    Weapon,
-    Armor,
-    Accessory
-}
 
 public abstract class Mask
 {
@@ -17,19 +10,17 @@ public abstract class Mask
     public int SwitchCost { get; protected set; }
     public Sprite MaskIcon { get; protected set; }
     
-    protected List<Skill> maskSkills = new List<Skill>();
+    protected MaskAttackPattern attackPattern;
     protected BattleUnit equippedUnit;
-    
+
+    public int Attack => Attack;
+    public int Heal => Heal; //面具的血量
+
     public Mask(string maskId, string maskName, int switchCost)
     {
         MaskId = maskId;
         MaskName = maskName;
         SwitchCost = switchCost;
-    }
-    
-    public EquipmentType GetEquipmentType()
-    {
-        return EquipmentType.Mask;
     }
     
     public virtual void OnAddedToInventory()
@@ -59,9 +50,9 @@ public abstract class Mask
     {
     }
     
-    public List<Skill> GetSkills()
+    public MaskAttackPattern GetAttackPattern()
     {
-        return new List<Skill>(maskSkills);
+        return attackPattern;
     }
     
     public int GetSwitchCost()
