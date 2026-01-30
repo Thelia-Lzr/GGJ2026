@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections;
 
 public class PlayerController : UnitController
 {
@@ -62,48 +63,41 @@ public class PlayerController : UnitController
         
         PerformAction(command);
         
+        if (animationHandler != null)
+        {
+            IEnumerator actionCoroutine = GetActionCoroutine(command);
+            animationHandler.SubmitAction(actionCoroutine, command);
+        }
+        else
+        {
+            Debug.LogWarning("AnimationHandler is not set!");
+        }
+        
         OnActionConfirmed?.Invoke(command);
     }
     
-    public virtual void Attack(BattleUnit target)
+    protected virtual IEnumerator GetActionCoroutine(ActionCommand command)
     {
-        if (target == null || !target.IsAlive())
+        switch (command.ActionType)
         {
-            Debug.LogWarning("Invalid attack target.");
-            return;
+            case ActionType.Attack:
+                yield return Attack(command.Target);
+                break;
+            
+            case ActionType.SwitchMask:
+                if (command.MaskData != null)
+                {
+                    SwitchMask(command.MaskData, command.ResourceCost);
+                }
+                break;
+            
+            default:
+                Debug.LogWarning($"Unknown action type: {command.ActionType}");
+                break;
         }
-        
-        ActionCommand attackCommand = new ActionCommand(this, target, ActionType.Attack)
-        {
-            ResourceCost = 1
-        };
-        
-        ConfirmAction(attackCommand);
     }
     
-    public virtual void UseSkill(Skill skill, BattleUnit target)
-    {
-        if (skill == null || !skill.CanUse(this))
-        {
-            Debug.LogWarning("Cannot use skill.");
-            return;
-        }
-        
-        if (target == null || !target.IsAlive())
-        {
-            Debug.LogWarning("Invalid skill target.");
-            return;
-        }
-        
-        ActionCommand skillCommand = new ActionCommand(this, target, ActionType.Skill)
-        {
-            SkillData = skill,
-            ResourceCost = 1
-        };
-        
-        ConfirmAction(skillCommand);
-    }
-    
+
     public override bool SwitchMask(Mask newMask, int cost)
     {
         bool success = base.SwitchMask(newMask, cost);

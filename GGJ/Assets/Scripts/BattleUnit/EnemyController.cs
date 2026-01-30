@@ -45,9 +45,40 @@ public class EnemyController : UnitController
         if (decision != null && CanPerformAction(decision))
         {
             PerformAction(decision);
+            
+            if (animationHandler != null)
+            {
+                System.Collections.IEnumerator actionCoroutine = GetActionCoroutine(decision);
+                animationHandler.SubmitAction(actionCoroutine, decision);
+            }
+            else
+            {
+                Debug.LogWarning("AnimationHandler is not set!");
+            }
         }
         
         OnTurnEnd();
+    }
+    
+    protected virtual System.Collections.IEnumerator GetActionCoroutine(ActionCommand command)
+    {
+        switch (command.ActionType)
+        {
+            case ActionType.Attack:
+                yield return Attack(command.Target);
+                break;
+            
+            case ActionType.SwitchMask:
+                if (command.MaskData != null)
+                {
+                    SwitchMask(command.MaskData, command.ResourceCost);
+                }
+                break;
+            
+            default:
+                Debug.LogWarning($"Unknown action type: {command.ActionType}");
+                break;
+        }
     }
     
     public virtual ActionCommand AI()
@@ -141,46 +172,12 @@ public class EnemyController : UnitController
             return null;
         }
         
-        List<ActionCommand> usableSkills = availableActions.Where(a => 
-            a.ActionType == ActionType.Skill && 
-            a.SkillData != null && 
-            a.SkillData.CanUse(this)
-        ).ToList();
-        
-        if (usableSkills.Count > 0 && ShouldUseSkill())
-        {
-            ActionCommand skillCommand = usableSkills[Random.Range(0, usableSkills.Count)];
-            skillCommand.Target = target;
-            return skillCommand;
-        }
-        
         ActionCommand attackCommand = new ActionCommand(this, target, ActionType.Attack)
         {
             ResourceCost = 1
         };
         
         return attackCommand;
-    }
-    
-    protected virtual bool ShouldUseSkill()
-    {
-        switch (behaviorType)
-        {
-            case AIBehaviorType.Aggressive:
-                return Random.value > 0.3f;
-            
-            case AIBehaviorType.Defensive:
-                return boundUnit.CurrentHealth < boundUnit.MaxHealth * 0.5f;
-            
-            case AIBehaviorType.Balanced:
-                return Random.value > 0.5f;
-            
-            case AIBehaviorType.Random:
-                return Random.value > 0.5f;
-            
-            default:
-                return Random.value > 0.5f;
-        }
     }
     
     public void SetBehaviorType(AIBehaviorType type)

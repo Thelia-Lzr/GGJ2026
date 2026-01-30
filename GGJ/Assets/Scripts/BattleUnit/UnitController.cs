@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -9,9 +10,10 @@ public abstract class UnitController : MonoBehaviour
     [SerializeField] protected Mask currentMask;
     
     protected Dictionary<ResourceType, int> resources = new Dictionary<ResourceType, int>();
-    protected List<Skill> availableSkills = new List<Skill>();
     protected bool isStunned = false;
     protected bool canAct = true;
+    
+    protected AnimationHandler animationHandler;
     
     public event Action<ActionCommand> OnActionPerformed;
     public event Action<Mask, Mask> OnMaskSwitched;
@@ -19,7 +21,13 @@ public abstract class UnitController : MonoBehaviour
     public BattleUnit BoundUnit => boundUnit;
     public Mask CurrentMask => currentMask;
     public bool CanAct => canAct && !isStunned && boundUnit != null && boundUnit.IsAlive();
-    
+
+    //初始属性定义
+    private int initialAttack = 10;
+    private int initialDefense = 5;
+    private int initialMaxHealth = 100;
+    private int initialHealth = 50;
+
     protected virtual void Awake()
     {
         InitializeResources();
@@ -27,7 +35,6 @@ public abstract class UnitController : MonoBehaviour
     
     protected virtual void InitializeResources()
     {
-        resources[ResourceType.ActionPoint] = 3;
         resources[ResourceType.Mana] = 0;
         resources[ResourceType.Energy] = 0;
         resources[ResourceType.MaskEnergy] = 100;
@@ -36,11 +43,18 @@ public abstract class UnitController : MonoBehaviour
     public virtual void BindUnit(BattleUnit unit)
     {
         boundUnit = unit;
+        boundUnit.Attack = initialAttack;
         
+
         if (boundUnit != null)
         {
             boundUnit.Initialize(this);
         }
+    }
+    
+    public void SetAnimationHandler(AnimationHandler handler)
+    {
+        animationHandler = handler;
     }
     
     public abstract void TakeTurn();
@@ -125,8 +139,6 @@ public abstract class UnitController : MonoBehaviour
         
         SpendResource(ResourceType.MaskEnergy, cost);
         
-        RefreshAvailableSkills();
-        
         OnMaskSwitched?.Invoke(oldMask, newMask);
         
         return true;
@@ -145,30 +157,21 @@ public abstract class UnitController : MonoBehaviour
         };
         actions.Add(attackAction);
         
-        foreach (Skill skill in availableSkills)
-        {
-            if (skill.CanUse(this))
-            {
-                ActionCommand skillAction = new ActionCommand(this, ActionType.Skill)
-                {
-                    SkillData = skill,
-                    ResourceCost = 1
-                };
-                actions.Add(skillAction);
-            }
-        }
-        
         return actions;
     }
     
-    protected virtual void RefreshAvailableSkills()
+    public virtual IEnumerator Attack(BattleUnit target)
     {
-        availableSkills.Clear();
-        
-        if (currentMask != null)
+        if (target == null || !target.IsAlive())
         {
-            availableSkills.AddRange(currentMask.GetSkills());
+            Debug.LogWarning("Invalid attack target.");
+            yield break;
         }
+        
+        Debug.Log($"{boundUnit.gameObject.name} attacks {target.gameObject.name}");
+        
+        
+        yield return null;
     }
     
     public virtual void OnTurnStart()
@@ -181,11 +184,6 @@ public abstract class UnitController : MonoBehaviour
         if (currentMask != null)
         {
             currentMask.OnTurnStart();
-        }
-        
-        foreach (Skill skill in availableSkills)
-        {
-            skill.OnCooldownTick();
         }
     }
     
