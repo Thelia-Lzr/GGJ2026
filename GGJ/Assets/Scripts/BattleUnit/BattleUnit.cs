@@ -13,8 +13,8 @@ public class BattleUnit : MonoBehaviour
     [Header("Unit Data")]
     [SerializeField] private int maxHealth = 100;
     [SerializeField] private int currentHealth;
-    [SerializeField] private int maxEnergy = 100;
-    [SerializeField] private int currentEnergy;
+    [SerializeField] private int attack = 10;
+    [SerializeField] private int defense = 5;
     [SerializeField] private Team team;
     
     [Header("References")]
@@ -31,18 +31,19 @@ public class BattleUnit : MonoBehaviour
     
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
-    public int Attack;
-    public int MaxEnergy => maxEnergy;
-    public int CurrentEnergy => currentEnergy;
+    public int Attack => attack;
+    public int Defense => defense;
     public Team UnitTeam => team;
     public UnitController Controller => controller;
     public IReadOnlyList<StatusEffect> ActiveStatusEffects => activeStatusEffects.AsReadOnly();
     
-    public void Initialize(UnitController unitController)
+    public void Initialize(UnitController unitController, int MaxHealth,int CurrentHealth,int Atk,int Def)
     {
         controller = unitController;
-        currentHealth = maxHealth;
-        currentEnergy = maxEnergy;
+        currentHealth = CurrentHealth;
+        maxHealth = MaxHealth;
+        attack = Atk;
+        defense = Def;
         activeStatusEffects.Clear();
     }
     
@@ -69,12 +70,6 @@ public class BattleUnit : MonoBehaviour
         currentHealth = Mathf.Min(maxHealth, currentHealth + actualHeal);
         
         OnHealthChanged?.Invoke(currentHealth);
-    }
-    
-    public void ModifyEnergy(int amount)
-    {
-        currentEnergy = Mathf.Clamp(currentEnergy + amount, 0, maxEnergy);
-        OnEnergyChanged?.Invoke(currentEnergy);
     }
     
     public void ApplyStatus(StatusEffect effect)

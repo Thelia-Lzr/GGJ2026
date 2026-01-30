@@ -17,10 +17,77 @@ public class EnemyController : UnitController
     [SerializeField] protected float thinkDelay = 1f;
     
     protected List<BattleUnit> potentialTargets = new List<BattleUnit>();
+    protected Dictionary<ResourceType, int> resources = new Dictionary<ResourceType, int>();
     
     protected override void Awake()
     {
         base.Awake();
+        InitializeResources();
+    }
+    
+    protected virtual void InitializeResources()
+    {
+        resources[ResourceType.ActionPoint] = 3;
+    }
+    
+    public override bool HasResource(ResourceType type, int amount)
+    {
+        if (!resources.ContainsKey(type))
+            return false;
+        
+        return resources[type] >= amount;
+    }
+    
+    public override void SpendResource(ResourceType type, int amount)
+    {
+        if (!resources.ContainsKey(type))
+        {
+            resources[type] = 0;
+        }
+        
+        resources[type] = Mathf.Max(0, resources[type] - amount);
+    }
+    
+    public override void GainResource(ResourceType type, int amount)
+    {
+        if (!resources.ContainsKey(type))
+        {
+            resources[type] = 0;
+        }
+        
+        resources[type] += amount;
+    }
+    
+    public override int GetResource(ResourceType type)
+    {
+        if (!resources.ContainsKey(type))
+            return 0;
+        
+        return resources[type];
+    }
+    
+    public override bool CanPerformAction(ActionCommand command)
+    {
+        if (!CanAct)
+            return false;
+        
+        if (command == null || !command.IsValid())
+            return false;
+        
+        return HasResource(ResourceType.ActionPoint, command.ResourceCost);
+    }
+    
+    public override void PerformAction(ActionCommand command)
+    {
+        if (!CanPerformAction(command))
+        {
+            Debug.LogWarning($"Cannot perform action: {command.ActionType}");
+            return;
+        }
+        
+        SpendResource(ResourceType.ActionPoint, command.ResourceCost);
+        
+        RaiseActionPerformed(command);
     }
     
     public override void TakeTurn()
