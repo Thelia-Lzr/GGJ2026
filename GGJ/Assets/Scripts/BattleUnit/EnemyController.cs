@@ -59,7 +59,13 @@ public class EnemyController : UnitController
         
         OnTurnEnd();
     }
-    
+
+    public ActionCommand GetPendingAction()
+    {
+        // 逻辑：改成这个攻击行为类似读一个列表，像杀戮尖塔这种，不需要AI
+        return AI();
+    }
+
     protected virtual System.Collections.IEnumerator GetActionCoroutine(ActionCommand command)
     {
         switch (command.ActionType)
