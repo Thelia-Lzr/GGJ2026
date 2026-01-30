@@ -93,6 +93,8 @@
 - `GetSkills()`：返回面具提供的技能集合。
 - `GetSwitchCost()`：获取切换消耗。
 
+可以增加更多钩子以适配更奇怪的设计
+
 ---
 
 # II. 显示层 (Presentation & Interaction Layer)
@@ -143,7 +145,7 @@
 
 ## 3. 动画处理器
 
-### AnimationHandler（动画处理器）
+### AnimationHandler（动画处理器）含有音效处理
 **职责**：统一处理**合法交互**后的动画播放，并在动画的关键节点向逻辑组件派发指令（伤害、生效、装备等）。**玩家输入只传给 AnimationHandler**，由它在合适的动画时机驱动数据逻辑与表现同步。
 
 **需要处理的合法交互**：
@@ -159,7 +161,17 @@
 - `OnEquipFrame(BattleUnit target, Mask mask)`：换装关键帧回调，执行 `Mask.OnEquip` 等逻辑。
 - `OnAnimationComplete()`：动画结束回调，统一处理死亡判定、移除与清理。
 
+**原子化技能流程（示例）**：
+1. **MoveToTarget**：单位移动到目标面前。
+2. **PlayStrike**：播放斩击特效/动作。
+3. **ApplyDamage**：造成伤害（同时触发伤害飘字）。
+4. **TriggerPassives**：处理可能的被动效果。
+5. **ReturnToOrigin**：单位回到原先位置。
+6. **ResolveDeath**：处理目标单位死亡与消除。
+
+TA可以另加类与组来使得动画处理器能够优雅地调用你准备好的动画，可以在pr信息里附上以方便其他人负责AnimationHandler的人调用。
 ---
+
 
 # III. 扩展定义 (Shared Definitions)
 - **ActionCommand**：行动指令数据包（发起者、目标、技能ID）。
@@ -167,6 +179,8 @@
 - **ResourceType**：资源的枚举（ActionPoint, Mana, MaskEnergy）。
 - **Target**：目标选择器（Single, AllEnemies, Self）。
 - **Skill**：技能抽象（冷却、消耗、效果）。
+- **SkillStep**：技能步骤原子单元（MoveToTarget, PlayStrike, ApplyDamage, TriggerPassives, ReturnToOrigin, ResolveDeath）。
+- **SkillSequence**：技能步骤序列（按顺序编排，供 AnimationHandler 执行）。
 
 ---
 
