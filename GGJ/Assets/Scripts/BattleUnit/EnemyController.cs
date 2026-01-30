@@ -49,7 +49,7 @@ public class EnemyController : UnitController
             if (animationHandler != null)
             {
                 System.Collections.IEnumerator actionCoroutine = GetActionCoroutine(decision);
-                animationHandler.SubmitAction(actionCoroutine, decision);
+                animationHandler.SubmitAction(actionCoroutine, decision, this);
             }
             else
             {

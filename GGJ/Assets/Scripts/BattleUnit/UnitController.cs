@@ -31,6 +31,13 @@ public abstract class UnitController : MonoBehaviour
     protected virtual void Awake()
     {
         InitializeResources();
+        
+        animationHandler = AnimationHandler.Instance;
+        
+        if (animationHandler == null)
+        {
+            Debug.LogWarning($"UnitController on {gameObject.name} could not find AnimationHandler in scene!");
+        }
     }
     
     protected virtual void InitializeResources()
@@ -54,7 +61,14 @@ public abstract class UnitController : MonoBehaviour
     
     public void SetAnimationHandler(AnimationHandler handler)
     {
-        animationHandler = handler;
+        if (handler != null)
+        {
+            animationHandler = handler;
+        }
+        else
+        {
+            Debug.LogWarning("Attempted to set null AnimationHandler!");
+        }
     }
     
     public abstract void TakeTurn();

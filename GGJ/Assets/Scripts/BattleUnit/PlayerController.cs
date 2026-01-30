@@ -66,7 +66,7 @@ public class PlayerController : UnitController
         if (animationHandler != null)
         {
             IEnumerator actionCoroutine = GetActionCoroutine(command);
-            animationHandler.SubmitAction(actionCoroutine, command);
+            animationHandler.SubmitAction(actionCoroutine, command, this);
         }
         else
         {
