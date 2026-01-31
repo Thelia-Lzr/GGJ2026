@@ -17,7 +17,7 @@ public class RoundManager : MonoBehaviour
     
     [Header("死亡处理配置")]
     [Tooltip("单位死亡后延迟销毁时间（秒），用于播放死亡动画")]
-    [SerializeField] private float destroyDelay = 2f;
+    [SerializeField] private float destroyDelay = 1f;
     [Tooltip("是否完全销毁GameObject（false=仅禁用）")]
     [SerializeField] private bool destroyGameObject = true;
 
@@ -30,7 +30,7 @@ public class RoundManager : MonoBehaviour
     [SerializeField] private bool autoStartBattle = false;
 
     // 战斗单位列表（所有参与战斗的单位）
-    private List<BattleUnit> battleUnits = new List<BattleUnit>();
+    public List<BattleUnit> battleUnits = new List<BattleUnit>();
     // 待销毁的单位队列
     private List<BattleUnit> unitsToDestroy = new List<BattleUnit>();
     // 当前行动阵营

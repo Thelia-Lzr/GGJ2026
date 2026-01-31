@@ -28,7 +28,7 @@ public abstract class UnitController : MonoBehaviour
     private int initialMaxHealth = 100;
     private int initialHealth = 50;
 
-    private int attackCount = 0;
+    protected int attackCount = 0;
 
 
     protected virtual void Awake()
@@ -40,7 +40,10 @@ public abstract class UnitController : MonoBehaviour
             Debug.LogWarning($"UnitController on {gameObject.name} could not find AnimationHandler in scene!");
         }
     }
-    
+    private void Start()
+    {
+        BindUnit(boundUnit);
+    }
     public virtual void BindUnit(BattleUnit unit)
     {
         boundUnit = unit;
@@ -173,5 +176,16 @@ public abstract class UnitController : MonoBehaviour
     public void SetCanAct(bool can)
     {
         canAct = can;
+    }
+    public IEnumerator MoveTo(Vector2 targetPosition,float time)
+    {
+        var movePosition =((Vector3)targetPosition-transform.position)/time;
+        while (time>0)
+        {
+            time-=Time.deltaTime;
+            transform.position += movePosition*Time.deltaTime;
+            yield return null;
+        }
+        transform.position = targetPosition;
     }
 }

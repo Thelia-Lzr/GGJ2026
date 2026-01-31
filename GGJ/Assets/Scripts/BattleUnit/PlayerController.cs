@@ -58,7 +58,7 @@ public class PlayerController : UnitController
             return;
         }
         
-        SpendResource(ResourceType.ActionPoint, command.ResourceCost);
+        //SpendResource(ResourceType.ActionPoint, command.ResourceCost);
         
         RaiseActionPerformed(command);
     }
@@ -125,6 +125,7 @@ public class PlayerController : UnitController
         switch (command.ActionType)
         {
             case ActionType.Attack:
+                attackCount--;
                 yield return Attack(command.Target);
                 break;
             
@@ -167,5 +168,14 @@ public class PlayerController : UnitController
     public void CancelAction()
     {
         pendingAction = null;
+    }
+    public void InitActionCircle()
+    {
+        //可以改为ResoruceManager来管理
+        if(attackCount > 0)
+        {
+
+        }
+
     }
 }
