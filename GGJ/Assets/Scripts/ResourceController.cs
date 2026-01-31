@@ -24,7 +24,6 @@ public class ResourceController: MonoBehaviour
 
     private void Awake()
     {
-        FONT = Resources.Load<TMP_FontAsset>("FONT/simsunSDF");
         
         // 将列表转换为字典
         prefabs = new Dictionary<string, GameObject>();
