@@ -46,7 +46,7 @@ public class DragUnit : MonoBehaviour
             if (isMatch())
             {
                 Debug.Log("?");
-                Destroy(gameObject);
+                afterMatch();
             }
             else
             {
@@ -55,6 +55,10 @@ public class DragUnit : MonoBehaviour
             }
 
         }
+    }
+    protected virtual void afterMatch()
+    {
+        Destroy(gameObject);
     }
     protected virtual bool isMatch()
     {
