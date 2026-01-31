@@ -1,81 +1,72 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Ãæ¾ß»ùÀà
+/// é¢å…·åŸºç±»
 /// 
-/// ÔÚÊµÏÖ Activate ·½·¨Ê±µÄÖØÒª¹æ·¶£º
-/// - Ê¼ÖÕÊ¹ÓÃ´«ÈëµÄ controller ²ÎÊı½øĞĞÒÆ¶¯¡¢¹¥»÷µÈ²Ù×÷
-/// - ²»ÒªÖ±½ÓÊ¹ÓÃ equippedUnit.transform£¬¶øÓ¦¸ÃÊ¹ÓÃ controller.transform
-/// - controller.BoundUnit Ó¦¸ÃÓë equippedUnit Ò»ÖÂ
-/// - ËùÓĞĞ­³Ì²Ù×÷£¨MoveTo, AttackµÈ£©¶¼Ó¦¸ÃÓÉ controller ·¢Æğ
+/// åœ¨å®ç° Activate æ–¹æ³•æ—¶çš„é‡è¦è§„èŒƒï¼š
+/// - å§‹ç»ˆä½¿ç”¨ä¼ å…¥çš„ controller å‚æ•°è¿›è¡Œç§»åŠ¨ã€æ”»å‡»ç­‰æ“ä½œ
+/// - ä¸è¦ç›´æ¥ä½¿ç”¨ equippedUnit.transformï¼Œè€Œåº”è¯¥ä½¿ç”¨ controller.transform
+/// - controller.BoundUnit åº”è¯¥ä¸ equippedUnit ä¸€è‡´
+/// - æ‰€æœ‰åç¨‹æ“ä½œï¼ˆMoveTo, Attackç­‰ï¼‰éƒ½åº”è¯¥ç”± controller å‘èµ·
 /// </summary>
 public abstract class Mask
 {
-    public string MaskId { get; protected set; }
     public string MaskName { get; protected set; }
     public string Description { get; protected set; }
     public int SwitchCost { get; protected set; }
     public Sprite MaskIcon { get; protected set; }
-    
+
     protected MaskAttackPattern attackPattern;
     protected BattleUnit equippedUnit;
 
     public int Atk { get; protected set; }
 
-    public int Usage { get; protected set; } //Ã¿´ÎÊ¹ÓÃ¸ÃÃæ¾ß½øĞĞ¹¥»÷ÏûºÄµÄÄÍ¾Ã
+    public int AtkCost { get; protected set; } //æ¯æ¬¡ä½¿ç”¨è¯¥é¢å…·è¿›è¡Œæ”»å‡»æ¶ˆè€—çš„è€ä¹…
     public int MaxHealth { get; protected set; }
     public int CurrentHealth { get; protected set; }
-    
+
     public bool IsBroken => CurrentHealth <= 0;
 
-    public Mask(string maskId, string maskName, int switchCost)
+    public Mask(string maskName, int switchCost,int maxHealth,int atk,int atkCost)
     {
-        MaskId = maskId;
         MaskName = maskName;
         SwitchCost = switchCost;
         MaxHealth = 50;
         CurrentHealth = MaxHealth;
-        Atk = 0;
+        Atk = atk;
+        AtkCost = atkCost;
     }
-    
+
     public virtual void OnAddedToInventory()
     {
     }
-    
+
     public virtual void OnRemovedFromInventory()
     {
     }
-    
+
     public virtual bool CanUseInBattle()
     {
         return true;
     }
-    
+
     public virtual void OnEquip(BattleUnit unit)
     {
         equippedUnit = unit;
     }
-    
+
     public virtual void OnUnequip(BattleUnit unit)
     {
         equippedUnit = null;
     }
-    
-    public virtual IEnumerator Attack(UnitController controller, BattleUnit target)//ÊµÏÖÃæ¾ß¹¥Ğ§¹û
+
+    public virtual IEnumerator Activate(UnitController controller, BattleUnit target)//å®ç°é¢å…·å¯æ•ˆæœ
     {
         this.UsageAfterAttack();
 
-        // Ä¬ÈÏĞĞÎª£ºÊ¹ÓÃ´«ÈëµÄ controller Ö´ĞĞ»ù´¡¹¥»÷
-        yield return controller.Attack(target);
-    }
-
-    public virtual IEnumerator Activate(UnitController controller, BattleUnit target)//ÊµÏÖÃæ¾ßÆôĞ§¹û
-    {
-        this.UsageAfterAttack();
-
-        // Ä¬ÈÏĞĞÎª£ºÊ¹ÓÃ´«ÈëµÄ controller Ö´ĞĞ»ù´¡¹¥»÷
+        // é»˜è®¤è¡Œä¸ºï¼šä½¿ç”¨ä¼ å…¥çš„ controller æ‰§è¡ŒåŸºç¡€æ”»å‡»
         yield return controller.Attack(target);
     }
 
@@ -84,18 +75,18 @@ public abstract class Mask
     {
         return SwitchCost;
     }
-    
+
     public virtual void OnTurnStart()
     {
     }
-    
+
     public virtual void OnTurnEnd()
     {
     }
-    
-    public virtual void UsageAfterAttack()//Ãæ¾ßÊ¹ÓÃºóÄÍ¾Ã¼õÉÙ
+
+    public virtual void UsageAfterAttack()//é¢å…·ä½¿ç”¨åè€ä¹…å‡å°‘
     {
-        int damage = Usage;
+        int damage = AtkCost;
         //if (IsBroken) return damage;
 
         int actualDamage = Mathf.Min(CurrentHealth, damage);
@@ -110,36 +101,36 @@ public abstract class Mask
 
         return;
     }
-    public virtual int TakeDamage(int damage)//´÷×ÅÃæ¾ßÊÜµ½ÉËº¦
+    public virtual int TakeDamage(int damage)//æˆ´ç€é¢å…·å—åˆ°ä¼¤å®³
     {
         if (IsBroken) return damage;
-        
+
         int actualDamage = Mathf.Min(CurrentHealth, damage);
         CurrentHealth -= actualDamage;
-        
+
         int overflow = damage - actualDamage;
-        
+
         if (IsBroken)
         {
             OnMaskBroken();
         }
-        
+
         return overflow;
     }
-    
+
     public virtual void RepairMask(int amount)
     {
         if (IsBroken) return;
         CurrentHealth = Mathf.Min(MaxHealth, CurrentHealth + amount);
     }
-    
+
     public virtual void FullyRepair()
     {
         CurrentHealth = MaxHealth;
     }
-    
+
     protected virtual void OnMaskBroken()
     {
-        Debug.Log($"Ãæ¾ß {MaskName} ÒÑÆÆËé£¡");
+        Debug.Log($"é¢å…· {MaskName} å·²ç ´ç¢ï¼");
     }
 }

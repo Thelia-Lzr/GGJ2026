@@ -65,7 +65,14 @@ public class BattleUnit : MonoBehaviour
         //UI
         OnHealthChanged += HealthDisplay;
         OnHealthChanged += HealthChangeDisplay;
+        if (UIText == null)
+        {
+            UIText = new GameObject("uitext");
+            RectTransform transform= UIText.AddComponent<RectTransform>();
+            transform.SetParent(resourceController.GetPrefab("Canvas").GetComponent<RectTransform>());
+        }
         UIText.GetComponent<RectTransform>().anchoredPosition = Camera.main.WorldToScreenPoint(transform.position);
+        UIText.GetComponent<RectTransform>().localScale = Vector3.one;
         UIText.GetComponent<RectTransform>().sizeDelta =new Vector2(200,250);
     }
     
