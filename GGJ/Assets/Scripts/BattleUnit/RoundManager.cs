@@ -17,7 +17,7 @@ public class RoundManager : MonoBehaviour
     
     [Header("死亡处理配置")]
     [Tooltip("单位死亡后延迟销毁时间（秒），用于播放死亡动画")]
-    [SerializeField] private float destroyDelay = 2f;
+    [SerializeField] private float destroyDelay = 1f;
     [Tooltip("是否完全销毁GameObject（false=仅禁用）")]
     [SerializeField] private bool destroyGameObject = true;
 

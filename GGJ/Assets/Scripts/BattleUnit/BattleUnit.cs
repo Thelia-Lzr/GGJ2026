@@ -18,7 +18,7 @@ public class BattleUnit : MonoBehaviour
     [SerializeField] private Team team;
     
     [Header("References")]
-    private UnitController controller;
+    public UnitController controller;
     private Mask currentMask;
     private List<StatusEffect> activeStatusEffects = new List<StatusEffect>();
     

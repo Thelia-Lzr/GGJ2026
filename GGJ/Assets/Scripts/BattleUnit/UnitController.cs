@@ -28,7 +28,7 @@ public abstract class UnitController : MonoBehaviour
     private int initialMaxHealth = 100;
     private int initialHealth = 50;
 
-    private int attackCount = 0;
+    protected int attackCount = 0;
 
 
     protected virtual void Awake()

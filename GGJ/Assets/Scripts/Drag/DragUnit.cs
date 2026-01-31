@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DragUnit : MonoBehaviour
 {
-    private Vector3 startPosition;
+    protected Vector3 startPosition;
     private DragController dragController => DragController.Instance;
     private Vector3 mouseOffset;
     private bool isDragging;
@@ -43,7 +43,7 @@ public class DragUnit : MonoBehaviour
 
         if (isDragging)
         {
-            if (dragController.JudgeCollider(transform.position))
+            if (isMatch())
             {
                 Debug.Log("?");
                 Destroy(gameObject);
@@ -56,6 +56,10 @@ public class DragUnit : MonoBehaviour
 
         }
     }
+    protected virtual bool isMatch()
+    {
+        return dragController.JudgeCollider(transform.position);
+    }
     private Vector3 GetWorldMousePosition()
     {
         Vector3 mouseScreenPos = Input.mousePosition;
@@ -66,19 +70,16 @@ public class DragUnit : MonoBehaviour
     public IEnumerator ReturnBackAction()
     {
         float speed = DragController.RETURNSPEED;
-        float minDistance = DragController.RETURNPOSITION;
-        Vector3 moveDirection = (startPosition - transform.position).normalized * speed;
-        while (true)
+        float minDistance = 0.01f;
+        
+        while (Vector3.Distance(transform.position, startPosition) > minDistance)
         {
-            transform.Translate(moveDirection, Space.World);
-            if (Vector3.Distance(transform.position, startPosition) < minDistance)
-            {
-                transform.position = startPosition;
-                break;
-            }
+            transform.position = Vector3.MoveTowards(transform.position, startPosition, speed * Time.deltaTime);
             yield return null;
         }
+        
+        transform.position = startPosition;
+        isDragging = false;
         dragController.Status = 0;
-        yield return null;
     }
 }
