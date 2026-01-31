@@ -161,7 +161,7 @@ MonoBehaviour:
   charSprites:
   - {fileID: 21300000, guid: c04136e41921b01419cb1f460cc257d5, type: 3}
   - {fileID: 21300000, guid: e21dab900ca36364eb44e7ce856b1545, type: 3}
-  shadowSprite: {fileID: 21300000, guid: 66466fce5bc24f1488a415c8d491d67c, type: 3}
+  shadowSprite: {fileID: 21300000, guid: ab20c6d68b607a04a976d463a3589b07, type: 3}
   nameText: {fileID: 1565182075}
   dialogText: {fileID: 1748066369}
   nextButton: {fileID: 1409394755}
