@@ -276,7 +276,8 @@ MonoBehaviour:
   currentHealth: 30
   attack: 10
   defense: 5
-  team: 1
+  controller: {fileID: 0}
+  <UIText>k__BackingField: {fileID: 0}
   <HealthText>k__BackingField: {fileID: 0}
 --- !u!212 &881631428
 SpriteRenderer:
@@ -450,6 +451,8 @@ GameObject:
   - component: {fileID: 1176040188}
   - component: {fileID: 1176040187}
   - component: {fileID: 1176040189}
+  - component: {fileID: 1176040190}
+  - component: {fileID: 1176040191}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -534,6 +537,36 @@ MonoBehaviour:
   testEnemyUnits:
   - {fileID: 881631427}
   autoStartBattle: 0
+  battleUnits: []
+--- !u!114 &1176040190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1176040184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e56caa64120ae94abf36d6d4ea88145, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabList:
+  - key: ActionCircle
+    prefab: {fileID: 3810956170213126452, guid: 284a72582b0867449b6b5021381bde99, type: 3}
+--- !u!114 &1176040191
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1176040184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 939520597f626f746b661e3f07023bd7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <DragDistrict>k__BackingField: []
+  Status: 0
 --- !u!1 &1397221578
 GameObject:
   m_ObjectHideFlags: 0
@@ -914,7 +947,8 @@ MonoBehaviour:
   currentHealth: 30
   attack: 10
   defense: 5
-  team: 0
+  controller: {fileID: 0}
+  <UIText>k__BackingField: {fileID: 0}
   <HealthText>k__BackingField: {fileID: 0}
 --- !u!212 &1532907025
 SpriteRenderer:
@@ -1018,7 +1052,8 @@ MonoBehaviour:
   currentHealth: 30
   attack: 10
   defense: 5
-  team: 0
+  controller: {fileID: 0}
+  <UIText>k__BackingField: {fileID: 0}
   <HealthText>k__BackingField: {fileID: 0}
 --- !u!212 &1826066613
 SpriteRenderer:
@@ -1102,6 +1137,63 @@ MonoBehaviour:
   boundUnit: {fileID: 1826066612}
   attackCountGains: 1
   waitingForInput: 0
+--- !u!1001 &1880967689
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3810956170213126452, guid: 284a72582b0867449b6b5021381bde99, type: 3}
+      propertyPath: m_Name
+      value: Circle
+      objectReference: {fileID: 0}
+    - target: {fileID: 6458148081896785717, guid: 284a72582b0867449b6b5021381bde99, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -6.095854
+      objectReference: {fileID: 0}
+    - target: {fileID: 6458148081896785717, guid: 284a72582b0867449b6b5021381bde99, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.7227539
+      objectReference: {fileID: 0}
+    - target: {fileID: 6458148081896785717, guid: 284a72582b0867449b6b5021381bde99, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6458148081896785717, guid: 284a72582b0867449b6b5021381bde99, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6458148081896785717, guid: 284a72582b0867449b6b5021381bde99, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6458148081896785717, guid: 284a72582b0867449b6b5021381bde99, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6458148081896785717, guid: 284a72582b0867449b6b5021381bde99, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6458148081896785717, guid: 284a72582b0867449b6b5021381bde99, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6458148081896785717, guid: 284a72582b0867449b6b5021381bde99, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6458148081896785717, guid: 284a72582b0867449b6b5021381bde99, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 284a72582b0867449b6b5021381bde99, type: 3}
 --- !u!1 &1892644099
 GameObject:
   m_ObjectHideFlags: 0
@@ -1204,7 +1296,8 @@ MonoBehaviour:
   currentHealth: 30
   attack: 10
   defense: 5
-  team: 0
+  controller: {fileID: 0}
+  <UIText>k__BackingField: {fileID: 0}
   <HealthText>k__BackingField: {fileID: 0}
 --- !u!212 &2058530852
 SpriteRenderer:
@@ -1285,3 +1378,4 @@ SceneRoots:
   - {fileID: 1176040186}
   - {fileID: 748207885}
   - {fileID: 1892644102}
+  - {fileID: 1880967689}

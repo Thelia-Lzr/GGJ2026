@@ -16,7 +16,7 @@ public class BattleUnit : MonoBehaviour
     [SerializeField] private int currentHealth;
     [SerializeField] private int attack = 10;
     [SerializeField] private int defense = 5;
-    public Team team { get; private set; }
+    [SerializeField] public Team team;//{ get; private set; }
     
     [Header("References")]
     public UnitController controller;
