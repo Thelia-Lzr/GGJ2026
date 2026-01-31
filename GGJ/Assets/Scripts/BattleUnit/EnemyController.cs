@@ -16,6 +16,9 @@ public class EnemyController : UnitController
     [SerializeField] protected AIBehaviorType behaviorType = AIBehaviorType.Random;
     [SerializeField] protected float thinkDelay = 1f;
     
+    protected int initialHealth = 10;
+    protected int initialAttack = 5;
+    
     protected List<BattleUnit> potentialTargets = new List<BattleUnit>();
     protected Dictionary<ResourceType, int> resources = new Dictionary<ResourceType, int>();
     

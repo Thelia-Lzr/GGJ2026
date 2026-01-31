@@ -14,9 +14,6 @@ public class EnemyTank : EnemyController
     [SerializeField] private int chargeTime = 2;
     [SerializeField] private float chargeMultiplier = 2.6f;
     
-    private int initialHealth = 30;
-    private int initialAttack = 5;
-    
     protected override void Awake()
     {
         base.Awake();
@@ -24,6 +21,9 @@ public class EnemyTank : EnemyController
     
     private void Start()
     {
+        initialHealth = 30;
+        initialAttack = 5;
+        
         if (boundUnit != null)
         {
             boundUnit.Initialize(this, initialHealth, initialHealth, initialAttack, 5);
