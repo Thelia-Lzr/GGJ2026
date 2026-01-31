@@ -9,15 +9,15 @@ public abstract class UnitController : MonoBehaviour
     [SerializeField] protected BattleUnit boundUnit;
     [SerializeField] protected Mask currentMask;
     [SerializeField] private int attackCountGains = 1;
-    
+
     protected bool isStunned = false;
     protected bool canAct = true;
-    
+
     protected AnimationHandler animationHandler;
-    
+
     public event Action<ActionCommand> OnActionPerformed;
     public event Action<Mask, Mask> OnMaskSwitched;
-    
+
     public BattleUnit BoundUnit => boundUnit;
     public Mask CurrentMask => currentMask;
     public bool CanAct => canAct && !isStunned && boundUnit != null && boundUnit.IsAlive();
@@ -28,7 +28,7 @@ public abstract class UnitController : MonoBehaviour
     private int initialMaxHealth = 100;
     private int initialHealth = 50;
 
-    protected int attackCount = 0;
+    public int attackCount { get; protected set; }
 
 
     protected virtual void Awake()
@@ -187,5 +187,16 @@ public abstract class UnitController : MonoBehaviour
             yield return null;
         }
         transform.position = targetPosition;
+    }
+    public void InitActionCircle()
+    {
+        //可以改为ResoruceManager来管理
+        if (attackCount > 0)
+        {
+            GameObject actionCircle = Instantiate(ResourceController.Instance.GetPrefab("ActionCircle"), transform);
+            ActionCircle aC = actionCircle.GetComponent<ActionCircle>();
+            aC.Initialize(this);
+        }
+
     }
 }
