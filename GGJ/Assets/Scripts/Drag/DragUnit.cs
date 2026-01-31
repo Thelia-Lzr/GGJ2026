@@ -5,7 +5,7 @@ using UnityEngine;
 public class DragUnit : MonoBehaviour
 {
     private Vector3 startPosition;
-    private DragController dragController=>DragController.Instance;
+    private DragController dragController => DragController.Instance;
     private Vector3 mouseOffset;
     private bool isDragging;
 
@@ -15,18 +15,18 @@ public class DragUnit : MonoBehaviour
     }
     private void Start()
     {
-        
+
     }
     // Update is called once per frame
     void Update()
     {
-        
+
     }
     private void OnMouseDown()
     {
-        if (dragController. Status != 0) return;
+        if (dragController.Status != 0) return;
         isDragging = true;
-        mouseOffset = GetWorldMousePosition()-transform.position;
+        mouseOffset = GetWorldMousePosition() - transform.position;
     }
     private void OnMouseDrag()
     {
@@ -60,18 +60,18 @@ public class DragUnit : MonoBehaviour
     {
         Vector3 mouseScreenPos = Input.mousePosition;
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
-        mouseWorldPos.z = 0; 
+        mouseWorldPos.z = 0;
         return mouseWorldPos;
     }
     public IEnumerator ReturnBackAction()
     {
         float speed = DragController.RETURNSPEED;
         float minDistance = DragController.RETURNPOSITION;
-        Vector3 moveDirection=(startPosition-transform.position).normalized*speed;
+        Vector3 moveDirection = (startPosition - transform.position).normalized * speed;
         while (true)
         {
-            transform.Translate(moveDirection,Space.World);
-            if (Vector3.Distance(transform.position,startPosition)<minDistance)
+            transform.Translate(moveDirection, Space.World);
+            if (Vector3.Distance(transform.position, startPosition) < minDistance)
             {
                 transform.position = startPosition;
                 break;
