@@ -42,6 +42,7 @@ public class Dialogmanager : MonoBehaviour
     {
         if (imageLeft) imageLeft.color = new Color(0.3f, 0.3f, 0.3f, 1f);
         if (imageRight) imageRight.color = new Color(0.3f, 0.3f, 0.3f, 1f);
+
     }
 
     void Start()
@@ -66,6 +67,18 @@ public class Dialogmanager : MonoBehaviour
 
     public void OnClickNext()
     {
+
+        Debug.Log("按钮被点击了！准备播放音效..."); // 看看控制台有没有这句
+        if (AudioManager.Instance != null)
+        {
+            Debug.Log("AudioManager 实例存在，正在发送播放请求");
+            // 这里替换成你修正后的那行 PlaySFX 代码
+            AudioManager.Instance.PlaySFX(AudioManager.SfxType.UI, "sfx_ui_click_button");
+        }
+        else
+        {
+            Debug.LogError("找不到 AudioManager 实例！请检查场景里有没有挂脚本。");
+        }
         // 剧情播完后，点击输出测试信息
         if (isFinished)
         {
@@ -151,6 +164,12 @@ public class Dialogmanager : MonoBehaviour
         typewriterCoroutine = StartCoroutine(TypeText(displayText));
 
         ApplyRender(targetSprite, pos, isNarrator);
+
+        // 仅在第一句剧情（dialogIndex=0）时播放BGM，和UI完全同步
+        if (dialogIndex == 0 && AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayNormalBGM("Plot");
+        }
     }
 
     private void ApplyRender(Sprite sprite, string pos, bool isNarrator)
