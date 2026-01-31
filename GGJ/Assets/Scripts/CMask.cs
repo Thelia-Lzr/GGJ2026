@@ -159,10 +159,10 @@ namespace GGJ_MaskSystem
     public interface IMaskEffect
     {
         string Description { get; }
-        EffectTriggerTiming Timing { get; }
+        EffectTiming Timing { get; }
 
-        void Trigger(Mask mask, BattleUnit owner, BattleSystem context);
-        bool CheckCondition(Mask mask,BattleUnit owner, BattleSystem context);
+        void Trigger(Mask mask, BattleUnit owner, BattleManager context);
+        bool CheckCondition(Mask mask, BattleUnit owner, BattleManager context);
     }
     
     /// <summary>
@@ -172,12 +172,12 @@ namespace GGJ_MaskSystem
     public abstract class MaskEffect : IMaskEffect
     {
         [SerializeField] protected string description;
-        [SerializeField] protected EffectTriggerTiming timing;
+        [SerializeField] protected EffectTiming timing;
 
         public string Description => description;
-        public EffectTriggerTiming Timing => timing;
+        public EffectTiming Timing => timing;
         
-        public virtual void Trigger(Mask mask, BattleUnit owner, BattleSystem context)
+        public virtual void Trigger(Mask mask, BattleUnit owner, BattleManager context)
         {
             if (context != null)
             {
@@ -190,7 +190,7 @@ namespace GGJ_MaskSystem
             return true;
         }
         
-        protected abstract void Execute(Mask mask, BattleUnit owner, BattleSystem context);
+        protected abstract void Execute(Mask mask, BattleUnit owner, BattleManager context);
     }
     
 
@@ -207,7 +207,7 @@ namespace GGJ_MaskSystem
         public DrawCardEffect()
         {
             description = $"抽{drawCount}张牌";
-            timing = EffectTriggerTiming.OnEquip;
+            timing = EffectTiming.OnEquip;
         }
         
         protected override void Execute(Mask mask, BattleUnit owner, BattleManager context)
@@ -236,7 +236,7 @@ namespace GGJ_MaskSystem
         public ComboAttackEffect()
         {
             description = $"场上角色第{requiredAttacks}次攻击时，获得额外{extraAttacks}次攻击次数";
-            timing = EffectTriggerTiming.OnCondition;
+            timing = EffectTiming.OnCondition;
         }
         
         public override bool CheckCondition(Mask mask, BattleUnit owner, BattleManager context)
@@ -277,7 +277,7 @@ namespace GGJ_MaskSystem
         public AttackGrowthEffect()
         {
             description = $"每次角色攻击时，攻击加成+{growthAmount}";
-            timing = EffectTriggerTiming.OnCondition;
+            timing = EffectTiming.OnCondition;
         }
         
         public override bool CheckCondition(Mask mask, BattleUnit owner, BattleManager context)
@@ -305,7 +305,7 @@ namespace GGJ_MaskSystem
         public DestroyOtherMaskEffect()
         {
             description = "销毁另一张场上的面具，抽1";
-            timing = EffectTriggerTiming.OnDestroy;
+            timing = EffectTiming.OnDestroy;
         }
         
         protected override void Execute(Mask mask, BattleUnit owner, BattleManager context)
@@ -348,7 +348,7 @@ namespace GGJ_MaskSystem
         public AoEEffect()
         {
             description = "群攻：攻击所有敌人";
-            timing = EffectTriggerTiming.OnCondition;
+            timing = EffectTiming.OnCondition;
         }
         
         public override bool CheckCondition(Mask mask, BattleUnit owner, BattleManager context)
@@ -391,7 +391,7 @@ namespace GGJ_MaskSystem
         
         // 效果系统
         private List<MaskEffect> effects;
-        private Dictionary<EffectTriggerTiming, List<MaskEffect>> effectMap;
+        private Dictionary<EffectTiming, List<MaskEffect>> effectMap;
         
         // 拥有者信息
         public BattleUnit EquippedBy { get; private set; }
@@ -424,9 +424,9 @@ namespace GGJ_MaskSystem
         private void InitializeEffectMap()
         {
             effects = new List<MaskEffect>();
-            effectMap = new Dictionary<EffectTriggerTiming, List<MaskEffect>>();
+            effectMap = new Dictionary<EffectTiming, List<MaskEffect>>();
             
-            foreach (EffectTriggerTiming timing in Enum.GetValues(typeof(EffectTriggerTiming)))
+            foreach (EffectTiming timing in Enum.GetValues(typeof(EffectTiming)))
             {
                 effectMap[timing] = new List<MaskEffect>();
             }
@@ -467,7 +467,7 @@ namespace GGJ_MaskSystem
         /// 触发指定时机的效果
         /// 处理优先级：销毁时 > 佩戴时 > 启动 > 永续
         /// </summary>
-        public void TriggerEffects(EffectTriggerTiming timing, BattleManager context)
+        public void TriggerEffects(EffectTiming timing, BattleManager context)
         {
             if (!effectMap.ContainsKey(timing)) return;
             
@@ -507,7 +507,7 @@ namespace GGJ_MaskSystem
                 oldMask.Unequip();
                 
                 // 2. 结算原先面具销毁时的效果
-                oldMask.TriggerEffects(EffectTriggerTiming.OnDestroy, context);
+                oldMask.TriggerEffects(EffectTiming.OnDestroy, context);
                 
                 // 3. 将旧面具送入弃牌堆
                 oldMask.MoveToDiscard(context);
@@ -522,7 +522,7 @@ namespace GGJ_MaskSystem
             OnEquipped?.Invoke(this);
             
             // 按优先级触发效果
-            TriggerEffects(EffectTriggerTiming.OnEquip, context);
+            TriggerEffects(EffectTiming.OnEquip, context);
             
             Debug.Log($"[面具] {unit.Name} 佩戴了 {Name}");
             return true;
@@ -581,7 +581,7 @@ namespace GGJ_MaskSystem
             if (Durability > 0) Durability = 0;
             
             // 触发销毁效果（最高优先级）
-            TriggerEffects(EffectTriggerTiming.OnDestroy, context);
+            TriggerEffects(EffectTiming.OnDestroy, context);
             
             // 触发事件
             OnDestroyed?.Invoke(this);
@@ -614,7 +614,7 @@ namespace GGJ_MaskSystem
         {
             if (!IsEquipped || Location != CardLocation.InPlay) return false;
             
-            TriggerEffects(EffectTriggerTiming.OnActivate, context);
+            TriggerEffects(EffectTiming.OnActivate, context);
             Debug.Log($"[面具] 激活 {Name} 的效果");
             return true;
         }
@@ -624,7 +624,7 @@ namespace GGJ_MaskSystem
         /// </summary>
         public void CheckConditionalEffects(BattleManager context)
         {
-            TriggerEffects(EffectTriggerTiming.OnCondition, context);
+            TriggerEffects(EffectTiming.OnCondition, context);
         }
         
         /// <summary>
@@ -650,19 +650,19 @@ namespace GGJ_MaskSystem
             var orderedEffects = new List<MaskEffect>();
             
             // 佩戴时效果
-            if (effectMap.TryGetValue(EffectTriggerTiming.OnEquip, out var onEquipEffects))
+            if (effectMap.TryGetValue(EffectTiming.OnEquip, out var onEquipEffects))
                 orderedEffects.AddRange(onEquipEffects);
             
             // 启动效果
-            if (effectMap.TryGetValue(EffectTriggerTiming.OnActivate, out var onActivateEffects))
+            if (effectMap.TryGetValue(EffectTiming.OnActivate, out var onActivateEffects))
                 orderedEffects.AddRange(onActivateEffects);
             
             // 永续效果
-            if (effectMap.TryGetValue(EffectTriggerTiming.OnCondition, out var onConditionEffects))
+            if (effectMap.TryGetValue(EffectTiming.OnCondition, out var onConditionEffects))
                 orderedEffects.AddRange(onConditionEffects);
             
             // 销毁时效果
-            if (effectMap.TryGetValue(EffectTriggerTiming.OnDestroy, out var onDestroyEffects))
+            if (effectMap.TryGetValue(EffectTiming.OnDestroy, out var onDestroyEffects))
                 orderedEffects.AddRange(onDestroyEffects);
             
             // 添加效果描述
@@ -989,10 +989,10 @@ namespace GGJ_MaskSystem
     {
         private int extraActions = 0;
         
-        public PlayerUnit(string name, int maxHP, int baseAttack) 
-            : base(name, maxHP, baseAttack)
-        {
-        }
+        // public PlayerUnit(string name, int maxHP, int baseAttack) 
+        //     : base(name, maxHP, baseAttack)
+        // {
+        // }
         
         public void AddExtraAction(int count)
         {
