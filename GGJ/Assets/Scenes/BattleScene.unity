@@ -281,6 +281,7 @@ MonoBehaviour:
   controller: {fileID: 881631426}
   <UIText>k__BackingField: {fileID: 0}
   <HealthText>k__BackingField: {fileID: 0}
+  <ShellText>k__BackingField: {fileID: 0}
 --- !u!212 &881631428
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -343,7 +344,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.93, y: -1.76, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -966,6 +967,7 @@ MonoBehaviour:
   controller: {fileID: 1826066615}
   <UIText>k__BackingField: {fileID: 0}
   <HealthText>k__BackingField: {fileID: 0}
+  <ShellText>k__BackingField: {fileID: 0}
 --- !u!212 &1826066613
 SpriteRenderer:
   m_ObjectHideFlags: 0
