@@ -70,7 +70,7 @@ public class PlayerController : UnitController
         }
         else
         {
-            return currentMask.Activate(this,target);
+            return currentMask.Attack(this,target);
         }
         
     }
