@@ -72,6 +72,8 @@ public class BattleUnit : MonoBehaviour
             transform.SetParent(resourceController.GetPrefab("Canvas").GetComponent<RectTransform>());
         }
         UIText.GetComponent<RectTransform>().anchoredPosition = Camera.main.WorldToScreenPoint(transform.position);
+        UIText.GetComponent<RectTransform>().anchorMax=new Vector2(0, 0);
+        UIText.GetComponent<RectTransform>().anchorMin=new Vector2(0, 0);
         UIText.GetComponent<RectTransform>().localScale = Vector3.one;
         UIText.GetComponent<RectTransform>().sizeDelta =new Vector2(200,250);
     }

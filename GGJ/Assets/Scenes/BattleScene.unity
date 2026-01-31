@@ -122,41 +122,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &447928722
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 447928723}
-  m_Layer: 5
-  m_Name: Character1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &447928723
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 447928722}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 748207885}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 440, y: 222}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &748207881
 GameObject:
   m_ObjectHideFlags: 0
@@ -254,8 +219,6 @@ RectTransform:
   - {fileID: 1501644245}
   - {fileID: 1469274882}
   - {fileID: 809421124}
-  - {fileID: 447928723}
-  - {fileID: 1346759977}
   - {fileID: 2076127870}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -451,7 +414,7 @@ MonoBehaviour:
   defense: 5
   team: 1
   controller: {fileID: 881631426}
-  <UIText>k__BackingField: {fileID: 1346759976}
+  <UIText>k__BackingField: {fileID: 0}
   <HealthText>k__BackingField: {fileID: 1920770568377555518, guid: 88eb8fd598d5584498766b395e26580f, type: 3}
 --- !u!212 &881631428
 SpriteRenderer:
@@ -736,6 +699,8 @@ MonoBehaviour:
     prefab: {fileID: 1920770568377555518, guid: 88eb8fd598d5584498766b395e26580f, type: 3}
   - key: ActionCircle
     prefab: {fileID: 3810956170213126452, guid: 284a72582b0867449b6b5021381bde99, type: 3}
+  - key: Canvas
+    prefab: {fileID: 748207881}
 --- !u!114 &1176040191
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -750,41 +715,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <DragDistrict>k__BackingField: []
   Status: 0
---- !u!1 &1346759976
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1346759977}
-  m_Layer: 5
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1346759977
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1346759976}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 748207885}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 440, y: 222}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1397221578
 GameObject:
   m_ObjectHideFlags: 0
@@ -1168,7 +1098,7 @@ MonoBehaviour:
   defense: 5
   team: 0
   controller: {fileID: 1826066615}
-  <UIText>k__BackingField: {fileID: 447928722}
+  <UIText>k__BackingField: {fileID: 0}
   <HealthText>k__BackingField: {fileID: 1920770568377555518, guid: 88eb8fd598d5584498766b395e26580f, type: 3}
 --- !u!212 &1826066613
 SpriteRenderer:
