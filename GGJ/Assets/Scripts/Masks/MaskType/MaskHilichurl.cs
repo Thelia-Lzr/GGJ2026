@@ -6,7 +6,11 @@ public class MaskHilichurl : Mask
 {
     private bool shouldDestroyAtTurnEnd = false;
 
+<<<<<<< Updated upstream
     public MaskHilichurl() : base(maskName: "ÇðÇðÈËµÄÃæ¾ß", switchCost: 1, maxHealth: 6, atk: 2, atkCost: 1)
+=======
+    public MaskHilichurl() : base(maskName: "å‘€ï¼", switchCost: 1, maxHealth: 6, atk: 2, atkCost: 1)
+>>>>>>> Stashed changes
     {
 
     }
@@ -27,7 +31,11 @@ public class MaskHilichurl : Mask
 
         if (targetWasKilled)
         {
+<<<<<<< Updated upstream
             Debug.Log($"[MaskHilichurl] {controller.gameObject.name} »÷É±ÁË {target.gameObject.name}£¬´¥·¢±©Å­Ð§¹û£¡");
+=======
+            Debug.Log($"[MaskHilichurl] {controller.gameObject.name} å‡»æ€äº† {target.gameObject.name}ï¼Œè§¦å‘æš´æ€’æ•ˆæžœï¼");
+>>>>>>> Stashed changes
             
             EnrageAllAllies(controller.BoundUnit);
             
@@ -57,7 +65,11 @@ public class MaskHilichurl : Mask
             }
         }
 
+<<<<<<< Updated upstream
         Debug.Log($"[MaskHilichurl] ËùÓÐ¼º·½½ÇÉ«ÏÝÈë±©Å­×´Ì¬£¡");
+=======
+        Debug.Log($"[MaskHilichurl] æ‰€æœ‰å·±æ–¹è§’è‰²é™·å…¥æš´æ€’çŠ¶æ€ï¼");
+>>>>>>> Stashed changes
     }
 
     private void StunRandomEnemy(BattleUnit user)
@@ -74,7 +86,11 @@ public class MaskHilichurl : Mask
 
             target.ApplyStatus(new Stunned(1));
 
+<<<<<<< Updated upstream
             Debug.Log($"[MaskHilichurl] Ãæ¾ß»Ù»µ£¬Ñ£ÔÎÁË {target.gameObject.name}£¡");
+=======
+            Debug.Log($"[MaskHilichurl] é¢å…·æ¯åï¼Œçœ©æ™•äº† {target.gameObject.name}ï¼");
+>>>>>>> Stashed changes
         }
     }
 
@@ -89,7 +105,11 @@ public class MaskHilichurl : Mask
     {
         if (shouldDestroyAtTurnEnd && equippedUnit != null)
         {
+<<<<<<< Updated upstream
             Debug.Log($"[MaskHilichurl] »ØºÏ½áÊø£¬Ïú»ÙÇðÇðÈËÃæ¾ß£¡");
+=======
+            Debug.Log($"[MaskHilichurl] å›žåˆç»“æŸï¼Œé”€æ¯ä¸˜ä¸˜äººé¢å…·ï¼");
+>>>>>>> Stashed changes
             
             equippedUnit.OnTurnEnded -= HandleTurnEnd;
             

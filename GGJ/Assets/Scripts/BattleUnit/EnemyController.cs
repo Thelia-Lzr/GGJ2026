@@ -261,4 +261,175 @@ public class EnemyController : UnitController
     {
         behaviorType = type;
     }
+    
+    // ==================== 攻击方法 ====================
+    
+    /// <summary>
+    /// 单体攻击 - 攻击单个目标
+    /// </summary>
+    protected System.Collections.IEnumerator AttackSingle(BattleUnit target, float damageMultiplier = 1f)
+    {
+        if (target == null || !target.IsAlive())
+        {
+            Debug.LogWarning("[Enemy] AttackSingle: 目标无效或已死亡");
+            yield break;
+        }
+
+        Debug.Log($"[Enemy] {gameObject.name} 发动单体攻击，目标: {target.gameObject.name}");
+
+        Vector2 originalPosition = transform.position;
+        
+        yield return MoveToTarget(target, 0.3f);
+        
+        int damage = Mathf.RoundToInt(boundUnit.Attack * damageMultiplier);
+        target.ApplyHealthChange(-damage);
+        Debug.Log($"[Enemy] {gameObject.name} 对 {target.gameObject.name} 造成 {damage} 点伤害");
+        
+        yield return new WaitForSeconds(0.1f);
+        
+        yield return MoveTo(originalPosition, 0.3f);
+    }
+
+    /// <summary>
+    /// 群体攻击 - 对所有敌方单位造成伤害
+    /// </summary>
+    protected System.Collections.IEnumerator AttackAOE(BattleUnit primaryTarget, float damageMultiplier = 1f)
+    {
+        if (boundUnit == null)
+        {
+            Debug.LogWarning("[Enemy] AttackAOE: BoundUnit 无效");
+            yield break;
+        }
+
+        Team enemyTeam = boundUnit.UnitTeam == Team.Player ? Team.Enemy : Team.Player;
+        List<BattleUnit> enemies = GetAllUnitsOfTeam(enemyTeam);
+
+        if (enemies.Count == 0)
+        {
+            Debug.LogWarning("[Enemy] AttackAOE: 没有找到敌方单位");
+            yield break;
+        }
+
+        Debug.Log($"[Enemy] {gameObject.name} 发动群体攻击，目标数: {enemies.Count}");
+
+        Vector2 originalPosition = transform.position;
+        
+        if (primaryTarget != null && primaryTarget.IsAlive())
+        {
+            yield return MoveToTarget(primaryTarget, 0.3f);
+        }
+        
+        int damage = Mathf.RoundToInt(boundUnit.Attack * damageMultiplier);
+        foreach (var enemy in enemies)
+        {
+            if (enemy.IsAlive())
+            {
+                enemy.ApplyHealthChange(-damage);
+                Debug.Log($"[Enemy] {gameObject.name} 对 {enemy.gameObject.name} 造成 {damage} 点伤害");
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+        
+        yield return MoveTo(originalPosition, 0.3f);
+    }
+
+    /// <summary>
+    /// 溅射攻击 - 对目标及相邻位置的敌人造成伤害
+    /// </summary>
+    protected System.Collections.IEnumerator AttackSplash(BattleUnit target, float damageMultiplier = 1f)
+    {
+        if (boundUnit == null)
+        {
+            Debug.LogWarning("[Enemy] AttackSplash: BoundUnit 无效");
+            yield break;
+        }
+
+        if (target == null || !target.IsAlive())
+        {
+            Debug.LogWarning("[Enemy] AttackSplash: 主目标无效或已死亡");
+            yield break;
+        }
+
+        Team enemyTeam = target.UnitTeam;
+        Location targetLocation = target.UnitLocation;
+        List<BattleUnit> splashTargets = new List<BattleUnit>();
+
+        splashTargets.Add(target);
+
+        List<Location> adjacentLocations = GetAdjacentLocations(targetLocation);
+        List<BattleUnit> allEnemies = GetAllUnitsOfTeam(enemyTeam);
+
+        foreach (var enemy in allEnemies)
+        {
+            if (enemy != target && adjacentLocations.Contains(enemy.UnitLocation) && enemy.IsAlive())
+            {
+                splashTargets.Add(enemy);
+            }
+        }
+
+        Debug.Log($"[Enemy] {gameObject.name} 发动溅射攻击，主目标: {target.gameObject.name}，溅射目标数: {splashTargets.Count}");
+
+        Vector2 originalPosition = transform.position;
+        
+        yield return MoveToTarget(target, 0.3f);
+        
+        int damage = Mathf.RoundToInt(boundUnit.Attack * damageMultiplier);
+        foreach (var splashTarget in splashTargets)
+        {
+            if (splashTarget.IsAlive())
+            {
+                splashTarget.ApplyHealthChange(-damage);
+                Debug.Log($"[Enemy] {gameObject.name} 对 {splashTarget.gameObject.name} 造成 {damage} 点伤害");
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+        
+        yield return MoveTo(originalPosition, 0.3f);
+    }
+    
+    /// <summary>
+    /// 获取相邻位置
+    /// </summary>
+    protected List<Location> GetAdjacentLocations(Location location)
+    {
+        List<Location> adjacent = new List<Location>();
+
+        switch (location)
+        {
+            case Location.Up:
+                adjacent.Add(Location.Middle);
+                break;
+            case Location.Middle:
+                adjacent.Add(Location.Up);
+                adjacent.Add(Location.Bottom);
+                break;
+            case Location.Bottom:
+                adjacent.Add(Location.Middle);
+                break;
+        }
+
+        return adjacent;
+    }
+
+    /// <summary>
+    /// 获取指定阵营的所有存活单位
+    /// </summary>
+    protected List<BattleUnit> GetAllUnitsOfTeam(Team team)
+    {
+        List<BattleUnit> units = new List<BattleUnit>();
+
+        if (RoundManager.Instance != null)
+        {
+            foreach (var unit in RoundManager.Instance.battleUnits)
+            {
+                if (unit.UnitTeam == team && unit.IsAlive())
+                {
+                    units.Add(unit);
+                }
+            }
+        }
+
+        return units;
+    }
 }
+
