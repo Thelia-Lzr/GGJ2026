@@ -40,7 +40,10 @@ public abstract class UnitController : MonoBehaviour
             Debug.LogWarning($"UnitController on {gameObject.name} could not find AnimationHandler in scene!");
         }
     }
-    
+    private void Start()
+    {
+        BindUnit(boundUnit);
+    }
     public virtual void BindUnit(BattleUnit unit)
     {
         boundUnit = unit;
