@@ -61,6 +61,19 @@ public class PlayerController : UnitController
         
         RaiseActionPerformed(command);
     }
+
+    public override IEnumerator Attack(BattleUnit target)
+    {
+        if(currentMask == null)
+        {
+            return base.Attack(target);
+        }
+        else
+        {
+            return currentMask.Activate(this,target);
+        }
+        
+    }
     
     public override void TakeTurn()
     {

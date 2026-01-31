@@ -54,6 +54,14 @@ public class RoundManager : MonoBehaviour
     private int roundCounter = 0;
     private int playerRoundCounter = 0;
     private int enemyRoundCounter = 0;
+    
+    // 面具系统
+    private MaskDeck maskDeck;
+    [Header("面具系统配置")]
+    [Tooltip("每回合抽取的面具数量")]
+    [SerializeField] private int masksPerTurn = 1;
+    [Tooltip("初始手牌数量")]
+    [SerializeField] private int initialHandSize = 3;
     #endregion
 
     #region 事件定义（衔接显示层）
@@ -176,6 +184,10 @@ public class RoundManager : MonoBehaviour
 
         DebugLog($"[RoundManager] 总单位数: {battleUnits.Count} (玩家: {playerRegistered}, 敌人: {enemyRegistered})");
         
+        // 初始化面具系统
+        DebugLog("[RoundManager] 步骤4.5: 初始化面具系统");
+        InitializeMaskSystem();
+        
         // 启动第一回合
         DebugLog("[RoundManager] 步骤5: 启动第一回合");
         StartRound();
@@ -239,6 +251,13 @@ public class RoundManager : MonoBehaviour
         // 2. 分配行动点（AP）
         DebugLog($"[RoundManager] 步骤2: 分配行动点");
         GrantActionPoints();
+        
+        // 2.5 玩家回合抽牌
+        if (currentActiveTeam == Team.Player)
+        {
+            DebugLog($"[RoundManager] 步骤2.5: 玩家抽取面具牌");
+            PlayerResourceManager.Instance.DrawMasks(masksPerTurn);
+        }
 
         // 3. 敌方回合额外逻辑：显示行动预告
         if (currentActiveTeam == Team.Enemy)
@@ -658,6 +677,27 @@ public class RoundManager : MonoBehaviour
         
         DebugLog($"  ✅ 所有敌人已死亡 - 玩家胜利！");
         return true;
+    }
+    #endregion
+
+    #region 面具系统集成
+    /// <summary>初始化面具系统（创建牌组并发初始手牌）</summary>
+    private void InitializeMaskSystem()
+    {
+        DebugLog("[RoundManager] InitializeMaskSystem() START");
+        
+        // 使用 MaskFactory 创建标准牌组
+        List<Mask> initialDeck = MaskFactory.CreateStandardDeck();
+        DebugLog($"  创建牌组: {initialDeck.Count} 张面具");
+        
+        // 初始化 PlayerResourceManager 的牌组
+        PlayerResourceManager.Instance.InitializeDeck(initialDeck);
+        
+        // 发初始手牌
+        DebugLog($"  发初始手牌: {initialHandSize} 张");
+        PlayerResourceManager.Instance.DrawMasks(initialHandSize);
+        
+        DebugLog("[RoundManager] InitializeMaskSystem() COMPLETE ✅");
     }
     #endregion
 

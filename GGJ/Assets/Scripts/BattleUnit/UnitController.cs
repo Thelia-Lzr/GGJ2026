@@ -247,7 +247,14 @@ public abstract class UnitController : MonoBehaviour
         {
             case ActionType.Attack:
                 attackCount--;
-                yield return Attack(command.Target);
+                if (currentMask != null)
+                {
+                    yield return currentMask.Activate(this, command.Target);
+                }
+                else
+                {
+                    yield return Attack(command.Target);
+                }
                 break;
             
             case ActionType.SwitchMask:
