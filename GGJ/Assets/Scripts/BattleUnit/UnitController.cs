@@ -8,6 +8,7 @@ public abstract class UnitController : MonoBehaviour
     [Header("Controller Settings")]
     [SerializeField] protected BattleUnit boundUnit;
     [SerializeField] protected Mask currentMask;
+    [SerializeField] private int attackCountGains = 1;
     
     protected bool isStunned = false;
     protected bool canAct = true;
@@ -26,6 +27,9 @@ public abstract class UnitController : MonoBehaviour
     private int initialDefense = 5;
     private int initialMaxHealth = 100;
     private int initialHealth = 50;
+
+    private int attackCount = 0;
+
 
     protected virtual void Awake()
     {
@@ -67,6 +71,10 @@ public abstract class UnitController : MonoBehaviour
         OnActionPerformed?.Invoke(command);
     }
     
+    public void GetAttackCount()
+    {
+        attackCount = attackCountGains;
+    }
     public virtual bool SwitchMask(Mask newMask, int cost)
     {
         if (newMask == null)
@@ -84,6 +92,12 @@ public abstract class UnitController : MonoBehaviour
         
         currentMask = newMask;
         currentMask.OnEquip(boundUnit);
+        
+        // 将面具信息同步到 BattleUnit 用于渲染
+        if (boundUnit != null)
+        {
+            boundUnit.SetMask(currentMask);
+        }
         
         if (cost > 0)
         {

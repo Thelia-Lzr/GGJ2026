@@ -3,10 +3,7 @@ using System.Collections.Generic;
 public enum ActionType
 {
     Attack,
-    SwitchMask,
-    UseItem,
-    Defend,
-    Wait
+    SwitchMask
 }
 
 public class ActionCommand
