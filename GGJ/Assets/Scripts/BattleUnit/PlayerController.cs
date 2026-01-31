@@ -19,6 +19,50 @@ public class PlayerController : UnitController
         base.Awake();
     }
     
+    public override bool HasResource(ResourceType type, int amount)
+    {
+        return PlayerResourceManager.Instance.HasResource(type, amount);
+    }
+    
+    public override void SpendResource(ResourceType type, int amount)
+    {
+        PlayerResourceManager.Instance.SpendResource(type, amount);
+    }
+    
+    public override void GainResource(ResourceType type, int amount)
+    {
+        PlayerResourceManager.Instance.GainResource(type, amount);
+    }
+    
+    public override int GetResource(ResourceType type)
+    {
+        return PlayerResourceManager.Instance.GetResource(type);
+    }
+    
+    public override bool CanPerformAction(ActionCommand command)
+    {
+        if (!CanAct)
+            return false;
+        
+        if (command == null || !command.IsValid())
+            return false;
+        
+        return HasResource(ResourceType.ActionPoint, command.ResourceCost);
+    }
+    
+    public override void PerformAction(ActionCommand command)
+    {
+        if (!CanPerformAction(command))
+        {
+            Debug.LogWarning($"Cannot perform action: {command.ActionType}");
+            return;
+        }
+        
+        SpendResource(ResourceType.ActionPoint, command.ResourceCost);
+        
+        RaiseActionPerformed(command);
+    }
+    
     public override void TakeTurn()
     {
         if (!CanAct)
@@ -66,7 +110,7 @@ public class PlayerController : UnitController
         if (animationHandler != null)
         {
             IEnumerator actionCoroutine = GetActionCoroutine(command);
-            animationHandler.SubmitAction(actionCoroutine, command);
+            animationHandler.SubmitAction(actionCoroutine, command, this);
         }
         else
         {

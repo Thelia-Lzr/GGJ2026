@@ -9,7 +9,6 @@ public abstract class UnitController : MonoBehaviour
     [SerializeField] protected BattleUnit boundUnit;
     [SerializeField] protected Mask currentMask;
     
-    protected Dictionary<ResourceType, int> resources = new Dictionary<ResourceType, int>();
     protected bool isStunned = false;
     protected bool canAct = true;
     
@@ -30,93 +29,42 @@ public abstract class UnitController : MonoBehaviour
 
     protected virtual void Awake()
     {
-        InitializeResources();
-    }
-    
-    protected virtual void InitializeResources()
-    {
-        resources[ResourceType.Mana] = 0;
-        resources[ResourceType.Energy] = 0;
-        resources[ResourceType.MaskEnergy] = 100;
+        animationHandler = AnimationHandler.Instance;
+        
+        if (animationHandler == null)
+        {
+            Debug.LogWarning($"UnitController on {gameObject.name} could not find AnimationHandler in scene!");
+        }
     }
     
     public virtual void BindUnit(BattleUnit unit)
     {
         boundUnit = unit;
-        boundUnit.Attack = initialAttack;
-        
 
         if (boundUnit != null)
         {
-            boundUnit.Initialize(this);
+            boundUnit.Initialize(this,initialMaxHealth,initialHealth,initialAttack,initialDefense);
         }
     }
     
-    public void SetAnimationHandler(AnimationHandler handler)
-    {
-        animationHandler = handler;
-    }
     
     public abstract void TakeTurn();
     
-    public virtual bool CanPerformAction(ActionCommand command)
-    {
-        if (!CanAct)
-            return false;
-        
-        if (command == null || !command.IsValid())
-            return false;
-        
-        return HasResource(ResourceType.ActionPoint, command.ResourceCost);
-    }
+    public abstract bool CanPerformAction(ActionCommand command);
     
-    public virtual void PerformAction(ActionCommand command)
+    public abstract void PerformAction(ActionCommand command);
+    
+    public abstract bool HasResource(ResourceType type, int amount);
+    
+    public abstract void SpendResource(ResourceType type, int amount);
+    
+    public abstract void GainResource(ResourceType type, int amount);
+    
+    public abstract int GetResource(ResourceType type);
+    
+    protected void RaiseActionPerformed(ActionCommand command)
     {
-        if (!CanPerformAction(command))
-        {
-            Debug.LogWarning($"Cannot perform action: {command.ActionType}");
-            return;
-        }
-        
-        SpendResource(ResourceType.ActionPoint, command.ResourceCost);
-        
         OnActionPerformed?.Invoke(command);
-    }
-    
-    public bool HasResource(ResourceType type, int amount)
-    {
-        if (!resources.ContainsKey(type))
-            return false;
-        
-        return resources[type] >= amount;
-    }
-    
-    public void SpendResource(ResourceType type, int amount)
-    {
-        if (!resources.ContainsKey(type))
-        {
-            resources[type] = 0;
-        }
-        
-        resources[type] = Mathf.Max(0, resources[type] - amount);
-    }
-    
-    public void GainResource(ResourceType type, int amount)
-    {
-        if (!resources.ContainsKey(type))
-        {
-            resources[type] = 0;
-        }
-        
-        resources[type] += amount;
-    }
-    
-    public int GetResource(ResourceType type)
-    {
-        if (!resources.ContainsKey(type))
-            return 0;
-        
-        return resources[type];
     }
     
     public virtual bool SwitchMask(Mask newMask, int cost)
@@ -124,7 +72,7 @@ public abstract class UnitController : MonoBehaviour
         if (newMask == null)
             return false;
         
-        if (!HasResource(ResourceType.MaskEnergy, cost))
+        if (cost > 0 && !HasResource(ResourceType.ActionPoint, cost))
             return false;
         
         Mask oldMask = currentMask;
@@ -137,7 +85,10 @@ public abstract class UnitController : MonoBehaviour
         currentMask = newMask;
         currentMask.OnEquip(boundUnit);
         
-        SpendResource(ResourceType.MaskEnergy, cost);
+        if (cost > 0)
+        {
+            SpendResource(ResourceType.ActionPoint, cost);
+        }
         
         OnMaskSwitched?.Invoke(oldMask, newMask);
         
