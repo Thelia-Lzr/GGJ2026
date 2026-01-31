@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8348261986520273208}
   - component: {fileID: 533857699315894829}
   - component: {fileID: 7226672702600607976}
+  - component: {fileID: -8732492191248771026}
   m_Layer: 5
   m_Name: HealthChangeDisplay
   m_TagString: Untagged
@@ -134,3 +135,16 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &-8732492191248771026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7582674478221805034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfb6e275cb225524e82a4906132f8cb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  time: 0

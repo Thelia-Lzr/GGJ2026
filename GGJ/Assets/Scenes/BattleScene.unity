@@ -122,6 +122,41 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &447928722
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 447928723}
+  m_Layer: 5
+  m_Name: Character1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &447928723
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 447928722}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 748207885}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &748207881
 GameObject:
   m_ObjectHideFlags: 0
@@ -216,10 +251,10 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1692841417}
   - {fileID: 1501644245}
   - {fileID: 1469274882}
   - {fileID: 809421124}
+  - {fileID: 447928723}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -412,7 +447,7 @@ MonoBehaviour:
   currentHealth: 30
   attack: 10
   defense: 5
-  team: 1
+  team: 0
   controller: {fileID: 881631426}
   <UIText>k__BackingField: {fileID: 0}
   <HealthText>k__BackingField: {fileID: 0}
@@ -465,7 +500,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &881631429
@@ -693,10 +728,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e56caa64120ae94abf36d6d4ea88145, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FONT: {fileID: 0}
+  FONT: {fileID: 11400000, guid: f1b8ec8f899bbc64aa20289413857e52, type: 2}
   prefabList:
-  - key: ActionCircle
-    prefab: {fileID: 3810956170213126452, guid: 284a72582b0867449b6b5021381bde99, type: 3}
+  - key: HealthChangeDisplay
+    prefab: {fileID: 7582674478221805034, guid: 9f0c5035ea304da48bf03b9785930848, type: 3}
 --- !u!114 &1176040191
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1094,7 +1129,7 @@ MonoBehaviour:
   defense: 5
   team: 0
   controller: {fileID: 1826066615}
-  <UIText>k__BackingField: {fileID: 0}
+  <UIText>k__BackingField: {fileID: 447928722}
   <HealthText>k__BackingField: {fileID: 0}
 --- !u!212 &1826066613
 SpriteRenderer:
