@@ -169,13 +169,5 @@ public class PlayerController : UnitController
     {
         pendingAction = null;
     }
-    public void InitActionCircle()
-    {
-        //可以改为ResoruceManager来管理
-        if(attackCount > 0)
-        {
-
-        }
-
-    }
+    
 }

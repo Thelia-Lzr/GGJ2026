@@ -57,15 +57,18 @@ public class AnimationHandler : MonoBehaviour
     {
         if (actionCoroutine == null)
         {
-            Debug.LogWarning("Cannot submit null coroutine.");
+            Debug.LogWarning("AnimationHandler: Cannot submit null coroutine.");
             return;
         }
         
         if (executor == null)
         {
-            Debug.LogWarning("Executor cannot be null, using AnimationHandler as fallback.");
+            Debug.LogWarning("AnimationHandler: Executor cannot be null, using AnimationHandler as fallback.");
             executor = this;
         }
+        
+        string commandInfo = command != null ? $"{command.ActionType}" : "null";
+        Debug.Log($"AnimationHandler: Submitting action [{commandInfo}] from executor [{executor.gameObject.name}]. Queue size: {actionQueue.Count} -> {actionQueue.Count + 1}");
         
         actionQueue.Enqueue(new ActionQueueItem
         {
@@ -76,7 +79,12 @@ public class AnimationHandler : MonoBehaviour
         
         if (!isProcessing)
         {
+            Debug.Log("AnimationHandler: Starting queue processing");
             StartCoroutine(ProcessActionQueue());
+        }
+        else
+        {
+            Debug.Log("AnimationHandler: Queue already processing, action added to queue");
         }
     }
     
@@ -96,11 +104,26 @@ public class AnimationHandler : MonoBehaviour
     
     private IEnumerator ExecuteAction(ActionQueueItem item)
     {
-        Debug.Log($"AnimationHandler: Executing action {item.Command.ActionType} on {item.Executor.gameObject.name}");
+        string commandInfo = item.Command != null ? $"{item.Command.ActionType}" : "null";
+        string executorName = item.Executor != null ? item.Executor.gameObject.name : "null";
+        
+        Debug.Log($"AnimationHandler: [START] Executing action [{commandInfo}] on [{executorName}]");
+        
+        if (item.Executor == null)
+        {
+            Debug.LogError($"AnimationHandler: Executor is null for action [{commandInfo}], skipping");
+            yield break;
+        }
+        
+        if (item.ActionCoroutine == null)
+        {
+            Debug.LogError($"AnimationHandler: ActionCoroutine is null for action [{commandInfo}], skipping");
+            yield break;
+        }
         
         yield return item.Executor.StartCoroutine(item.ActionCoroutine);
         
-        Debug.Log($"AnimationHandler: Action {item.Command.ActionType} completed");
+        Debug.Log($"AnimationHandler: [COMPLETE] Action [{commandInfo}] completed on [{executorName}]");
     }
     
     public void HandleAttackDrag(BattleUnit attacker, BattleUnit target)

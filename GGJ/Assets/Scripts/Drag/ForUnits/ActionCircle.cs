@@ -19,9 +19,12 @@ public class ActionCircle : DragUnit
     {
         foreach(var battleUnit in RoundManager.Instance.battleUnits)
         {
+            //Debug.Log("Checking ActionCircle against " + battleUnit.name);
+            //Debug.Log("Distance: " + Vector3.Distance(transform.position, battleUnit.transform.position));
             if (Vector3.Distance(transform.position, battleUnit.transform.position) < DragController.JUDGEDISTANCE && battleUnit.team == Team.Enemy)
             {
-                controller = GetComponent<UnitController>();
+                //Debug.Log("ActionCircle matched with " + battleUnit.name);
+                //controller = GetComponent<UnitController>();
                 target = battleUnit;
                 actionCommand = new ActionCommand(controller, target, ActionType.Attack);
                 if (actionCommand.IsValid())
