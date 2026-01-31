@@ -14,7 +14,7 @@ public class ResourceController: MonoBehaviour
 {
     public static ResourceController Instance { get; private set; }
     public TMP_FontAsset FONT;
-    [SerializeField] public Dictionary<string, GameObject> prefabs;
+    //[SerializeField] public Dictionary<string, GameObject> prefabs;
 
     //public static Font FONT;
     
