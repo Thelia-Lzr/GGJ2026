@@ -31,7 +31,7 @@ public class HandManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space)) DrawCard();
     }
 
-    private void DrawCard()
+    public void DrawCard()
     {
         if (handCards.Count >= maxHandSize) return;
 
