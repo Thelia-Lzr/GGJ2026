@@ -14,13 +14,31 @@ public class RoundManager : MonoBehaviour
     [Header("回合配置")]
     [Tooltip("每个单位默认行动点（AP）上限")]
     [SerializeField] private int defaultActionPoints = 3;
+    
+    [Header("死亡处理配置")]
+    [Tooltip("单位死亡后延迟销毁时间（秒），用于播放死亡动画")]
+    [SerializeField] private float destroyDelay = 2f;
+    [Tooltip("是否完全销毁GameObject（false=仅禁用）")]
+    [SerializeField] private bool destroyGameObject = true;
+
+    [Header("测试配置")]
+    [Tooltip("在Unity中配置的玩家单位列表")]
+    [SerializeField] private List<BattleUnit> testPlayerUnits = new List<BattleUnit>();
+    [Tooltip("在Unity中配置的敌方单位列表")]
+    [SerializeField] private List<BattleUnit> testEnemyUnits = new List<BattleUnit>();
+    [Tooltip("游戏开始时自动初始化战斗")]
+    [SerializeField] private bool autoStartBattle = false;
 
     // 战斗单位列表（所有参与战斗的单位）
     private List<BattleUnit> battleUnits = new List<BattleUnit>();
+    // 待销毁的单位队列
+    private List<BattleUnit> unitsToDestroy = new List<BattleUnit>();
     // 当前行动阵营
     private Team currentActiveTeam = Team.Player;
     // 战斗是否正在进行中
     private bool isBattleActive = false;
+    // 单位死亡事件处理字典（用于正确取消订阅）
+    private Dictionary<BattleUnit, Action> unitDeathHandlers = new Dictionary<BattleUnit, Action>();
     #endregion
 
     #region 事件定义（衔接显示层）
@@ -48,6 +66,14 @@ public class RoundManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
+
+    private void Start()
+    {
+        if (autoStartBattle)
+        {
+            InitializeBattleFromInspector();
+        }
+    }
     #endregion
 
     #region 核心战斗初始化
@@ -58,6 +84,9 @@ public class RoundManager : MonoBehaviour
     /// <param name="enemyUnits">敌方单位列表</param>
     public void InitializeBattle(List<BattleUnit> playerUnits, List<BattleUnit> enemyUnits)
     {
+        // 清理旧的事件订阅
+        ClearAllEventSubscriptions();
+        
         // 重置战斗状态
         battleUnits.Clear();
         isBattleActive = true;
@@ -123,7 +152,8 @@ public class RoundManager : MonoBehaviour
         if (!isBattleActive) return;
 
         // 1. 触发当前阵营所有单位的「回合结束」钩子
-        foreach (var unit in GetAllUnitsByTeam(currentActiveTeam))
+        List<BattleUnit> currentTeamUnits = GetAllUnitsByTeam(currentActiveTeam);
+        foreach (var unit in currentTeamUnits)
         {
             if (unit.IsAlive())
             {
@@ -131,11 +161,14 @@ public class RoundManager : MonoBehaviour
                 unit.Controller?.OnTurnEnd(); // 控制器逻辑结算（如资源重置）
             }
         }
+        
+        // 2. 清理死亡单位
+        CleanupDeadUnits();
 
-        // 2. 通知显示层：回合结束（更新UI）
+        // 3. 通知显示层：回合结束（更新UI）
         OnRoundEnded?.Invoke(currentActiveTeam);
 
-        // 3. 检查战斗是否结束
+        // 4. 检查战斗是否结束
         if (IsBattleOver())
         {
             bool isPlayerWin = CheckPlayerVictory();
@@ -144,7 +177,7 @@ public class RoundManager : MonoBehaviour
             return;
         }
 
-        // 4. 切换阵营并启动下一轮
+        // 5. 切换阵营并启动下一轮
         SwapRound();
         StartRound();
     }
@@ -159,9 +192,10 @@ public class RoundManager : MonoBehaviour
     #endregion
 
     #region 资源（AP）管理
-    /// <summary>为当前阵营所有单位分配AP（恢复至默认值）</summary>
+    /// <summary>为当前阵营所有单位分配攻击次数，AP恢复为3（恢复至默认值）</summary>
     public void GrantActionPoints()
     {
+        PlayerResourceManager.Instance.GainResource(ResourceType.ActionPoint, 3);
         foreach (var unit in GetAllUnitsByTeam(currentActiveTeam))
         {
             if (unit.IsAlive())
@@ -169,9 +203,7 @@ public class RoundManager : MonoBehaviour
                 UnitController controller = unit.Controller;
                 if (controller != null)
                 {
-                    // 先清空现有AP，再分配默认值（避免叠加）
-                    controller.SpendResource(ResourceType.ActionPoint, controller.GetResource(ResourceType.ActionPoint));
-                    controller.GainResource(ResourceType.ActionPoint, defaultActionPoints);
+                    controller.GetAttackCount();
                 }
             }
         }
@@ -235,6 +267,75 @@ public class RoundManager : MonoBehaviour
             }
         }
         return result;
+    }
+    
+    /// <summary>清理死亡单位（标记待销毁）</summary>
+    private void CleanupDeadUnits()
+    {
+        for (int i = battleUnits.Count - 1; i >= 0; i--)
+        {
+            BattleUnit unit = battleUnits[i];
+            if (unit != null && !unit.IsAlive())
+            {
+                if (!unitsToDestroy.Contains(unit))
+                {
+                    unitsToDestroy.Add(unit);
+                    StartCoroutine(DestroyUnitWithDelay(unit));
+                }
+            }
+        }
+    }
+    
+    /// <summary>延迟销毁单位（用于播放死亡动画）</summary>
+    private System.Collections.IEnumerator DestroyUnitWithDelay(BattleUnit unit)
+    {
+        if (unit == null) yield break;
+        
+        // 等待死亡动画播放
+        yield return new WaitForSeconds(destroyDelay);
+        
+        // 从待销毁列表中移除
+        unitsToDestroy.Remove(unit);
+        
+        if (unit != null)
+        {
+            if (destroyGameObject)
+            {
+                // 完全销毁GameObject
+                Destroy(unit.gameObject);
+            }
+            else
+            {
+                // 仅禁用GameObject（可能需要保留用于复活或其他机制）
+                unit.gameObject.SetActive(false);
+            }
+            
+            Debug.Log($"单位 {unit.gameObject.name} 已被销毁");
+        }
+    }
+    
+    /// <summary>立即清理所有死亡单位（战斗结束时调用）</summary>
+    public void CleanupAllDeadUnits()
+    {
+        StopAllCoroutines();
+        
+        for (int i = battleUnits.Count - 1; i >= 0; i--)
+        {
+            BattleUnit unit = battleUnits[i];
+            if (unit != null && !unit.IsAlive())
+            {
+                if (destroyGameObject)
+                {
+                    Destroy(unit.gameObject);
+                }
+                else
+                {
+                    unit.gameObject.SetActive(false);
+                }
+            }
+        }
+        
+        unitsToDestroy.Clear();
     }
     #endregion
 
@@ -315,6 +416,12 @@ public class RoundManager : MonoBehaviour
     #endregion
 
     #region 编辑器调试（可选）
+    [ContextMenu("使用Inspector配置启动战斗")]
+    private void Debug_InitializeBattleFromInspector()
+    {
+        InitializeBattleFromInspector();
+    }
+
     [ContextMenu("强制结束当前回合")]
     private void Debug_EndCurrentRound()
     {
@@ -324,9 +431,66 @@ public class RoundManager : MonoBehaviour
     [ContextMenu("重置战斗")]
     private void Debug_ResetBattle()
     {
+        ClearAllEventSubscriptions();
         isBattleActive = false;
         battleUnits.Clear();
         currentActiveTeam = Team.Player;
     }
+
+    /// <summary>使用Inspector中配置的单位列表初始化战斗</summary>
+    public void InitializeBattleFromInspector()
+    {
+        if (testPlayerUnits.Count == 0 && testEnemyUnits.Count == 0)
+        {
+            Debug.LogWarning("RoundManager: 未配置任何单位，请在Inspector中设置testPlayerUnits和testEnemyUnits");
+            return;
+        }
+        
+        InitializeBattle(testPlayerUnits, testEnemyUnits);
+        Debug.Log($"战斗已启动：玩家单位 {testPlayerUnits.Count} 个，敌方单位 {testEnemyUnits.Count} 个");
+    }
     #endregion
+
+    #region 事件注册与管理
+    /// <summary>订阅所有需要的事件</summary>
+    private void SubscribeEvents()
+    {
+        // 在这里订阅其他系统的事件
+        // 例如：如果有全局事件管理器，可以在此订阅
+        
+        // 单位级别的事件订阅在RegisterUnit中处理
+    }
+
+    /// <summary>取消订阅所有事件</summary>
+    private void UnsubscribeEvents()
+    {
+        // 清理所有单位的死亡事件订阅
+        foreach (var kvp in unitDeathHandlers)
+        {
+            if (kvp.Key != null)
+            {
+                kvp.Key.OnDeath -= kvp.Value;
+            }
+        }
+        unitDeathHandlers.Clear();
+        
+        // 在这里取消订阅其他系统的事件
+    }
+
+    /// <summary>清理所有事件订阅（战斗结束或重置时调用）</summary>
+    public void ClearAllEventSubscriptions()
+    {
+        UnsubscribeEvents();
+    }
+    #endregion
+
+    private void OnEnable()
+    {
+        SubscribeEvents();
+    }
+
+    private void OnDisable()
+    {
+        UnsubscribeEvents();
+    }
 }

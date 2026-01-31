@@ -13,14 +13,20 @@ public abstract class Mask
     protected MaskAttackPattern attackPattern;
     protected BattleUnit equippedUnit;
 
-    public int Attack => Attack;
-    public int Heal => Heal; //面具的血量
+    public int Attack { get; protected set; }
+    public int MaxHealth { get; protected set; }
+    public int CurrentHealth { get; protected set; }
+    
+    public bool IsBroken => CurrentHealth <= 0;
 
     public Mask(string maskId, string maskName, int switchCost)
     {
         MaskId = maskId;
         MaskName = maskName;
         SwitchCost = switchCost;
+        MaxHealth = 50;
+        CurrentHealth = MaxHealth;
+        Attack = 0;
     }
     
     public virtual void OnAddedToInventory()
@@ -66,5 +72,38 @@ public abstract class Mask
     
     public virtual void OnTurnEnd()
     {
+    }
+    
+    public virtual int TakeDamage(int damage)
+    {
+        if (IsBroken) return damage;
+        
+        int actualDamage = Mathf.Min(CurrentHealth, damage);
+        CurrentHealth -= actualDamage;
+        
+        int overflow = damage - actualDamage;
+        
+        if (IsBroken)
+        {
+            OnMaskBroken();
+        }
+        
+        return overflow;
+    }
+    
+    public virtual void RepairMask(int amount)
+    {
+        if (IsBroken) return;
+        CurrentHealth = Mathf.Min(MaxHealth, CurrentHealth + amount);
+    }
+    
+    public virtual void FullyRepair()
+    {
+        CurrentHealth = MaxHealth;
+    }
+    
+    protected virtual void OnMaskBroken()
+    {
+        Debug.Log($"面具 {MaskName} 已破碎！");
     }
 }

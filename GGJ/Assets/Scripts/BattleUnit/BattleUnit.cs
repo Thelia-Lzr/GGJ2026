@@ -19,6 +19,7 @@ public class BattleUnit : MonoBehaviour
     
     [Header("References")]
     private UnitController controller;
+    private Mask currentMask;
     private List<StatusEffect> activeStatusEffects = new List<StatusEffect>();
     
     public event Action<int> OnHealthChanged;
@@ -28,6 +29,8 @@ public class BattleUnit : MonoBehaviour
     public event Action OnDeath;
     public event Action OnTurnStarted;
     public event Action OnTurnEnded;
+    public event Action<Mask> OnMaskChanged;
+    public event Action<int, int> OnMaskDamaged;
     
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
@@ -35,6 +38,7 @@ public class BattleUnit : MonoBehaviour
     public int Defense => defense;
     public Team UnitTeam => team;
     public UnitController Controller => controller;
+    public Mask CurrentMask => currentMask;
     public IReadOnlyList<StatusEffect> ActiveStatusEffects => activeStatusEffects.AsReadOnly();
     
     public void Initialize(UnitController unitController, int MaxHealth,int CurrentHealth,int Atk,int Def)
@@ -45,6 +49,18 @@ public class BattleUnit : MonoBehaviour
         attack = Atk;
         defense = Def;
         activeStatusEffects.Clear();
+    }
+    
+    public void SetMask(Mask mask)
+    {
+        currentMask = mask;
+        OnMaskChanged?.Invoke(mask);
+    }
+    
+    public void ClearMask()
+    {
+        currentMask = null;
+        OnMaskChanged?.Invoke(null);
     }
     
     public void ApplyDamage(int amount)
