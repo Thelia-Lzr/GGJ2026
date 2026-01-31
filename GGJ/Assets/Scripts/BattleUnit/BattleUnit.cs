@@ -14,7 +14,7 @@ public enum Location
 {
     Up,
     Middle,
-    Bootom
+    Bottom
 }
 public class BattleUnit : MonoBehaviour
 {
@@ -23,7 +23,8 @@ public class BattleUnit : MonoBehaviour
     [SerializeField] private int currentHealth;
     [SerializeField] private int attack = 10;
     [SerializeField] private int defense = 5;
-    [SerializeField] public Team team;//{ get; private set; }
+    [SerializeField] public Team team;
+    [SerializeField] public Location location;
     
     [Header("References")]
     public UnitController controller;
@@ -32,14 +33,12 @@ public class BattleUnit : MonoBehaviour
     private List<StatusEffect> activeStatusEffects = new List<StatusEffect>();
     
     public event Action<int> OnHealthChanged;
-    public event Action<int> OnEnergyChanged;
     public event Action<StatusEffect> OnStatusApplied;
     public event Action<StatusEffect> OnStatusRemoved;
     public event Action OnDeath;
     public event Action OnTurnStarted;
     public event Action OnTurnEnded;
     public event Action<Mask> OnMaskChanged;
-    public event Action<int, int> OnMaskDamaged;
     //ÎÄ±¾
     private TMP_FontAsset textFont => ResourceController.Instance.FONT;
     //ÏÔÊ¾
@@ -56,6 +55,7 @@ public class BattleUnit : MonoBehaviour
     public int Attack => attack;
     public int Defense => defense;
     public Team UnitTeam => team;
+    public Location UnitLocation => location;
     public UnitController Controller => controller;
     public Mask CurrentMask => currentMask;
     public IReadOnlyList<StatusEffect> ActiveStatusEffects => activeStatusEffects.AsReadOnly();
@@ -299,6 +299,26 @@ public class BattleUnit : MonoBehaviour
             effect.OnRemoved(this);
             OnStatusRemoved?.Invoke(effect);
         }
+    }
+    
+    public bool HasStatus(string statusId)
+    {
+        return activeStatusEffects.Exists(e => e.StatusId == statusId);
+    }
+    
+    public StatusEffect GetStatus(string statusId)
+    {
+        return activeStatusEffects.Find(e => e.StatusId == statusId);
+    }
+    
+    public bool HasStatus<T>() where T : StatusEffect
+    {
+        return activeStatusEffects.Exists(e => e is T);
+    }
+    
+    public T GetStatus<T>() where T : StatusEffect
+    {
+        return activeStatusEffects.Find(e => e is T) as T;
     }
     
     public bool IsAlive()

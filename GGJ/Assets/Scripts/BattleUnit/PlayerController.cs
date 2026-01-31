@@ -105,13 +105,12 @@ public class PlayerController : UnitController
     }
     
     public override void ConfirmAction(ActionCommand command)
-    {
-        if (waitingForInput)
-        {
-            waitingForInput = false;
-        }
-        
+    {   
         base.ConfirmAction(command);
+        if(attackCount > 0)
+        {
+            InitActionCircle();
+        }
     }
     
     

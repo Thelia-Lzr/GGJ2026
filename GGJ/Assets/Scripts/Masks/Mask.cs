@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 /// <summary>
 /// 面具基类
@@ -63,10 +64,175 @@ public abstract class Mask
     }
     public virtual IEnumerator Attack(UnitController controller, BattleUnit target)//实现面具启效果
     {
-        yield return controller.Attack(target);
-        yield return null;
+        yield return AttackSingle(controller,target);
     }
-    public virtual IEnumerator Activate(UnitController controller, BattleUnit target)//实现面具启效果
+
+    /// <summary>
+    /// 单体攻击 - 攻击单个目标
+    /// </summary>
+    protected IEnumerator AttackSingle(UnitController controller, BattleUnit target)
+    {
+        if (target == null || !target.IsAlive())
+        {
+            Debug.LogWarning("[Mask] AttackSingle: 目标无效或已死亡");
+            yield break;
+        }
+
+        Debug.Log($"[Mask] {MaskName} 发动单体攻击，目标: {target.gameObject.name}");
+
+        Vector2 originalPosition = controller.transform.position;
+        
+        yield return controller.MoveToTarget(target, 0.3f);
+        
+        int damage = controller.BoundUnit.Attack + Atk;
+        target.ApplyHealthChange(-damage);
+        
+        yield return new WaitForSeconds(0.1f);
+        
+        yield return controller.MoveTo(originalPosition, 0.3f);
+    }
+
+    /// <summary>
+    /// 群体攻击 - 对所有敌方单位造成伤害
+    /// </summary>
+    protected IEnumerator AttackAOE(UnitController controller,BattleUnit target)
+    {
+        if (controller == null || controller.BoundUnit == null)
+        {
+            Debug.LogWarning("[Mask] AttackAOE: Controller 无效");
+            yield break;
+        }
+
+        Team enemyTeam = controller.BoundUnit.UnitTeam == Team.Player ? Team.Enemy : Team.Player;
+        List<BattleUnit> enemies = GetAllUnitsOfTeam(enemyTeam);
+
+        if (enemies.Count == 0)
+        {
+            Debug.LogWarning("[Mask] AttackAOE: 没有找到敌方单位");
+            yield break;
+        }
+
+        Debug.Log($"[Mask] {MaskName} 发动群体攻击，目标数: {enemies.Count}");
+
+        Vector2 originalPosition = controller.transform.position;
+        
+        if (target != null && target.IsAlive())
+        {
+            yield return controller.MoveToTarget(target, 0.3f);
+        }
+        
+        foreach (var enemy in enemies)
+        {
+            if (enemy.IsAlive())
+            {
+                int damage = controller.BoundUnit.Attack + Atk;
+                enemy.ApplyHealthChange(-damage);
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+        
+        yield return controller.MoveTo(originalPosition, 0.3f);
+    }
+
+    /// <summary>
+    /// 溅射攻击 - 对目标及相邻位置的敌人造成伤害
+    /// </summary>
+    protected IEnumerator AttackSplash(UnitController controller, BattleUnit target)
+    {
+        if (controller == null || controller.BoundUnit == null)
+        {
+            Debug.LogWarning("[Mask] AttackSplash: Controller 无效");
+            yield break;
+        }
+
+        if (target == null || !target.IsAlive())
+        {
+            Debug.LogWarning("[Mask] AttackSplash: 主目标无效或已死亡");
+            yield break;
+        }
+
+        Team enemyTeam = target.UnitTeam;
+        Location targetLocation = target.UnitLocation;
+        List<BattleUnit> splashTargets = new List<BattleUnit>();
+
+        splashTargets.Add(target);
+
+        List<Location> adjacentLocations = GetAdjacentLocations(targetLocation);
+        List<BattleUnit> allEnemies = GetAllUnitsOfTeam(enemyTeam);
+
+        foreach (var enemy in allEnemies)
+        {
+            if (enemy != target && adjacentLocations.Contains(enemy.UnitLocation) && enemy.IsAlive())
+            {
+                splashTargets.Add(enemy);
+            }
+        }
+
+        Debug.Log($"[Mask] {MaskName} 发动溅射攻击，主目标: {target.gameObject.name}，溅射目标数: {splashTargets.Count}");
+
+        Vector2 originalPosition = controller.transform.position;
+        
+        yield return controller.MoveToTarget(target, 0.3f);
+        
+        foreach (var splashTarget in splashTargets)
+        {
+            if (splashTarget.IsAlive())
+            {
+                int damage = controller.BoundUnit.Attack + Atk;
+                splashTarget.ApplyHealthChange(-damage);
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+        
+        yield return controller.MoveTo(originalPosition, 0.3f);
+    }
+
+    /// <summary>
+    /// 获取相邻位置
+    /// </summary>
+    private List<Location> GetAdjacentLocations(Location location)
+    {
+        List<Location> adjacent = new List<Location>();
+
+        switch (location)
+        {
+            case Location.Up:
+                adjacent.Add(Location.Middle);
+                break;
+            case Location.Middle:
+                adjacent.Add(Location.Up);
+                adjacent.Add(Location.Bottom);
+                break;
+            case Location.Bottom:
+                adjacent.Add(Location.Middle);
+                break;
+        }
+
+        return adjacent;
+    }
+
+    /// <summary>
+    /// 获取指定阵营的所有存活单位
+    /// </summary>
+    private List<BattleUnit> GetAllUnitsOfTeam(Team team)
+    {
+        List<BattleUnit> units = new List<BattleUnit>();
+
+        if (RoundManager.Instance != null)
+        {
+            foreach (var unit in RoundManager.Instance.battleUnits)
+            {
+                if (unit.UnitTeam == team && unit.IsAlive())
+                {
+                    units.Add(unit);
+                }
+            }
+        }
+
+        return units;
+    }
+
+    public virtual IEnumerator Activate(UnitController controller)//实现面具启效果
     {
         //this.UsageAfterAttack();
         yield return null;
