@@ -112,7 +112,7 @@ public class BattleUnit : MonoBehaviour
             text.alignment = TextAlignmentOptions.MidlineLeft;
             HealthText = newText;
         }
-        HealthText.GetComponent<TextMeshProUGUI>().text=CurrentHealth.ToString();
+        HealthText.GetComponent<TextMeshProUGUI>().text = CurrentHealth.ToString();
     }
     public void HealthChangeDisplay(int amount)
     {

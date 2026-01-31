@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Linq;
 
 /// <summary>
 /// 回合管理器：核心战斗流程驱动中心，负责回合切换、资源分配、战斗状态判定
@@ -245,6 +246,10 @@ public class RoundManager : MonoBehaviour
         {
             DebugLog($"[RoundManager] 步骤3: 触发敌方行动预告");
             TriggerEnemyActionPreview();
+            
+            // 3.5 执行敌方行动
+            DebugLog($"[RoundManager] 步骤3.5: 启动敌方行动执行协程");
+            StartCoroutine(ExecuteEnemyActions());
         }
         else
         {
@@ -367,9 +372,12 @@ public class RoundManager : MonoBehaviour
                 {
                     DebugLog($"  → {unit.gameObject.name}.Controller.GetAttackCount()");
                     controller.GetAttackCount();
-                    if (controller.attackCount > 0)
+                    
+                    // 只为玩家单位初始化 ActionCircle
+                    if (controller.attackCount > 0 && currentActiveTeam == Team.Player)
                     {
                         controller.InitActionCircle();
+                        DebugLog($"  → {unit.gameObject.name} 初始化 ActionCircle");
                     }
                 }
                 else
@@ -693,6 +701,82 @@ public class RoundManager : MonoBehaviour
         }
         
         DebugLog($"[RoundManager] TriggerEnemyActionPreview() COMPLETE - 生成 {previewCount} 个预告");
+    }
+    
+    /// <summary>执行所有敌方单位的行动（随机顺序）</summary>
+    private System.Collections.IEnumerator ExecuteEnemyActions()
+    {
+        DebugLog($"[RoundManager] ExecuteEnemyActions() START");
+        
+        List<BattleUnit> enemies = GetAllUnitsByTeam(Team.Enemy);
+        
+        // 随机打乱敌方行动顺序
+        List<BattleUnit> shuffledEnemies = ShuffleEnemyOrder(enemies);
+        
+        DebugLog($"  敌方单位数: {shuffledEnemies.Count}");
+        DebugLog($"  行动顺序: {string.Join(" -> ", shuffledEnemies.Select(e => e.gameObject.name))}");
+        
+        // 依次执行每个敌方单位的所有攻击
+        foreach (var enemyUnit in shuffledEnemies)
+        {
+            if (enemyUnit.IsAlive() && enemyUnit.Controller is EnemyController enemyController)
+            {
+                DebugLog($"  → {enemyUnit.gameObject.name} 开始行动，攻击次数: {enemyController.attackCount}");
+                
+                // 循环执行该敌人的所有攻击次数
+                while (enemyController.attackCount > 0 && enemyUnit.IsAlive())
+                {
+                    DebugLog($"    ├─ {enemyUnit.gameObject.name} 剩余攻击次数: {enemyController.attackCount}");
+                    
+                    // 获取AI决策
+                    ActionCommand decision = enemyController.AI();
+                    
+                    if (decision != null && enemyController.CanPerformAction(decision))
+                    {
+                        // 执行攻击
+                        enemyController.ConfirmAction(decision);
+                        
+                        // 等待当前攻击完成
+                        yield return new WaitUntil(() => !AnimationHandler.Instance.IsProcessing);
+                        
+                        DebugLog($"    └─ 攻击完成");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"    └─ {enemyUnit.gameObject.name} 无法执行行动，跳过剩余攻击");
+                        break;
+                    }
+                    
+                    // 短暂延迟，避免过快
+                    yield return new WaitForSeconds(0.2f);
+                }
+                
+                DebugLog($"  ✅ {enemyUnit.gameObject.name} 所有攻击完成");
+            }
+        }
+        
+        DebugLog($"[RoundManager] ExecuteEnemyActions() COMPLETE - 所有敌方行动完成");
+        
+        // 所有敌方行动完成后，自动结束回合
+        DebugLog($"[RoundManager] 自动结束敌方回合");
+        EndRound();
+    }
+    
+    /// <summary>随机打乱敌方单位的行动顺序</summary>
+    private List<BattleUnit> ShuffleEnemyOrder(List<BattleUnit> enemies)
+    {
+        List<BattleUnit> shuffled = new List<BattleUnit>(enemies);
+        
+        // Fisher-Yates 洗牌算法
+        for (int i = shuffled.Count - 1; i > 0; i--)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, i + 1);
+            BattleUnit temp = shuffled[i];
+            shuffled[i] = shuffled[randomIndex];
+            shuffled[randomIndex] = temp;
+        }
+        
+        return shuffled;
     }
     #endregion
 

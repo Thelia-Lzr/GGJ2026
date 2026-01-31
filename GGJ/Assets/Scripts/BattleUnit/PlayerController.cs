@@ -10,7 +10,6 @@ public class PlayerController : UnitController
     private ActionCommand pendingAction;
     
     public event Action OnTurnStartRequested;
-    public event Action<ActionCommand> OnActionConfirmed;
     
     public bool IsWaitingForInput => waitingForInput;
     
@@ -62,6 +61,19 @@ public class PlayerController : UnitController
         
         RaiseActionPerformed(command);
     }
+
+    public override IEnumerator Attack(BattleUnit target)
+    {
+        if(currentMask == null)
+        {
+            return base.Attack(target);
+        }
+        else
+        {
+            return currentMask.Activate(this,target);
+        }
+        
+    }
     
     public override void TakeTurn()
     {
@@ -92,55 +104,16 @@ public class PlayerController : UnitController
         pendingAction = command;
     }
     
-    public void ConfirmAction(ActionCommand command)
+    public override void ConfirmAction(ActionCommand command)
     {
-        if (!waitingForInput)
-            return;
-        
-        if (command == null || !CanPerformAction(command))
+        if (waitingForInput)
         {
-            Debug.LogWarning("Cannot confirm action.");
-            return;
+            waitingForInput = false;
         }
         
-        waitingForInput = false;
-        
-        PerformAction(command);
-        
-        if (animationHandler != null)
-        {
-            IEnumerator actionCoroutine = GetActionCoroutine(command);
-            animationHandler.SubmitAction(actionCoroutine, command, this);
-        }
-        else
-        {
-            Debug.LogWarning("AnimationHandler is not set!");
-        }
-        
-        OnActionConfirmed?.Invoke(command);
+        base.ConfirmAction(command);
     }
     
-    protected virtual IEnumerator GetActionCoroutine(ActionCommand command)
-    {
-        switch (command.ActionType)
-        {
-            case ActionType.Attack:
-                attackCount--;
-                yield return Attack(command.Target);
-                break;
-            
-            case ActionType.SwitchMask:
-                if (command.MaskData != null)
-                {
-                    SwitchMask(command.MaskData, command.ResourceCost);
-                }
-                break;
-            
-            default:
-                Debug.LogWarning($"Unknown action type: {command.ActionType}");
-                break;
-        }
-    }
     
 
     public override bool SwitchMask(Mask newMask, int cost)
