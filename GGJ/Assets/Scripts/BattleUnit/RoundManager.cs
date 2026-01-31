@@ -30,7 +30,7 @@ public class RoundManager : MonoBehaviour
     [SerializeField] private bool autoStartBattle = false;
 
     // 战斗单位列表（所有参与战斗的单位）
-    private List<BattleUnit> battleUnits = new List<BattleUnit>();
+    public List<BattleUnit> battleUnits = new List<BattleUnit>();
     // 待销毁的单位队列
     private List<BattleUnit> unitsToDestroy = new List<BattleUnit>();
     // 当前行动阵营

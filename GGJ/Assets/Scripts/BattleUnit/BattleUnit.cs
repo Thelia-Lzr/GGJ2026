@@ -16,7 +16,7 @@ public class BattleUnit : MonoBehaviour
     [SerializeField] private int currentHealth;
     [SerializeField] private int attack = 10;
     [SerializeField] private int defense = 5;
-    [SerializeField] private Team team;
+    public Team team { get; private set; }
     
     [Header("References")]
     public UnitController controller;
@@ -104,7 +104,7 @@ public class BattleUnit : MonoBehaviour
             textTranform.localScale = Vector3.one;
             TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
             text.fontSize = 30;
-            text.font = textfont;
+            //text.font = textfont;
             //text.alignment = TextAlignmentOptions.MidlineLeft;
             //text.text = unitText[i];
         }

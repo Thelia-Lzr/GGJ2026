@@ -17,7 +17,7 @@ public class ActionCircle : DragUnit
     }
     protected override bool isMatch()
     {
-        foreach(var battleUnit in BattleManager.Instance.AllUnits)
+        foreach(var battleUnit in RoundManager.Instance.battleUnits)
         {
             if (Vector3.Distance(transform.position, battleUnit.transform.position) < DragController.JUDGEDISTANCE && battleUnit.team == Team.Enemy)
             {
