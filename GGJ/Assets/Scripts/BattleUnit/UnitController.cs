@@ -160,4 +160,15 @@ public abstract class UnitController : MonoBehaviour
     {
         canAct = can;
     }
+    public IEnumerator MoveTo(Vector2 targetPosition,float time)
+    {
+        var movePosition =((Vector3)targetPosition-transform.position)/time;
+        while (time>0)
+        {
+            time-=Time.deltaTime;
+            transform.position += movePosition*Time.deltaTime;
+            yield return null;
+        }
+        transform.position = targetPosition;
+    }
 }
