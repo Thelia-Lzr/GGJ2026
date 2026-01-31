@@ -16,15 +16,15 @@ public class ResourceController: MonoBehaviour
     public TMP_FontAsset FONT;
     [SerializeField] public Dictionary<string, GameObject> prefabs;
 
-    public static Font FONT;
+    //public static Font FONT;
     
     [SerializeField] private List<PrefabEntry> prefabList = new List<PrefabEntry>();
     
-    private Dictionary<string, GameObject> prefabs;
+    //private Dictionary<string, GameObject> prefabs;
 
     private void Awake()
     {
-        FONT = Resources.Load<Font>("FONT/simsunSDF");
+        FONT = Resources.Load<TMP_FontAsset>("FONT/simsunSDF");
         
         // 将列表转换为字典
         prefabs = new Dictionary<string, GameObject>();

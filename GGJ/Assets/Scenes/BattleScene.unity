@@ -538,11 +538,13 @@ MonoBehaviour:
   - {fileID: 0}
   testEnemyUnits:
   - {fileID: 881631427}
-  autoStartBattle: 0
+  autoStartBattle: 1
   enableDebugLogs: 1
   autoPrintRoundStatus: 1
   logEvents: 1
-  battleUnits: []
+  battleUnits:
+  - {fileID: 1826066612}
+  - {fileID: 881631427}
 --- !u!114 &1176040190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -555,6 +557,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e56caa64120ae94abf36d6d4ea88145, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  FONT: {fileID: 0}
   prefabList:
   - key: ActionCircle
     prefab: {fileID: 3810956170213126452, guid: 284a72582b0867449b6b5021381bde99, type: 3}
