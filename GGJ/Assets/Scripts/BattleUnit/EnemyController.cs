@@ -111,17 +111,7 @@ public class EnemyController : UnitController
         
         if (decision != null && CanPerformAction(decision))
         {
-            PerformAction(decision);
-            
-            if (animationHandler != null)
-            {
-                System.Collections.IEnumerator actionCoroutine = GetActionCoroutine(decision);
-                animationHandler.SubmitAction(actionCoroutine, decision, this);
-            }
-            else
-            {
-                Debug.LogWarning("AnimationHandler is not set!");
-            }
+            ConfirmAction(decision);
         }
         
         OnTurnEnd();
@@ -133,7 +123,7 @@ public class EnemyController : UnitController
         return AI();
     }
 
-    protected virtual System.Collections.IEnumerator GetActionCoroutine(ActionCommand command)
+    protected override System.Collections.IEnumerator GetActionCoroutine(ActionCommand command)
     {
         switch (command.ActionType)
         {

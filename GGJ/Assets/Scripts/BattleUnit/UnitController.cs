@@ -17,6 +17,7 @@ public abstract class UnitController : MonoBehaviour
 
     public event Action<ActionCommand> OnActionPerformed;
     public event Action<Mask, Mask> OnMaskSwitched;
+    public event Action<ActionCommand> OnActionConfirmed;
 
     public BattleUnit BoundUnit => boundUnit;
     public Mask CurrentMask => currentMask;
@@ -138,8 +139,25 @@ public abstract class UnitController : MonoBehaviour
         
         Debug.Log($"{boundUnit.gameObject.name} attacks {target.gameObject.name}");
         
+        Vector2 originalPosition = transform.position;
+        Vector2 targetPosition = target.transform.position;
         
-        yield return null;
+        Vector2 direction = (targetPosition - originalPosition).normalized;
+        float attackDistance = 1.5f;
+        Vector2 attackPosition = targetPosition - direction * attackDistance;
+        
+        float moveTime = 0.3f;
+        
+        yield return MoveTo(attackPosition, moveTime);
+        
+        int damage = boundUnit.Attack;
+        target.ApplyHealthChange(-damage);
+        
+        yield return new WaitForSeconds(0.1f);
+        Debug.Log($"Return");
+        yield return MoveTo(originalPosition, moveTime);
+        Debug.Log($"Return/");
+
     }
     
     public virtual void OnTurnStart()
@@ -198,5 +216,50 @@ public abstract class UnitController : MonoBehaviour
             aC.Initialize(this);
         }
 
+    }
+    
+    public virtual void ConfirmAction(ActionCommand command)
+    {
+        if (command == null || !CanPerformAction(command))
+        {
+            Debug.LogWarning("Cannot confirm action.");
+            return;
+        }
+        
+        PerformAction(command);
+        
+        if (animationHandler != null)
+        {
+            IEnumerator actionCoroutine = GetActionCoroutine(command);
+            animationHandler.SubmitAction(actionCoroutine, command, this);
+        }
+        else
+        {
+            Debug.LogWarning("AnimationHandler is not set!");
+        }
+        
+        OnActionConfirmed?.Invoke(command);
+    }
+    
+    protected virtual IEnumerator GetActionCoroutine(ActionCommand command)
+    {
+        switch (command.ActionType)
+        {
+            case ActionType.Attack:
+                attackCount--;
+                yield return Attack(command.Target);
+                break;
+            
+            case ActionType.SwitchMask:
+                if (command.MaskData != null)
+                {
+                    SwitchMask(command.MaskData, command.ResourceCost);
+                }
+                break;
+            
+            default:
+                Debug.LogWarning($"Unknown action type: {command.ActionType}");
+                break;
+        }
     }
 }

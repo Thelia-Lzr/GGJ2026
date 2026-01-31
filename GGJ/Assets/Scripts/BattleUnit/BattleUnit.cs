@@ -93,24 +93,24 @@ public class BattleUnit : MonoBehaviour
     }
     public void HealthDisplay(int amount)
     {
-        if (HealthText == null)
-        {
-            GameObject newText = new GameObject("healthText");
-            RectTransform textTranform = newText.AddComponent<RectTransform>();
-            textTranform.SetParent(UIText.GetComponent<RectTransform>());
-            textTranform.pivot = new Vector2(0.5f, 1);
-            textTranform.anchorMin = new Vector2(0.5f, 1);
-            textTranform.anchorMax = new Vector2(0.5f, 1);
-            textTranform.anchoredPosition = new Vector2(0, 0);
-            textTranform.sizeDelta = new Vector2(200, 50);
-            textTranform.localScale = Vector3.one;
-            TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
-            text.fontSize = 50;
-            text.font = textFont;
-            text.alignment = TextAlignmentOptions.MidlineLeft;
-            HealthText = newText;
-        }
-        HealthText.GetComponent<TextMeshProUGUI>().text=CurrentHealth.ToString();
+        //if (HealthText == null)
+        //{
+        //    GameObject newText = new GameObject("healthText");
+        //    RectTransform textTranform = newText.AddComponent<RectTransform>();
+        //    textTranform.SetParent(UIText.GetComponent<RectTransform>());
+        //    textTranform.pivot = new Vector2(0.5f, 1);
+        //    textTranform.anchorMin = new Vector2(0.5f, 1);
+        //    textTranform.anchorMax = new Vector2(0.5f, 1);
+        //    textTranform.anchoredPosition = new Vector2(0, 0);
+        //    textTranform.sizeDelta = new Vector2(200, 50);
+        //    textTranform.localScale = Vector3.one;
+        //    TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
+        //    text.fontSize = 50;
+        //    text.font = textFont;
+        //    text.alignment = TextAlignmentOptions.MidlineLeft;
+        //    HealthText = newText;
+        //}
+        //HealthText.GetComponent<TextMeshProUGUI>().text=CurrentHealth.ToString();
     }
     public void HealthChangeDisplay(int amount)
     {
