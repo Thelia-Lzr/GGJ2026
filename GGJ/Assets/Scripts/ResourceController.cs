@@ -21,7 +21,7 @@ public class ResourceController: MonoBehaviour
     [SerializeField] private List<PrefabEntry> prefabList = new List<PrefabEntry>();
     
     private Dictionary<string, GameObject> prefabs;
-
+    public List<Sprite> Sprites;
     private void Awake()
     {
         
@@ -34,7 +34,10 @@ public class ResourceController: MonoBehaviour
                 prefabs[entry.key] = entry.prefab;
             }
         }
-        
+        Sprites = new List<Sprite>();
+        Sprites.Add(Resources.Load<Sprite>("Image/Icon/Health"));
+        Sprites.Add(Resources.Load<Sprite>("Image/Icon/Attack"));
+        Sprites.Add(Resources.Load<Sprite>("Image/Icon/Shell"));
         if (Instance == null)
         {
             Instance = this;
