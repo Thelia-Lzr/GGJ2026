@@ -33,7 +33,7 @@ public class BattleUnit : MonoBehaviour
     public event Action<Mask> OnMaskChanged;
     public event Action<int, int> OnMaskDamaged;
     //文本
-
+    private TMP_FontAsset textFont => ResourceController.Instance.FONT;
     //血条文本
     [field: SerializeField]
     public GameObject UIText { get; private set; }
@@ -63,7 +63,8 @@ public class BattleUnit : MonoBehaviour
         activeStatusEffects.Clear();
         //UI
         OnHealthChanged += HealthDisplay;
-        UIText.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        UIText.GetComponent<RectTransform>().anchoredPosition = Camera.main.WorldToScreenPoint(transform.position);
+        UIText.GetComponent<RectTransform>().sizeDelta =new Vector2(200,250);
     }
     
     public void SetMask(Mask mask)
@@ -82,14 +83,15 @@ public class BattleUnit : MonoBehaviour
         if (!IsAlive()) return;
         currentHealth = Mathf.Max(0, currentHealth + amount);
 
-        OnHealthChanged?.Invoke(currentHealth);
+        OnHealthChanged?.Invoke(amount);
+
 
         if (currentHealth <= 0)
         {
             Die();
         }
     }
-    public void HealthDisplay(int currentHealth)
+    public void HealthDisplay(int amount)
     {
         if (HealthText == null)
         {
@@ -103,11 +105,16 @@ public class BattleUnit : MonoBehaviour
             textTranform.sizeDelta = new Vector2(200, 50);
             textTranform.localScale = Vector3.one;
             TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
-            text.fontSize = 30;
-            //text.font = textfont;
-            //text.alignment = TextAlignmentOptions.MidlineLeft;
-            //text.text = unitText[i];
+            text.fontSize = 50;
+            text.font = textFont;
+            text.alignment = TextAlignmentOptions.MidlineLeft;
+            HealthText = newText;
         }
+        HealthText.GetComponent<TextMeshProUGUI>().text=CurrentHealth.ToString();
+    }
+    public void HealthChangeDisplay(int amount)
+    {
+
     }
     public void tmp()
     {
