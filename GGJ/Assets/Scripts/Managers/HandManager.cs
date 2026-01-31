@@ -6,7 +6,7 @@ using DG.Tweening;
 public class HandManager : MonoBehaviour
 {
     public static HandManager Instance { get; private set; }
-    public void Awake()
+    private void Awake() 
     {
         if (Instance != null && Instance != this)
         {
@@ -17,8 +17,8 @@ public class HandManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-
     }
+
     [SerializeField] private int maxHandSize;
     [SerializeField] private GameObject cardPrefab;
     [SerializeField] private SplineContainer splineContainer;
@@ -28,18 +28,27 @@ public class HandManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) DrawCard();
+        if (Input.GetKeyDown(KeyCode.Space)) DrawCard(); // 空格抽卡测试*******************************************************
     }
 
     public void DrawCard()
     {
+        // 1. 手牌上限
         if (handCards.Count >= maxHandSize) return;
 
+        // 2. 调用DeckManager抽卡，校验卡池是否为空
+        CardType? drawnCardType = DeckManager.Instance?.DrawCardType();
+        if (!drawnCardType.HasValue) return;
+
+        // 3. 生成卡牌预制体
         GameObject g = Instantiate(cardPrefab, spawnPoint.position, spawnPoint.rotation);
+        g.name = $"Card_{drawnCardType.Value}"; // 可选：给卡牌命名，方便调试识别类型
 
+        // 4. 禁用碰撞
         Collider2D col = g.GetComponent<Collider2D>();
-        if (col != null) col.enabled = false;  
+        if (col != null) col.enabled = false;
 
+        // 5. 加入手牌列表+更新位置
         handCards.Add(g);
         UpdateCardPositions();
     }
@@ -59,9 +68,7 @@ public class HandManager : MonoBehaviour
             Vector3 forward = spline.EvaluateTangent(p);
             Vector3 up = spline.EvaluateUpVector(p);
             Quaternion rotation = Quaternion.LookRotation(up, Vector3.Cross(up, forward).normalized);
-
-            // 为了在Lambda表达式中安全使用，缓存当前卡牌变量
-            GameObject currentCard = handCards[i]; 
+            GameObject currentCard = handCards[i];
 
             // 处理层级
             var sr = currentCard.GetComponent<SpriteRenderer>();
@@ -71,7 +78,7 @@ public class HandManager : MonoBehaviour
             currentCard.transform.DOMove(splinePosition, 0.25f)
                 .OnComplete(() => {
                     Collider2D col = currentCard.GetComponent<Collider2D>();
-                    if (col != null) col.enabled = true; 
+                    if (col != null) col.enabled = true;
                 });
 
             currentCard.transform.DOLocalRotateQuaternion(rotation, 0.25f);
