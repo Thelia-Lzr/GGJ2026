@@ -13,6 +13,9 @@ public class PrefabEntry
 public class ResourceController: MonoBehaviour
 {
     public static ResourceController Instance { get; private set; }
+    public TMP_FontAsset FONT;
+    [SerializeField] public Dictionary<string, GameObject> prefabs;
+
     public static Font FONT;
     
     [SerializeField] private List<PrefabEntry> prefabList = new List<PrefabEntry>();
