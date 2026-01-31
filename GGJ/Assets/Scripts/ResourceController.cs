@@ -6,12 +6,12 @@ using UnityEngine;
 public class ResourceController: MonoBehaviour
 {
     public static ResourceController Instance { get; private set; }
-    public static Font FONT;
+    public TMP_FontAsset FONT;
     [SerializeField] public Dictionary<string, GameObject> prefabs;
 
     private void Awake()
     {
-        FONT = Resources.Load<Font>("FONT/simsunSDF");
+        FONT = Resources.Load<TMP_FontAsset>("FONT/simsunSDF");
         if (Instance == null)
         {
             Instance = this;
