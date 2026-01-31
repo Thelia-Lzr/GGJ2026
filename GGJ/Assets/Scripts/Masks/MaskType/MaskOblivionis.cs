@@ -4,17 +4,9 @@ using UnityEngine;
 
 public class MaskOblivionis : Mask
 {
-<<<<<<< Updated upstream
     public MaskOblivionis() : base(maskName: "难崩的假面", switchCost: 1, maxHealth: 11, atk: 3, atkCost: 2)
     {
 
-=======
-
-    public MaskOblivionis() : base(maskName: "姣嶉浮鍗＄殑涓栫晫瑙傦紒", switchCost: 1, maxHealth: 11, atk: 3, atkCost: 2)
-    {
-        MaskIcon = Resources.Load<Sprite>("Image/CardImage/12");
-        MaskObject = Resources.Load<Sprite>("Image/Mask/Mask12");
->>>>>>> Stashed changes
     }
     public bool usedFlag = false;
     
@@ -23,11 +15,7 @@ public class MaskOblivionis : Mask
         yield return AttackSplash(controller, target);
     }
     
-<<<<<<< Updated upstream
     public override int TakeDamage(int damage)//戴着面具受到伤害
-=======
-    public override int TakeDamage(int damage)//鎴寸潃闈㈠叿鍙楀埌浼ゅ
->>>>>>> Stashed changes
     {
         if (IsBroken) return damage;
 
