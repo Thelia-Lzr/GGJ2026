@@ -30,7 +30,7 @@ public class ActionCircle : DragUnit
                 if (actionCommand.IsValid())
                 {
                     Operation?.Invoke(actionCommand);
-                    battleUnit.controller.PerformAction(actionCommand);
+                    controller.ConfirmAction(actionCommand);
                     return true;
                 }
             }

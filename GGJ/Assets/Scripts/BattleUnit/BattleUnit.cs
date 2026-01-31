@@ -20,6 +20,7 @@ public class BattleUnit : MonoBehaviour
     
     [Header("References")]
     public UnitController controller;
+    public ResourceController resourceController=>ResourceController.Instance;
     private Mask currentMask;
     private List<StatusEffect> activeStatusEffects = new List<StatusEffect>();
     
@@ -63,7 +64,17 @@ public class BattleUnit : MonoBehaviour
         activeStatusEffects.Clear();
         //UI
         OnHealthChanged += HealthDisplay;
+        OnHealthChanged += HealthChangeDisplay;
+        if (UIText == null)
+        {
+            UIText = new GameObject("uitext");
+            RectTransform transform= UIText.AddComponent<RectTransform>();
+            transform.SetParent(resourceController.GetPrefab("Canvas").GetComponent<RectTransform>());
+        }
         UIText.GetComponent<RectTransform>().anchoredPosition = Camera.main.WorldToScreenPoint(transform.position);
+        UIText.GetComponent<RectTransform>().anchorMax=new Vector2(0, 0);
+        UIText.GetComponent<RectTransform>().anchorMin=new Vector2(0, 0);
+        UIText.GetComponent<RectTransform>().localScale = Vector3.one;
         UIText.GetComponent<RectTransform>().sizeDelta =new Vector2(200,250);
     }
     
@@ -110,11 +121,13 @@ public class BattleUnit : MonoBehaviour
             text.alignment = TextAlignmentOptions.MidlineLeft;
             HealthText = newText;
         }
-        HealthText.GetComponent<TextMeshProUGUI>().text=CurrentHealth.ToString();
+        HealthText.GetComponent<TextMeshProUGUI>().text = CurrentHealth.ToString();
     }
     public void HealthChangeDisplay(int amount)
     {
-
+        GameObject newDisplay = Instantiate(resourceController.GetPrefab("HealthChangeDisplay"));
+        newDisplay.GetComponent<RectTransform>().SetParent(UIText.GetComponent<RectTransform>());
+        newDisplay.GetComponent<HealthChangeDisplay>().Intial(amount);
     }
     public void tmp()
     {

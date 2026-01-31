@@ -13,7 +13,7 @@ public enum AIBehaviorType
 public class EnemyController : UnitController
 {
     [Header("Enemy AI Settings")]
-    [SerializeField] protected AIBehaviorType behaviorType = AIBehaviorType.Balanced;
+    [SerializeField] protected AIBehaviorType behaviorType = AIBehaviorType.Random;
     [SerializeField] protected float thinkDelay = 1f;
     
     protected List<BattleUnit> potentialTargets = new List<BattleUnit>();
@@ -111,20 +111,14 @@ public class EnemyController : UnitController
         
         if (decision != null && CanPerformAction(decision))
         {
-            PerformAction(decision);
-            
-            if (animationHandler != null)
-            {
-                System.Collections.IEnumerator actionCoroutine = GetActionCoroutine(decision);
-                animationHandler.SubmitAction(actionCoroutine, decision, this);
-            }
-            else
-            {
-                Debug.LogWarning("AnimationHandler is not set!");
-            }
+            ConfirmAction(decision);
+        }
+        else
+        {
+            Debug.LogWarning($"{gameObject.name} 无法执行行动");
         }
         
-        OnTurnEnd();
+        // 注意：不再在这里调用 OnTurnEnd()，由 RoundManager 统一管理
     }
 
     public ActionCommand GetPendingAction()
@@ -133,11 +127,12 @@ public class EnemyController : UnitController
         return AI();
     }
 
-    protected virtual System.Collections.IEnumerator GetActionCoroutine(ActionCommand command)
+    protected override System.Collections.IEnumerator GetActionCoroutine(ActionCommand command)
     {
         switch (command.ActionType)
         {
             case ActionType.Attack:
+                attackCount--;
                 yield return Attack(command.Target);
                 break;
             
@@ -156,21 +151,33 @@ public class EnemyController : UnitController
     
     public virtual ActionCommand AI()
     {
-        RefreshPotentialTargets();
+        // 获取所有敌对单位（不同阵营）
+        List<BattleUnit> enemyUnits = new List<BattleUnit>();
+        BattleUnit[] allUnits = FindObjectsOfType<BattleUnit>();
         
-        if (potentialTargets.Count == 0)
+        foreach (BattleUnit unit in allUnits)
         {
+            // 选择不同阵营的活着的单位
+            if (unit.IsAlive() && unit.GetTeam() != boundUnit.GetTeam())
+            {
+                enemyUnits.Add(unit);
+            }
+        }
+        
+        if (enemyUnits.Count == 0)
+        {
+            Debug.LogWarning($"{gameObject.name}: 没有可攻击的敌对单位");
             return null;
         }
         
-        BattleUnit target = SelectTarget();
+        // 随机选择一个敌对单位作为目标
+        int randomIndex = Random.Range(0, enemyUnits.Count);
+        BattleUnit target = enemyUnits[randomIndex];
         
-        if (target == null)
-        {
-            return null;
-        }
+        Debug.Log($"{gameObject.name} 的 AI 决定攻击敌对单位: {target.gameObject.name}");
         
-        ActionCommand action = SelectAction(target);
+        // 创建攻击指令
+        ActionCommand action = new ActionCommand(this, target, ActionType.Attack);
         
         return action;
     }
@@ -244,11 +251,8 @@ public class EnemyController : UnitController
         {
             return null;
         }
-        
-        ActionCommand attackCommand = new ActionCommand(this, target, ActionType.Attack)
-        {
-            ResourceCost = 1
-        };
+
+        ActionCommand attackCommand = new ActionCommand(this, target, ActionType.Attack);
         
         return attackCommand;
     }
