@@ -9,6 +9,12 @@ public enum Team
     Enemy
 }
 
+public enum Location
+{
+    Up,
+    Middle,
+    Bootom
+}
 public class BattleUnit : MonoBehaviour
 {
     [Header("Unit Data")]
@@ -50,6 +56,10 @@ public class BattleUnit : MonoBehaviour
     public UnitController Controller => controller;
     public Mask CurrentMask => currentMask;
     public IReadOnlyList<StatusEffect> ActiveStatusEffects => activeStatusEffects.AsReadOnly();
+    public void addAttack(int add)
+    {
+        attack += add;
+    }
     public void Start()
     {
         
@@ -89,7 +99,7 @@ public class BattleUnit : MonoBehaviour
         currentMask = null;
         OnMaskChanged?.Invoke(null);
     }
-    public void ApplyHealthChange(int amount)
+    public virtual void ApplyHealthChange(int amount)
     {
         if (!IsAlive()) return;
         currentHealth = Mathf.Max(0, currentHealth + amount);

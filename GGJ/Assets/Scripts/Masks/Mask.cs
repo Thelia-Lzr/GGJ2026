@@ -61,13 +61,15 @@ public abstract class Mask
     {
         equippedUnit = null;
     }
-
+    public virtual IEnumerator Attack(UnitController controller, BattleUnit target)//实现面具启效果
+    {
+        yield return controller.Attack(target);
+        yield return null;
+    }
     public virtual IEnumerator Activate(UnitController controller, BattleUnit target)//实现面具启效果
     {
-        this.UsageAfterAttack();
-
-        // 默认行为：使用传入的 controller 执行基础攻击
-        yield return controller.Attack(target);
+        //this.UsageAfterAttack();
+        yield return null;
     }
 
 
