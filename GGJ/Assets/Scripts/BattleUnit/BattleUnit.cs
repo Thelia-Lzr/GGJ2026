@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using TMPro;
 
 public enum Team
 {
@@ -31,6 +32,14 @@ public class BattleUnit : MonoBehaviour
     public event Action OnTurnEnded;
     public event Action<Mask> OnMaskChanged;
     public event Action<int, int> OnMaskDamaged;
+    //文本
+
+    //血条文本
+    [field: SerializeField]
+    public GameObject UIText { get; private set; }
+    //血条文本
+    [field:SerializeField]
+    public GameObject HealthText {  get; private set; }
     
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
@@ -40,7 +49,10 @@ public class BattleUnit : MonoBehaviour
     public UnitController Controller => controller;
     public Mask CurrentMask => currentMask;
     public IReadOnlyList<StatusEffect> ActiveStatusEffects => activeStatusEffects.AsReadOnly();
-    
+    public void Start()
+    {
+        
+    }
     public void Initialize(UnitController unitController, int MaxHealth,int CurrentHealth,int Atk,int Def)
     {
         controller = unitController;
@@ -49,6 +61,9 @@ public class BattleUnit : MonoBehaviour
         attack = Atk;
         defense = Def;
         activeStatusEffects.Clear();
+        //UI
+        OnHealthChanged += HealthDisplay;
+        UIText.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
     }
     
     public void SetMask(Mask mask)
@@ -62,32 +77,42 @@ public class BattleUnit : MonoBehaviour
         currentMask = null;
         OnMaskChanged?.Invoke(null);
     }
-    
-    public void ApplyDamage(int amount)
+    public void ApplyHealthChange(int amount)
     {
         if (!IsAlive()) return;
-        
-        int actualDamage = Mathf.Max(0, amount);
-        currentHealth = Mathf.Max(0, currentHealth - actualDamage);
-        
+        currentHealth = Mathf.Max(0, currentHealth + amount);
+
         OnHealthChanged?.Invoke(currentHealth);
-        
+
         if (currentHealth <= 0)
         {
             Die();
         }
     }
-    
-    public void Heal(int amount)
+    public void HealthDisplay(int currentHealth)
     {
-        if (!IsAlive()) return;
-        
-        int actualHeal = Mathf.Max(0, amount);
-        currentHealth = Mathf.Min(maxHealth, currentHealth + actualHeal);
-        
-        OnHealthChanged?.Invoke(currentHealth);
+        if (HealthText == null)
+        {
+            GameObject newText = new GameObject("healthText");
+            RectTransform textTranform = newText.AddComponent<RectTransform>();
+            textTranform.SetParent(UIText.GetComponent<RectTransform>());
+            textTranform.pivot = new Vector2(0.5f, 1);
+            textTranform.anchorMin = new Vector2(0.5f, 1);
+            textTranform.anchorMax = new Vector2(0.5f, 1);
+            textTranform.anchoredPosition = new Vector2(0, 0);
+            textTranform.sizeDelta = new Vector2(200, 50);
+            textTranform.localScale = Vector3.one;
+            TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
+            text.fontSize = 30;
+            text.font = textfont;
+            //text.alignment = TextAlignmentOptions.MidlineLeft;
+            //text.text = unitText[i];
+        }
     }
-    
+    public void tmp()
+    {
+        ApplyHealthChange(1);
+    }
     public void ApplyStatus(StatusEffect effect)
     {
         if (effect == null) return;
