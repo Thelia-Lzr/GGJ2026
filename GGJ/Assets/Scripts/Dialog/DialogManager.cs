@@ -30,7 +30,7 @@ public class Dialogmanager : MonoBehaviour
     public float typeSpeed = 0.03f;
     private bool isFinished = false; // 标记剧情是否结束
 
-    private string[] dialogRows;
+    private string[] dialogRows;
     private Coroutine typewriterCoroutine;
     private string currentFullContent;
 
@@ -47,11 +47,11 @@ public class Dialogmanager : MonoBehaviour
 
     void Start()
     {
-        // 1. 纯粹绑定按钮，不写任何 PlayData
-        if (nextButton != null)
+        // 1. 纯粹绑定按钮，不写任何 PlayData
+        if (nextButton != null)
         {
             nextButton.onClick.RemoveAllListeners(); // 先清空，防止 Inspector 里重复绑定
-            nextButton.onClick.AddListener(OnClickNext);
+            nextButton.onClick.AddListener(OnClickNext);
         }
     }
 
@@ -69,23 +69,23 @@ public class Dialogmanager : MonoBehaviour
     {
 
         Debug.Log("按钮被点击了！准备播放音效..."); // 看看控制台有没有这句
-        if (AudioManager.Instance != null)
+        if (AudioManager.Instance != null)
         {
             Debug.Log("AudioManager 实例存在，正在发送播放请求");
-            // 这里替换成你修正后的那行 PlaySFX 代码
-            AudioManager.Instance.PlaySFX(AudioManager.SfxType.UI, "sfx_ui_click_button");
+            // 这里替换成你修正后的那行 PlaySFX 代码
+            AudioManager.Instance.PlaySFX(AudioManager.SfxType.UI, "sfx_ui_click_button");
         }
         else
         {
             Debug.LogError("找不到 AudioManager 实例！请检查场景里有没有挂脚本。");
         }
-        // 剧情播完后，点击输出测试信息
-        if (isFinished)
+        // 剧情播完后，点击输出测试信息
+        if (isFinished)
         {
             Debug.Log("<color=orange>【逻辑测试】此处应跳转至战斗场景，当前执行：输出日志</color>");
-            // 等你写好战斗场景后，再取消下面这行的注释：
-            // UnityEngine.SceneManagement.SceneManager.LoadScene("BattleScene"); 
-            return;
+            // 等你写好战斗场景后，再取消下面这行的注释：
+            // UnityEngine.SceneManagement.SceneManager.LoadScene("BattleScene"); 
+            return;
         }
 
         if (typewriterCoroutine != null)
@@ -112,16 +112,16 @@ public class Dialogmanager : MonoBehaviour
             {
                 if (cells[0].Trim() == "#")
                 {
-                    // 背景切换逻辑
-                    if (cells.Length >= 7)
+                    // 背景切换逻辑
+                    if (cells.Length >= 7)
                     {
                         if (int.TryParse(cells[6].Trim(), out int bgIndex)) ChangeBackground(bgIndex);
                     }
 
                     UpdateUI(cells[2], cells[4], cells[3]);
 
-                    // 安全解析下一句 ID，防止 Parse "end" 崩溃
-                    string nextTarget = cells[5].Trim();
+                    // 安全解析下一句 ID，防止 Parse "end" 崩溃
+                    string nextTarget = cells[5].Trim();
                     if (nextTarget.ToLower() == "end")
                     {
                         isFinished = true;
@@ -165,8 +165,8 @@ public class Dialogmanager : MonoBehaviour
 
         ApplyRender(targetSprite, pos, isNarrator);
 
-        // 仅在第一句剧情（dialogIndex=0）时播放BGM，和UI完全同步
-        if (dialogIndex == 0 && AudioManager.Instance != null)
+        // 仅在第一句剧情（dialogIndex=0）时播放BGM，和UI完全同步
+        if (dialogIndex == 0 && AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayNormalBGM("Plot");
         }
@@ -179,6 +179,13 @@ public class Dialogmanager : MonoBehaviour
         Color active = Color.white;
         Color inactive = new Color(0.3f, 0.3f, 0.3f, 1f);
 
+        // 1. 定义两个精准的缩放值
+        Vector3 playerScale = new Vector3(0.6f, 0.6f, 1f); // 你原本主角的缩放
+        Vector3 shadowScale = new Vector3(0.3f, 0.42f, 1f); // 杂鱼放大的缩放 (根据需要调这个数)
+
+        // 2. 判定：当前传入的是否是兜底杂鱼
+        bool isShadow = (sprite != null && shadowSprite != null && sprite.name == shadowSprite.name);
+
         if (isNarrator)
         {
             imageLeft.DOColor(inactive, 0.2f); imageRight.DOColor(inactive, 0.2f);
@@ -186,15 +193,22 @@ public class Dialogmanager : MonoBehaviour
         else if (pos == "左")
         {
             if (sprite != null) imageLeft.sprite = sprite;
-            imageLeft.DOColor(active, 0.2f); imageRight.DOColor(inactive, 0.2f);
+            imageLeft.DOColor(active, 0.2f);
+            imageRight.DOColor(inactive, 0.2f);
+
+            // 核心逻辑：是杂鱼就用 1.2，不是杂鱼（主角）就强制回 0.6
+            imageLeft.transform.localScale = isShadow ? shadowScale : playerScale;
         }
         else if (pos == "右")
         {
             if (sprite != null) imageRight.sprite = sprite;
-            imageRight.DOColor(active, 0.2f); imageLeft.DOColor(inactive, 0.2f);
+            imageRight.DOColor(active, 0.2f);
+            imageLeft.DOColor(inactive, 0.2f);
+
+            // 核心逻辑：同上
+            imageRight.transform.localScale = isShadow ? shadowScale : playerScale;
         }
     }
-
     private void ChangeBackground(int index)
     {
         if (backgroundDisplay == null || index < 0 || index >= backgroundSprites.Count) return;
