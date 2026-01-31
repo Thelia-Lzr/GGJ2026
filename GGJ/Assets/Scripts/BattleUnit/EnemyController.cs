@@ -13,11 +13,8 @@ public enum AIBehaviorType
 public class EnemyController : UnitController
 {
     [Header("Enemy AI Settings")]
-    [SerializeField] protected AIBehaviorType behaviorType = AIBehaviorType.Random;
-    [SerializeField] protected float thinkDelay = 1f;
-    
-    protected int initialHealth = 10;
-    protected int initialAttack = 5;
+    protected AIBehaviorType behaviorType = AIBehaviorType.Random;
+    protected float thinkDelay = 1f;
     
     protected List<BattleUnit> potentialTargets = new List<BattleUnit>();
     protected Dictionary<ResourceType, int> resources = new Dictionary<ResourceType, int>();

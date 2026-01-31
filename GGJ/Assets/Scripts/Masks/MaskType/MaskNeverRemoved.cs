@@ -5,7 +5,13 @@ using UnityEngine;
 
 public class MaskNeverRemoved : Mask
 {
-    public MaskNeverRemoved() : base(maskName: "从不摘下的面具", switchCost: 1, maxHealth: 8, atk: 5, atkCost: 0)
+    public MaskNeverRemoved() : base(
+        maskName: "从不摘下的面具",
+        switchCost: 1,
+        maxHealth: 8,
+        atk: 5,
+        atkCost: 0,
+        description: "启：所有己方角色攻击力+2（持续1回合）。攻击不消耗面具耐久。")
     {
 
     }

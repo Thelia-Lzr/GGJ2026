@@ -24,10 +24,10 @@ public abstract class UnitController : MonoBehaviour
     public bool CanAct => canAct && !isStunned && boundUnit != null && boundUnit.IsAlive();
 
     //初始属性定义
-    private int initialAttack = 10;
-    private int initialDefense = 5;
-    private int initialMaxHealth = 100;
-    private int initialHealth = 50;
+    protected int initialAttack = 10;
+    protected int initialDefense = 5;
+    protected int initialMaxHealth = 100;
+    protected int initialHealth = 50;
 
     public int attackCount { get; protected set; }
 
@@ -118,6 +118,25 @@ public abstract class UnitController : MonoBehaviour
         OnMaskSwitched?.Invoke(oldMask, newMask);
         
         return true;
+    }
+    
+    public virtual void RemoveBrokenMask()
+    {
+        if (currentMask == null || !currentMask.IsBroken)
+            return;
+        
+        Debug.Log($"[UnitController] 移除破损面具: {currentMask.MaskName}");
+        
+        Mask brokenMask = currentMask;
+        brokenMask.OnUnequip(boundUnit);
+        currentMask = null;
+        
+        if (boundUnit != null)
+        {
+            boundUnit.ClearMask();
+        }
+        
+        OnMaskSwitched?.Invoke(brokenMask, null);
     }
     
     public List<ActionCommand> GetAvailableActions()

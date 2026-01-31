@@ -4,7 +4,13 @@ using UnityEngine;
 
 public class MaskAgony : Mask
 {
-    public MaskAgony() : base(maskName: "痛苦的面具", switchCost: 1, maxHealth: 6, atk: 3, atkCost: 1)
+    public MaskAgony() : base(
+        maskName: "痛苦的面具",
+        switchCost: 1,
+        maxHealth: 6,
+        atk: 3,
+        atkCost: 1,
+        description: "戴：眩晕1名随机敌人。攻：溅射攻击目标及相邻敌人。")
     {
 
     }
@@ -12,6 +18,11 @@ public class MaskAgony : Mask
     public override IEnumerator Attack(UnitController controller, BattleUnit target)
     {
         yield return AttackSplash(controller, target);
+        UsageAfterAttack();
+        if (controller.BoundUnit != null)
+        {
+            controller.BoundUnit.HealthDisplay(0);
+        }
     }
 
     public override void OnEquip(BattleUnit unit)

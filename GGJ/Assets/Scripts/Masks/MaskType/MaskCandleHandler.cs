@@ -4,7 +4,13 @@ using UnityEngine;
 
 public class MaskCandleHandler : Mask
 {
-    public MaskCandleHandler() : base(maskName: "秉烛人的面具", switchCost: 1, maxHealth: 11, atk: 5, atkCost: 1)
+    public MaskCandleHandler() : base(
+        maskName: "秉烛人的面具",
+        switchCost: 1,
+        maxHealth: 11,
+        atk: 5,
+        atkCost: 1,
+        description: "启：若面具耐久≤4，对所有敌人造成3点群体伤害，然后回复此面具3点耐久。")
     {
 
     }

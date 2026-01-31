@@ -6,7 +6,13 @@ public class MaskHilichurl : Mask
 {
     private bool shouldDestroyAtTurnEnd = false;
 
-    public MaskHilichurl() : base(maskName: "丘丘人的面具", switchCost: 1, maxHealth: 6, atk: 2, atkCost: 1)
+    public MaskHilichurl() : base(
+        maskName: "丘丘人的面具",
+        switchCost: 1,
+        maxHealth: 6,
+        atk: 2,
+        atkCost: 1,
+        description: "攻：若此次攻击击杀目标，令所有己方角色暴怒（攻击次数+1），然后回合结束时销毁此面具。毁：眩晕1名敌人。")
     {
 
     }
@@ -16,6 +22,11 @@ public class MaskHilichurl : Mask
         if (target == null || controller == null)
         {
             yield return AttackAOE(controller, target);
+            UsageAfterAttack();
+            if (controller != null && controller.BoundUnit != null)
+            {
+                controller.BoundUnit.HealthDisplay(0);
+            }
             yield break;
         }
 
@@ -33,6 +44,12 @@ public class MaskHilichurl : Mask
             
             shouldDestroyAtTurnEnd = true;
             SubscribeToTurnEnd(controller);
+        }
+        
+        UsageAfterAttack();
+        if (controller.BoundUnit != null)
+        {
+            controller.BoundUnit.HealthDisplay(0);
         }
     }
 

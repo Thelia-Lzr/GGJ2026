@@ -67,6 +67,15 @@ public class BattleUnit : MonoBehaviour
     {
         
     }
+    
+    private void LateUpdate()
+    {
+        if (UIText != null)
+        {
+            UIText.GetComponent<RectTransform>().anchoredPosition = Camera.main.WorldToScreenPoint(transform.position);
+        }
+    }
+    
     public void Initialize(UnitController unitController, int MaxHealth,int CurrentHealth,int Atk,int Def)
     {
         controller = unitController;
@@ -88,7 +97,7 @@ public class BattleUnit : MonoBehaviour
         UIText.GetComponent<RectTransform>().anchorMax = new Vector2(0, 0);
         UIText.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0);
         UIText.GetComponent<RectTransform>().localScale = Vector3.one;
-        UIText.GetComponent<RectTransform>().sizeDelta =new Vector2(250,300);
+        UIText.GetComponent<RectTransform>().sizeDelta =new Vector2(150,180);
         HealthDisplay(0);
     }
     
@@ -96,16 +105,26 @@ public class BattleUnit : MonoBehaviour
     {
         currentMask = mask;
         OnMaskChanged?.Invoke(mask);
+        HealthDisplay(0);
     }
     
     public void ClearMask()
     {
         currentMask = null;
         OnMaskChanged?.Invoke(null);
+        HealthDisplay(0);
     }
     public virtual void ApplyHealthChange(int amount)
     {
         if (!IsAlive()) return;
+        
+        if (amount < 0 && currentMask != null && !currentMask.IsBroken)
+        {
+            int overflow = currentMask.TakeDamage(-amount);
+            amount = -overflow;
+            HealthDisplay(0);
+        }
+        
         currentHealth = Mathf.Max(0, currentHealth + amount);
 
         OnHealthChanged?.Invoke(amount);
@@ -130,7 +149,7 @@ public class BattleUnit : MonoBehaviour
                 textTranform.anchorMin = new Vector2(0, 1);
                 textTranform.anchorMax = new Vector2(0, 1);
                 textTranform.anchoredPosition = new Vector2(0, 0);
-                textTranform.sizeDelta = new Vector2(50, 50);
+                textTranform.sizeDelta = new Vector2(30, 30);
                 textTranform.localScale = Vector3.one;
                 Image image = healthIcon.AddComponent<Image>();
                 image.sprite = resourceController.Sprites[0];
@@ -143,11 +162,11 @@ public class BattleUnit : MonoBehaviour
                 textTranform.pivot = new Vector2(0, 1);
                 textTranform.anchorMin = new Vector2(0, 1);
                 textTranform.anchorMax = new Vector2(0, 1);
-                textTranform.anchoredPosition = new Vector2(50, 0);
-                textTranform.sizeDelta = new Vector2(200, 50);
+                textTranform.anchoredPosition = new Vector2(30, 0);
+                textTranform.sizeDelta = new Vector2(120, 30);
                 textTranform.localScale = Vector3.one;
                 TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
-                text.fontSize = 50;
+                text.fontSize = 30;
                 text.font = textFont;
                 text.alignment = TextAlignmentOptions.MidlineLeft;
                 HealthText = newText;
@@ -161,8 +180,8 @@ public class BattleUnit : MonoBehaviour
                 textTranform.pivot = new Vector2(0, 1);
                 textTranform.anchorMin = new Vector2(0, 1);
                 textTranform.anchorMax = new Vector2(0, 1);
-                textTranform.anchoredPosition = new Vector2(130, 0);
-                textTranform.sizeDelta = new Vector2(50, 50);
+                textTranform.anchoredPosition = new Vector2(75, 0);
+                textTranform.sizeDelta = new Vector2(30, 30);
                 textTranform.localScale = Vector3.one;
                 Image image = healthIcon.AddComponent<Image>();
                 image.sprite = resourceController.Sprites[2];
@@ -175,11 +194,11 @@ public class BattleUnit : MonoBehaviour
                 textTranform.pivot = new Vector2(0, 1);
                 textTranform.anchorMin = new Vector2(0, 1);
                 textTranform.anchorMax = new Vector2(0, 1);
-                textTranform.anchoredPosition = new Vector2(180, 0);
-                textTranform.sizeDelta = new Vector2(200, 50);
+                textTranform.anchoredPosition = new Vector2(105, 0);
+                textTranform.sizeDelta = new Vector2(120, 30);
                 textTranform.localScale = Vector3.one;
                 TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
-                text.fontSize = 50;
+                text.fontSize = 30;
                 text.font = textFont;
                 text.alignment = TextAlignmentOptions.MidlineLeft;
                 ShellText = newText;

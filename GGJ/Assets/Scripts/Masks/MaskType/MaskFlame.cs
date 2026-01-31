@@ -5,7 +5,13 @@ using UnityEngine;
 
 public class MaskFlame : Mask
 {
-    public MaskFlame() : base(maskName: "火焰少女的面具", switchCost: 1, maxHealth: 6, atk: 7, atkCost: 1)
+    public MaskFlame() : base(
+        maskName: "火焰少女的面具",
+        switchCost: 1,
+        maxHealth: 6,
+        atk: 7,
+        atkCost: 1,
+        description: "攻：攻击力额外+2。毁：己方单位攻击力+2。")
     {
         
     }
@@ -16,7 +22,12 @@ public class MaskFlame : Mask
     public override IEnumerator Attack(UnitController controller, BattleUnit target)
     {
         Atk += 2;
-        yield return base.Attack(controller, target);
+        yield return AttackSingle(controller, target);
+        UsageAfterAttack();
+        if (controller.BoundUnit != null)
+        {
+            controller.BoundUnit.HealthDisplay(0);
+        }
     }
     public override void OnUnequip(BattleUnit unit)
     {
