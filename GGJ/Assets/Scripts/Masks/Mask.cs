@@ -37,7 +37,7 @@ public abstract class Mask
         SwitchCost = switchCost;
         MaxHealth = 50;
         CurrentHealth = MaxHealth;
-        Attack = 0;
+        Atk = 0;
     }
     
     public virtual void OnAddedToInventory()
