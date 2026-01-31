@@ -20,7 +20,7 @@ public class ResourceController: MonoBehaviour
     
     [SerializeField] private List<PrefabEntry> prefabList = new List<PrefabEntry>();
     
-    //private Dictionary<string, GameObject> prefabs;
+    private Dictionary<string, GameObject> prefabs;
 
     private void Awake()
     {
