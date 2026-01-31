@@ -5,6 +5,20 @@ using DG.Tweening;
 
 public class HandManager : MonoBehaviour
 {
+    public static HandManager Instance { get; private set; }
+    public void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+
+    }
     [SerializeField] private int maxHandSize;
     [SerializeField] private GameObject cardPrefab;
     [SerializeField] private SplineContainer splineContainer;
