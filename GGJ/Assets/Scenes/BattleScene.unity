@@ -447,7 +447,7 @@ MonoBehaviour:
   currentHealth: 30
   attack: 10
   defense: 5
-  team: 0
+  team: 1
   controller: {fileID: 881631426}
   <UIText>k__BackingField: {fileID: 0}
   <HealthText>k__BackingField: {fileID: 0}
@@ -492,15 +492,15 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 7549fb9b470625244aa644782322bbc1, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3aa5b7913885f754d8b519c4f608fffb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 12.8, y: 12.8}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &881631429
@@ -716,6 +716,8 @@ MonoBehaviour:
   battleUnits:
   - {fileID: 1826066612}
   - {fileID: 881631427}
+  masksPerTurn: 1
+  initialHandSize: 3
 --- !u!114 &1176040190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1172,7 +1174,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 24c3b52487e8cbd48b473a870a02c644, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1193,8 +1195,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -6.06, y: 1.76, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

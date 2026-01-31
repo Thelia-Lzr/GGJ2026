@@ -22,7 +22,7 @@ public abstract class Mask
     protected MaskAttackPattern attackPattern;
     protected BattleUnit equippedUnit;
 
-    public int Attack { get; protected set; }
+    public int Atk { get; protected set; }
 
     public int Usage { get; protected set; } //每次使用该面具进行攻击消耗的耐久
     public int MaxHealth { get; protected set; }
@@ -63,19 +63,23 @@ public abstract class Mask
         equippedUnit = null;
     }
     
-    public virtual IEnumerator Activate(UnitController controller, BattleUnit target)
+    public virtual IEnumerator Attack(UnitController controller, BattleUnit target)//实现面具攻效果
     {
         this.UsageAfterAttack();
 
         // 默认行为：使用传入的 controller 执行基础攻击
         yield return controller.Attack(target);
     }
-    
-    public MaskAttackPattern GetAttackPattern()
+
+    public virtual IEnumerator Activate(UnitController controller, BattleUnit target)//实现面具启效果
     {
-        return attackPattern;
+        this.UsageAfterAttack();
+
+        // 默认行为：使用传入的 controller 执行基础攻击
+        yield return controller.Attack(target);
     }
-    
+
+
     public int GetSwitchCost()
     {
         return SwitchCost;
@@ -89,7 +93,7 @@ public abstract class Mask
     {
     }
     
-    public virtual void UsageAfterAttack()
+    public virtual void UsageAfterAttack()//面具使用后耐久减少
     {
         int damage = Usage;
         //if (IsBroken) return damage;
@@ -106,7 +110,7 @@ public abstract class Mask
 
         return;
     }
-    public virtual int TakeDamage(int damage)
+    public virtual int TakeDamage(int damage)//戴着面具受到伤害
     {
         if (IsBroken) return damage;
         
