@@ -6,7 +6,7 @@ using System;
 public abstract class UnitController : MonoBehaviour
 {
     [Header("Controller Settings")]
-    [SerializeField] protected BattleUnit boundUnit;
+    [SerializeField] public BattleUnit boundUnit;
     [SerializeField] protected Mask currentMask;
     [SerializeField] private int attackCountGains = 1;
 
@@ -79,6 +79,13 @@ public abstract class UnitController : MonoBehaviour
     {
         attackCount = attackCountGains;
     }
+
+    public void AddAttackCount(int amount)
+    {
+        attackCount += amount;
+        Debug.Log($"[UnitController] {gameObject.name} 攻击次数增加 {amount}，当前: {attackCount}");
+    }
+
     public virtual bool SwitchMask(Mask newMask, int cost)
     {
         if (newMask == null)
@@ -129,6 +136,22 @@ public abstract class UnitController : MonoBehaviour
         return actions;
     }
     
+    public virtual IEnumerator MoveToTarget(BattleUnit target, float time)
+    {
+        if (target == null)
+        {
+            Debug.LogWarning("Invalid target for movement.");
+            yield break;
+        }
+        
+        Vector2 targetPosition = target.transform.position;
+        Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
+        float attackDistance = 1.5f;
+        Vector2 attackPosition = targetPosition - direction * attackDistance;
+        
+        yield return MoveTo(attackPosition, time);
+    }
+    
     public virtual IEnumerator Attack(BattleUnit target)
     {
         if (target == null || !target.IsAlive())
@@ -140,16 +163,10 @@ public abstract class UnitController : MonoBehaviour
         Debug.Log($"{boundUnit.gameObject.name} attacks {target.gameObject.name}");
         
         Vector2 originalPosition = transform.position;
-        Vector2 targetPosition = target.transform.position;
-        
-        Vector2 direction = (targetPosition - originalPosition).normalized;
-        float attackDistance = 1.5f;
-        Vector2 attackPosition = targetPosition - direction * attackDistance;
-        
         float moveTime = 0.3f;
         
-        yield return MoveTo(attackPosition, moveTime);
-        
+        yield return MoveToTarget(target, moveTime);
+
         int damage = boundUnit.Attack;
         target.ApplyHealthChange(-damage);
         
@@ -249,7 +266,7 @@ public abstract class UnitController : MonoBehaviour
                 attackCount--;
                 if (currentMask != null)
                 {
-                    yield return currentMask.Activate(this, command.Target);
+                    yield return currentMask.Attack(this, command.Target);
                 }
                 else
                 {

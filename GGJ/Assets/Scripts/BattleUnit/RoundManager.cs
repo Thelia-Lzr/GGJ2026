@@ -371,7 +371,11 @@ public class RoundManager : MonoBehaviour
                 if (controller != null)
                 {
                     DebugLog($"  → {unit.gameObject.name}.Controller.GetAttackCount()");
-                    controller.GetAttackCount();
+                    if (!unit.HasStatus<Stunned>())
+                    {
+                        controller.GetAttackCount();
+                    }
+                    
                     
                     // 只为玩家单位初始化 ActionCircle
                     if (controller.attackCount > 0 && currentActiveTeam == Team.Player)

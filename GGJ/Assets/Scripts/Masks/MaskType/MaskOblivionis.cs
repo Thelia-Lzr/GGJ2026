@@ -4,11 +4,17 @@ using UnityEngine;
 
 public class MaskOblivionis : Mask
 {
-    public MaskOblivionis() : base(maskName: "蓝发少女的面具", switchCost: 1, maxHealth: 11, atk: 3, atkCost: 1)
+    public MaskOblivionis() : base(maskName: "难崩的假面", switchCost: 1, maxHealth: 11, atk: 3, atkCost: 2)
     {
 
     }
     public bool usedFlag = false;
+    
+    public override IEnumerator Attack(UnitController controller, BattleUnit target)
+    {
+        yield return AttackSplash(controller, target);
+    }
+    
     public override int TakeDamage(int damage)//戴着面具受到伤害
     {
         if (IsBroken) return damage;
