@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using TMPro;
+using UnityEngine.UI;
 
 public enum Team
 {
@@ -40,13 +41,15 @@ public class BattleUnit : MonoBehaviour
     public event Action<Mask> OnMaskChanged;
     //文本
     private TMP_FontAsset textFont => ResourceController.Instance.FONT;
-    //血条文本
+    //显示
     [field: SerializeField]
     public GameObject UIText { get; private set; }
-    //血条文本
+    //血量文本
     [field:SerializeField]
     public GameObject HealthText {  get; private set; }
-    
+    //护盾文本
+    [field: SerializeField]
+    public GameObject ShellText { get; private set; }
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
     public int Attack => attack;
@@ -82,10 +85,11 @@ public class BattleUnit : MonoBehaviour
             transform.SetParent(resourceController.GetPrefab("Canvas").GetComponent<RectTransform>());
         }
         UIText.GetComponent<RectTransform>().anchoredPosition = Camera.main.WorldToScreenPoint(transform.position);
-        UIText.GetComponent<RectTransform>().anchorMax=new Vector2(0, 0);
-        UIText.GetComponent<RectTransform>().anchorMin=new Vector2(0, 0);
+        UIText.GetComponent<RectTransform>().anchorMax = new Vector2(0, 0);
+        UIText.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0);
         UIText.GetComponent<RectTransform>().localScale = Vector3.one;
-        UIText.GetComponent<RectTransform>().sizeDelta =new Vector2(200,250);
+        UIText.GetComponent<RectTransform>().sizeDelta =new Vector2(250,300);
+        HealthDisplay(0);
     }
     
     public void SetMask(Mask mask)
@@ -116,32 +120,88 @@ public class BattleUnit : MonoBehaviour
     {
         if (HealthText == null)
         {
-            GameObject newText = new GameObject("healthText");
-            RectTransform textTranform = newText.AddComponent<RectTransform>();
-            textTranform.SetParent(UIText.GetComponent<RectTransform>());
-            textTranform.pivot = new Vector2(0.5f, 1);
-            textTranform.anchorMin = new Vector2(0.5f, 1);
-            textTranform.anchorMax = new Vector2(0.5f, 1);
-            textTranform.anchoredPosition = new Vector2(0, 0);
-            textTranform.sizeDelta = new Vector2(200, 50);
-            textTranform.localScale = Vector3.one;
-            TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
-            text.fontSize = 50;
-            text.font = textFont;
-            text.alignment = TextAlignmentOptions.MidlineLeft;
-            HealthText = newText;
+            //图片
+            if (true)
+            {
+                GameObject healthIcon = new GameObject("HealthIcon");
+                RectTransform textTranform = healthIcon.AddComponent<RectTransform>();
+                textTranform.SetParent(UIText.GetComponent<RectTransform>());
+                textTranform.pivot = new Vector2(0, 1);
+                textTranform.anchorMin = new Vector2(0, 1);
+                textTranform.anchorMax = new Vector2(0, 1);
+                textTranform.anchoredPosition = new Vector2(0, 0);
+                textTranform.sizeDelta = new Vector2(50, 50);
+                textTranform.localScale = Vector3.one;
+                Image image = healthIcon.AddComponent<Image>();
+                image.sprite = resourceController.Sprites[0];
+            }
+            if (true)
+            {
+                GameObject newText = new GameObject("healthText");
+                RectTransform textTranform = newText.AddComponent<RectTransform>();
+                textTranform.SetParent(UIText.GetComponent<RectTransform>());
+                textTranform.pivot = new Vector2(0, 1);
+                textTranform.anchorMin = new Vector2(0, 1);
+                textTranform.anchorMax = new Vector2(0, 1);
+                textTranform.anchoredPosition = new Vector2(50, 0);
+                textTranform.sizeDelta = new Vector2(200, 50);
+                textTranform.localScale = Vector3.one;
+                TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
+                text.fontSize = 50;
+                text.font = textFont;
+                text.alignment = TextAlignmentOptions.MidlineLeft;
+                HealthText = newText;
+            }
+            //图片
+            if (true)
+            {
+                GameObject healthIcon = new GameObject("HealthIcon");
+                RectTransform textTranform = healthIcon.AddComponent<RectTransform>();
+                textTranform.SetParent(UIText.GetComponent<RectTransform>());
+                textTranform.pivot = new Vector2(0, 1);
+                textTranform.anchorMin = new Vector2(0, 1);
+                textTranform.anchorMax = new Vector2(0, 1);
+                textTranform.anchoredPosition = new Vector2(130, 0);
+                textTranform.sizeDelta = new Vector2(50, 50);
+                textTranform.localScale = Vector3.one;
+                Image image = healthIcon.AddComponent<Image>();
+                image.sprite = resourceController.Sprites[2];
+            }
+            if (true)
+            {
+                GameObject newText = new GameObject("shellText");
+                RectTransform textTranform = newText.AddComponent<RectTransform>();
+                textTranform.SetParent(UIText.GetComponent<RectTransform>());
+                textTranform.pivot = new Vector2(0, 1);
+                textTranform.anchorMin = new Vector2(0, 1);
+                textTranform.anchorMax = new Vector2(0, 1);
+                textTranform.anchoredPosition = new Vector2(180, 0);
+                textTranform.sizeDelta = new Vector2(200, 50);
+                textTranform.localScale = Vector3.one;
+                TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
+                text.fontSize = 50;
+                text.font = textFont;
+                text.alignment = TextAlignmentOptions.MidlineLeft;
+                ShellText = newText;
+            }
+
         }
         HealthText.GetComponent<TextMeshProUGUI>().text = CurrentHealth.ToString();
+        if (currentMask != null)
+        {
+            ShellText.GetComponent<TextMeshProUGUI>().text = currentMask.CurrentHealth.ToString();
+
+        }
+        else
+        {
+            ShellText.GetComponent<TextMeshProUGUI>().text = "" + 0;
+        }
     }
     public void HealthChangeDisplay(int amount)
     {
         GameObject newDisplay = Instantiate(resourceController.GetPrefab("HealthChangeDisplay"));
         newDisplay.GetComponent<RectTransform>().SetParent(UIText.GetComponent<RectTransform>());
         newDisplay.GetComponent<HealthChangeDisplay>().Intial(amount);
-    }
-    public void tmp()
-    {
-        ApplyHealthChange(1);
     }
     public void ApplyStatus(StatusEffect effect)
     {

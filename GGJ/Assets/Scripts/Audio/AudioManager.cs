@@ -138,6 +138,8 @@ public class AudioManager : MonoBehaviour
     {
         if (Instance == null) { Instance = this; DontDestroyOnLoad(gameObject); InitializePool(); }
         else { Destroy(gameObject); }
+
+
     }
 
     private void InitializePool()
