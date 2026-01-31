@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.RuleTile.TilingRuleOutput;
@@ -18,7 +18,7 @@ public abstract class Mask
     public string Description { get; protected set; }
     public int SwitchCost { get; protected set; }
     public Sprite MaskIcon { get; protected set; }
-
+    public Sprite MaskObject { get; protected set; }
     protected MaskAttackPattern attackPattern;
     protected BattleUnit equippedUnit;
 

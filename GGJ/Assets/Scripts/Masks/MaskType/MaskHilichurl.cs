@@ -6,9 +6,10 @@ public class MaskHilichurl : Mask
 {
     private bool shouldDestroyAtTurnEnd = false;
 
-    public MaskHilichurl() : base(maskName: "ÇğÇğÈËµÄÃæ¾ß", switchCost: 1, maxHealth: 6, atk: 2, atkCost: 1)
+    public MaskHilichurl() : base(maskName: "å‘€ï¼", switchCost: 1, maxHealth: 6, atk: 2, atkCost: 1)
     {
-
+        MaskIcon = Resources.Load<Sprite>("Image/CardImage/Card7");
+        MaskObject = Resources.Load<Sprite>("Image/Mask/Mask7");
     }
 
     public override IEnumerator Attack(UnitController controller, BattleUnit target)
@@ -27,7 +28,7 @@ public class MaskHilichurl : Mask
 
         if (targetWasKilled)
         {
-            Debug.Log($"[MaskHilichurl] {controller.gameObject.name} »÷É±ÁË {target.gameObject.name}£¬´¥·¢±©Å­Ğ§¹û£¡");
+            Debug.Log($"[MaskHilichurl] {controller.gameObject.name} å‡»æ€äº† {target.gameObject.name}ï¼Œè§¦å‘æš´æ€’æ•ˆæœï¼");
             
             EnrageAllAllies(controller.BoundUnit);
             
@@ -57,7 +58,7 @@ public class MaskHilichurl : Mask
             }
         }
 
-        Debug.Log($"[MaskHilichurl] ËùÓĞ¼º·½½ÇÉ«ÏİÈë±©Å­×´Ì¬£¡");
+        Debug.Log($"[MaskHilichurl] æ‰€æœ‰å·±æ–¹è§’è‰²é™·å…¥æš´æ€’çŠ¶æ€ï¼");
     }
 
     private void StunRandomEnemy(BattleUnit user)
@@ -74,7 +75,7 @@ public class MaskHilichurl : Mask
 
             target.ApplyStatus(new Stunned(1));
 
-            Debug.Log($"[MaskHilichurl] Ãæ¾ß»Ù»µ£¬Ñ£ÔÎÁË {target.gameObject.name}£¡");
+            Debug.Log($"[MaskHilichurl] é¢å…·æ¯åï¼Œçœ©æ™•äº† {target.gameObject.name}ï¼");
         }
     }
 
@@ -89,7 +90,7 @@ public class MaskHilichurl : Mask
     {
         if (shouldDestroyAtTurnEnd && equippedUnit != null)
         {
-            Debug.Log($"[MaskHilichurl] »ØºÏ½áÊø£¬Ïú»ÙÇğÇğÈËÃæ¾ß£¡");
+            Debug.Log($"[MaskHilichurl] å›åˆç»“æŸï¼Œé”€æ¯ä¸˜ä¸˜äººé¢å…·ï¼");
             
             equippedUnit.OnTurnEnded -= HandleTurnEnd;
             

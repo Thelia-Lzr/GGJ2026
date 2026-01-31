@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class MaskBodyCult : Mask
 {
-    public MaskBodyCult() : base(maskName: "ÈËÌåÅÉµÄÃæ¾ß", switchCost: 1, maxHealth: 8, atk: 3, atkCost: 2)
+    public MaskBodyCult() : base(maskName: "é€†å¡å·´æ‹‰è®¡æ•°å™¨", switchCost: 1, maxHealth: 8, atk: 3, atkCost: 2)
     {
-
+        MaskIcon = Resources.Load<Sprite>("Image/CardImage/Card6");
+        MaskObject = Resources.Load<Sprite>("Image/Mask/Mask6");
     }
 
     public override IEnumerator Attack(UnitController controller, BattleUnit target)
@@ -55,7 +56,7 @@ public class MaskBodyCult : Mask
             }
         }
 
-        Debug.Log($"[MaskBodyCult] {user.gameObject.name} µÄÉíÌå³ç°İÃæ¾ßÉúĞ§£¬ËùÓĞ¼º·½½ÇÉ«»Ø¸´2µãÌåÁ¦ºÍÃæ¾ßÄÍ¾Ã£¡");
+        Debug.Log($"[MaskBodyCult] {user.gameObject.name} çš„èº«ä½“å´‡æ‹œé¢å…·ç”Ÿæ•ˆï¼Œæ‰€æœ‰å·±æ–¹è§’è‰²å›å¤2ç‚¹ä½“åŠ›å’Œé¢å…·è€ä¹…ï¼");
     }
 
     private List<BattleUnit> GetAllyUnits(Team allyTeam)

@@ -4,16 +4,17 @@ using UnityEngine;
 
 public class MaskCandleHandler : Mask
 {
-    public MaskCandleHandler() : base(maskName: "±üÖòÈËµÄÃæ¾ß", switchCost: 1, maxHealth: 11, atk: 5, atkCost: 1)
+    public MaskCandleHandler() : base(maskName: "æŒ‡ç‚¹è¿·æ´¥", switchCost: 1, maxHealth: 11, atk: 5, atkCost: 1)
     {
-
+        MaskIcon = Resources.Load<Sprite>("Image/CardImage/Card8");
+        MaskObject = Resources.Load<Sprite>("Image/Mask/Mask8");
     }
 
     public override IEnumerator Activate(UnitController controller)
     {
         if (CurrentHealth <= 4)
         {
-            Debug.Log($"[MaskCandleHandler] Ãæ¾ßÄÍ¾Ã ¡Ü 4£¬´¥·¢ÈºÌåÉËº¦Ğ§¹û£¡");
+            Debug.Log($"[MaskCandleHandler] é¢å…·è€ä¹… â‰¤ 4ï¼Œè§¦å‘ç¾¤ä½“ä¼¤å®³æ•ˆæœï¼");
 
             Team enemyTeam = controller.BoundUnit.UnitTeam == Team.Player ? Team.Enemy : Team.Player;
             List<BattleUnit> enemies = GetEnemyUnits(enemyTeam);
@@ -23,16 +24,16 @@ public class MaskCandleHandler : Mask
                 if (enemy.IsAlive())
                 {
                     enemy.ApplyHealthChange(-3);
-                    Debug.Log($"[MaskCandleHandler] ¶Ô {enemy.gameObject.name} Ôì³É 3 µãÉËº¦£¡");
+                    Debug.Log($"[MaskCandleHandler] å¯¹ {enemy.gameObject.name} é€ æˆ 3 ç‚¹ä¼¤å®³ï¼");
                 }
             }
 
             RepairMask(3);
-            Debug.Log($"[MaskCandleHandler] Ãæ¾ß»Ø¸´ 3 µãÄÍ¾Ã£¬µ±Ç°ÄÍ¾Ã: {CurrentHealth}/{MaxHealth}");
+            Debug.Log($"[MaskCandleHandler] é¢å…·å›å¤ 3 ç‚¹è€ä¹…ï¼Œå½“å‰è€ä¹…: {CurrentHealth}/{MaxHealth}");
         }
         else
         {
-            Debug.Log($"[MaskCandleHandler] Ãæ¾ßÄÍ¾Ã > 4 ({CurrentHealth}/{MaxHealth})£¬Ğ§¹ûÎ´´¥·¢");
+            Debug.Log($"[MaskCandleHandler] é¢å…·è€ä¹… > 4 ({CurrentHealth}/{MaxHealth})ï¼Œæ•ˆæœæœªè§¦å‘");
         }
 
         yield return base.Activate(controller);

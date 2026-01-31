@@ -5,9 +5,10 @@ using UnityEngine;
 
 public class MaskFlame : Mask
 {
-    public MaskFlame() : base(maskName: "火焰少女的面具", switchCost: 1, maxHealth: 6, atk: 7, atkCost: 1)
+    public MaskFlame() : base(maskName: "浣犺鐏劙鍖呭洿浜嗭紒", switchCost: 1, maxHealth: 6, atk: 7, atkCost: 1)
     {
-        
+        MaskIcon = Resources.Load<Sprite>("Image/CardImage/Card1");   
+        MaskObject = Resources.Load<Sprite>("Image/Mask/Mask1"); 
     }
     public override void OnEquip(BattleUnit unit)
     {

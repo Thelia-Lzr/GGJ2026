@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class MaskEndfield : Mask
 {
-    public MaskEndfield() : base(maskName: "拉线工人的面罩", switchCost: 1, maxHealth: 8, atk: 0, atkCost: 1)
+    public MaskEndfield() : base(maskName: "寮�濮嬬數鍔涜繍杈擄紒", switchCost: 1, maxHealth: 8, atk: 0, atkCost: 1)
     {
-
+        MaskIcon = Resources.Load<Sprite>("Image/CardImage/Card3");
+        MaskObject = Resources.Load<Sprite>("Image/Mask/Mask3");
     }
     public override IEnumerator Attack(UnitController controller, BattleUnit target)
     {

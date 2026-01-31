@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class MaskAgony : Mask
 {
-    public MaskAgony() : base(maskName: "Í´¿àµÄÃæ¾ß", switchCost: 1, maxHealth: 6, atk: 3, atkCost: 1)
+    public MaskAgony() : base(maskName: "æŠ˜ç£¨å¼€å§‹", switchCost: 1, maxHealth: 6, atk: 3, atkCost: 1)
     {
-
+        MaskIcon = Resources.Load<Sprite>("Image/CardImage/Card5");
+        MaskObject = Resources.Load<Sprite>("Image/Mask/Mask5");
     }
 
     public override IEnumerator Attack(UnitController controller, BattleUnit target)
@@ -28,7 +29,7 @@ public class MaskAgony : Mask
             
             target.ApplyStatus(new Stunned(1));
             
-            Debug.Log($"[MaskAgony] {unit.gameObject.name} ×°±¸Í´¿àÃæ¾ß£¬Ñ£ÔÎÁË {target.gameObject.name}£¡");
+            Debug.Log($"[MaskAgony] {unit.gameObject.name} è£…å¤‡ç—›è‹¦é¢å…·ï¼Œçœ©æ™•äº† {target.gameObject.name}ï¼");
         }
     }
 

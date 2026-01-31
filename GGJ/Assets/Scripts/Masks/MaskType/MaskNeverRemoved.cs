@@ -5,9 +5,10 @@ using UnityEngine;
 
 public class MaskNeverRemoved : Mask
 {
-    public MaskNeverRemoved() : base(maskName: "�Ӳ�ժ�µ����", switchCost: 1, maxHealth: 8, atk: 5, atkCost: 0)
+    public MaskNeverRemoved() : base(maskName: "牛战士从不摘下自己的面具！", switchCost: 1, maxHealth: 8, atk: 5, atkCost: 0)
     {
-
+        MaskIcon = Resources.Load<Sprite>("Image/CardImage/Card4");
+        MaskObject = Resources.Load<Sprite>("Image/Mask/Mask4");
     }
     public override IEnumerator Activate(UnitController controller)
     {
