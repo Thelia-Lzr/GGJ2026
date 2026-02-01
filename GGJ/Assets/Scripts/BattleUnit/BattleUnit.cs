@@ -99,6 +99,7 @@ public class BattleUnit : MonoBehaviour
         OnHealthChanged += HealthDisplay;
         OnHealthChanged += HealthChangeDisplay;
         OnStatusApplied += BuffUIDisplay;
+        OnTurnStarted += BuffUIDisplayTurn;
         if (UIText == null)
         {
             UIText = new GameObject("uitext");
@@ -239,6 +240,65 @@ public class BattleUnit : MonoBehaviour
         newDisplay.GetComponent<RectTransform>().SetParent(UIText.GetComponent<RectTransform>());
         newDisplay.GetComponent<HealthChangeDisplay>().Intial(amount);
     }
+    public void BuffUIDisplayTurn()
+    {
+        GameObject[] BuffUITemp = new GameObject[BuffUI.Count];
+        for (int i = 0; i < BuffUITemp.Length; i++)
+        {
+            BuffUITemp[i] = BuffUI[i];
+        }
+        for (int i = 0; i < BuffUITemp.Length; i++)
+        {
+            Destroy(BuffUITemp[i]);
+        }
+        BuffUI.Clear();
+        //À¢–¬UIœ‘ æ
+        for (int i = 0; i < activeStatusEffects.Count; i++)
+        {
+            StatusEffect effect = activeStatusEffects[i];
+            GameObject newUI = new GameObject("BuffUI");
+            RectTransform UITranform = newUI.AddComponent<RectTransform>();
+            UITranform.SetParent(UIText.GetComponent<RectTransform>());
+            UITranform.pivot = new Vector2(0, 1);
+            UITranform.anchorMin = new Vector2(0, 1);
+            UITranform.anchorMax = new Vector2(0, 1);
+            UITranform.sizeDelta = new Vector2(30, 30);
+            UITranform.localScale = Vector3.one;
+            //75,-90
+            UITranform.anchoredPosition = new Vector2(40 * i, 40);
+            BuffUI.Add(newUI);
+
+            Image image = UITranform.AddComponent<Image>();
+            switch (effect.StatusId)
+            {
+                case "Add2Atk":
+                    Debug.LogWarning("Add2Atk");
+
+                    break;
+                case "Minus2Atk":
+                    Debug.LogWarning("Minus2Atk");
+                    break;
+                case "Stunned":
+                    Debug.LogWarning("Stunned");
+
+                    break;
+                case "Enraged":
+                    Debug.LogWarning("Enraged");
+
+                    break;
+            }
+            if (controller is EnemyTank tank)
+            {
+                if (tank.JudgeCharge())
+                {
+                    //œ‘ æUI
+                }
+            }
+
+
+
+        }
+    }
     public void BuffUIDisplay(StatusEffect newEffect)
     {
         GameObject[] BuffUITemp=new GameObject[BuffUI.Count];
@@ -271,15 +331,18 @@ public class BattleUnit : MonoBehaviour
             switch (effect.StatusId)
             {
                 case "Add2Atk":
+                    Debug.LogWarning("Add2Atk");
 
                     break;
                 case "Minus2Atk":
-                    Debug.LogWarning("!");
+                    Debug.LogWarning("Minus2Atk");
                     break;
                 case "Stunned":
+                    Debug.LogWarning("Stunned");
 
                     break;
                 case "Enraged":
+                    Debug.LogWarning("Enraged");
 
                     break;
             }

@@ -3,26 +3,6 @@
 /// <summary>
 /// 音频系统全功能诊断测试器
 /// </summary>
-
-/// <summary>
-///  类型1：BGM播放/停止调用示例
-///  自动播放Lobby的Intro前奏，播放完毕后无缝切换至Loop段无限循环
-/// AudioManager.Instance.PlayTwoPartBGM("Lobby");
-
-/// 类型2：普通无限循环BGM（单片段循环）
-/// 适用场景：剧情、对话、简易场景背景音等，直接单片段无限循环播放
-/// 直接循环播放Plot对应的单片段音频
-/// AudioManager.Instance.PlayNormalBGM("Plot");
-
-/// 停止当前所有正在播放的背景音乐（两段式/普通循环均适用）
-/// AudioManager.Instance.StopBGM();
-
-///类型3：音效
-/// 方法A：指定文件名播放
-/// // 示例：播放Attack分类下名为sfx_atk_hammer的音效（前提：该文件已拖入Attack分类的音效列表）
-/// AudioManager.Instance.PlaySFX(AudioManager.SfxType.Attack, "sfx_atk_hammer");
-/// </summary>
-
 public class AudioTester : MonoBehaviour
 {
     [Header("BGM 测试名称 (需与 Inspector 中一致)")]
