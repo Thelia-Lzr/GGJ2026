@@ -10,19 +10,28 @@ using UnityEngine;
 public class EnemyAOE : EnemyController
 {
     [Header("AOE Enemy Settings")]
-    private int initialHealth = 20;
-    private int initialAttack = 2;
+    // 在字段初始化时设置属性
+    protected new int initialHealth = 20;
+    protected new int initialMaxHealth = 20;
+    protected new int initialAttack = 2;
+    protected new int initialDefense = 5;
     
     protected override void Awake()
     {
         base.Awake();
     }
     
-    private void Start()
+    public override void BindUnit(BattleUnit unit)
     {
+        if (isBound && unit == boundUnit) return;
+        
+        boundUnit = unit;
+        isBound = true;
+        
         if (boundUnit != null)
         {
-            boundUnit.Initialize(this, initialHealth, initialHealth, initialAttack, 5);
+            boundUnit.Initialize(this, initialMaxHealth, initialHealth, initialAttack, initialDefense);
+            SubscribeToStatusEvents();
         }
     }
     
