@@ -51,16 +51,18 @@ public class BattleUnit : MonoBehaviour
     //血量文本
     [field:SerializeField]
     public GameObject HealthText {  get; private set; }
+    //血量图标
+    public GameObject HealthIcon { get; private set; }
     //护盾文本
     [field: SerializeField]
     public GameObject ShellText { get; private set; }
-
-    //UI
-    public List<GameObject> BuffUI = new List<GameObject>();
-
     //护盾图标
     [field: SerializeField]
     public GameObject ShellIcon { get; private set; }
+    //UI
+    public List<GameObject> BuffUI = new List<GameObject>();
+
+
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
     public int Attack => attack;
@@ -110,7 +112,7 @@ public class BattleUnit : MonoBehaviour
         UIText.GetComponent<RectTransform>().anchorMax = new Vector2(0, 0);
         UIText.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0);
         UIText.GetComponent<RectTransform>().localScale = Vector3.one;
-        UIText.GetComponent<RectTransform>().sizeDelta =new Vector2(150,180);
+        UIText.GetComponent<RectTransform>().sizeDelta =new Vector2(150,250);
         HealthDisplay(0);
     }
     
@@ -166,6 +168,7 @@ public class BattleUnit : MonoBehaviour
                 textTranform.localScale = Vector3.one;
                 Image image = healthIcon.AddComponent<Image>();
                 image.sprite = resourceController.Sprites[0];
+                HealthIcon = healthIcon;
             }
             if (true)
             {
@@ -187,8 +190,8 @@ public class BattleUnit : MonoBehaviour
             //图片
             if (true)
             {
-                GameObject healthIcon = new GameObject("ShellIcon");
-                RectTransform textTranform = healthIcon.AddComponent<RectTransform>();
+                GameObject shellIcon = new GameObject("ShellIcon");
+                RectTransform textTranform = shellIcon.AddComponent<RectTransform>();
                 textTranform.SetParent(UIText.GetComponent<RectTransform>());
                 textTranform.pivot = new Vector2(0, 1);
                 textTranform.anchorMin = new Vector2(0, 1);
@@ -196,9 +199,9 @@ public class BattleUnit : MonoBehaviour
                 textTranform.anchoredPosition = new Vector2(75, 0);
                 textTranform.sizeDelta = new Vector2(30, 30);
                 textTranform.localScale = Vector3.one;
-                Image image = healthIcon.AddComponent<Image>();
+                Image image = shellIcon.AddComponent<Image>();
                 image.sprite = resourceController.Sprites[2];
-                ShellIcon = healthIcon;
+                ShellIcon = shellIcon;
             }
             if (true)
             {
@@ -220,18 +223,50 @@ public class BattleUnit : MonoBehaviour
 
         }
         HealthText.GetComponent<TextMeshProUGUI>().text = CurrentHealth.ToString();
-        
         // 根据是否有面具来显示/隐藏护盾UI
         if (currentMask != null)
         {
-            if (ShellIcon != null) ShellIcon.SetActive(true);
-            if (ShellText != null) ShellText.SetActive(true);
+            if (HealthIcon != null)
+            {
+                HealthIcon.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
+            }
+            if (HealthText != null)
+            {
+                HealthText.GetComponent<RectTransform>().anchoredPosition = new Vector2(30, 0);
+
+            }
+            if (ShellIcon != null)
+            {
+                ShellIcon.SetActive(true);
+                ShellIcon.GetComponent<RectTransform>().anchoredPosition = new Vector2(75, 0);
+            }
+            if (ShellText != null)
+            {
+                ShellText.SetActive(true);
+                ShellText.GetComponent<RectTransform>().anchoredPosition = new Vector2(105, 0);
+
+            }
             ShellText.GetComponent<TextMeshProUGUI>().text = currentMask.CurrentHealth.ToString();
         }
         else
         {
-            if (ShellIcon != null) ShellIcon.SetActive(false);
-            if (ShellText != null) ShellText.SetActive(false);
+            if (HealthIcon != null)
+            {
+                HealthIcon.GetComponent<RectTransform>().anchoredPosition = new Vector2(40, 0);
+            }
+            if (HealthText != null)
+            {
+                HealthText.GetComponent<RectTransform>().anchoredPosition = new Vector2(70, 0);
+            }
+            if (ShellIcon != null)
+            {
+                ShellIcon.SetActive(false);
+            }
+            if (ShellText != null)
+            {
+                ShellText.SetActive(false);
+
+            }
         }
     }
     public void HealthChangeDisplay(int amount)
