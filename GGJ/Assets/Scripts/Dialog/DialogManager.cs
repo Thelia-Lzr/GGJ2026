@@ -50,14 +50,13 @@ public class Dialogmanager : MonoBehaviour
 
     void Start()
     {
-        // 1. 纯粹绑定按钮，不写任何 PlayData
-
         if (SceneController.Instance != null)
         {
-            // 直接问控制器：轮到哪个剧本了？控制器给完索引后会自动+1
-            dialogIndex = SceneController.Instance.GetAndIncrementStoryIndex();
-            Debug.Log($"<color=green>【剧情顺序】当前自动加载第 {dialogIndex} 个剧本</color>");
+            // 改用这个：只拿数字，不准偷偷加 1
+            dialogIndex = SceneController.Instance.GetCurrentStoryIndex();
+            Debug.Log($"<color=green>【加载】准备播放剧本：{dialogIndex}</color>");
         }
+
 
         PlayData(dialogIndex);
         if (nextButton != null)
@@ -92,14 +91,34 @@ public class Dialogmanager : MonoBehaviour
         }
         if (isFinished)
         {
-            Debug.Log("<color=red>检测到剧情已结束，正在请求 SceneController 跳转...</color>");
             if (SceneController.Instance != null)
             {
-                SceneController.Instance.GoToBattle();
-            }
-            else
-            {
-                Debug.LogError("跳转失败：场景中不存在 SceneController 实例！");
+                // 1. 先自增进度（为下次回来做准备）
+                SceneController.Instance.AdvanceStoryIndex();
+
+                // 2. 获取刚才播完的那个剧本索引（因为上面刚加了1，这里要减回来判断）
+                int finishedStep = SceneController.Instance.GetCurrentStoryIndex() - 1;
+
+                Debug.Log($"<color=yellow>剧情 {finishedStep} 播完了，准备跳转对应战斗</color>");
+
+                // 3. 分岔路口判断
+                if (finishedStep == 0)
+                {
+                    SceneController.Instance.GoToBattle1();
+                }
+                else if (finishedStep == 1)
+                {
+                    SceneController.Instance.GoToBattle2();
+                }
+                else if (finishedStep == 2)
+                {
+                    SceneController.Instance.GoToBattle3();
+                }
+                else
+                {
+                    Debug.Log("没有更多战斗了，返回主菜单");
+                    SceneController.Instance.BackToMainMenu();
+                }
             }
             return;
         }
@@ -265,5 +284,25 @@ public class Dialogmanager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(raw)) return "";
         return Regex.Replace(raw, @"[^\u4e00-\u9fa5a-zA-Z0-9]", "").Trim();
+    }
+    // 剧情场景“退出”按钮专用
+    public void OnExitButtonClicked()
+    {
+        Debug.Log("<color=cyan>【UI操作】退出按钮被点击了！</color>");
+
+        if (SceneController.Instance != null)
+        {
+            Debug.Log("<color=green>【系统】检测到 SceneController 实例，准备重置进度并返回主菜单...</color>");
+
+            // 调用控制器的返回方法
+            SceneController.Instance.BackToMainMenu();
+        }
+        else
+        {
+            Debug.LogWarning("<color=red>【警告】找不到 SceneController 实例！正在执行 SceneManager 强制跳转...</color>");
+
+            // 兜底方案：如果单例丢失，尝试强制跳转到索引 1
+            UnityEngine.SceneManagement.SceneManager.LoadScene(0);
+        }
     }
 }
