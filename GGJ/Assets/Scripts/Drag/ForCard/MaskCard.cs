@@ -21,7 +21,7 @@ public class MaskCard : DragUnit
     private PlayerResourceManager playerResourceManager => PlayerResourceManager.Instance;
     private BattleUnit targetUnit;
     
-    // MaskCard ÌØÓĞµÄ×´Ì¬
+    // MaskCard ç‰¹æœ‰çš„çŠ¶æ€
     private bool isReturning = false;
     private ZoomUI zoomUI;
     
@@ -69,48 +69,42 @@ public class MaskCard : DragUnit
         }
     }
     
-    // ÖØĞ´ OnMouseDown À´Ìí¼Ó MaskCard ÌØÓĞµÄĞĞÎª
+    // é‡å†™ OnMouseDown æ¥æ·»åŠ  MaskCard ç‰¹æœ‰çš„è¡Œä¸º
     protected override void OnMouseDown()
     {
-        if (isReturning) return; // MaskCard ÌØÓĞ£º·µ»ØÖĞ²»ÔÊĞíÍÏ¶¯
+        if (isReturning) return; // MaskCard ç‰¹æœ‰ï¼šè¿”å›ä¸­ä¸å…è®¸æ‹–åŠ¨
         
-        // Í¨Öª ZoomUI ¿ªÊ¼ÍÏ¶¯
+        // é€šçŸ¥ ZoomUI å¼€å§‹æ‹–åŠ¨
         if (zoomUI != null)
         {
             zoomUI.OnDragStart();
         }
         
-        // µ÷ÓÃ»ùÀàµÄĞĞÎª
+        // è°ƒç”¨åŸºç±»çš„è¡Œä¸º
         base.OnMouseDown();
     }
     
-    // ÖØĞ´ OnMouseUp À´Ìí¼Ó MaskCard ÌØÓĞµÄĞĞÎª
+    // é‡å†™ OnMouseUp æ¥æ·»åŠ  MaskCard ç‰¹æœ‰çš„è¡Œä¸º
     protected override void OnMouseUp()
     {
-        // µ÷ÓÃ»ùÀàµÄĞĞÎª
+        // è°ƒç”¨åŸºç±»çš„è¡Œä¸º
         base.OnMouseUp();
         
-        // Í¨Öª ZoomUI ÍÏ¶¯½áÊø
+        // é€šçŸ¥ ZoomUI æ‹–åŠ¨ç»“æŸ
         if (zoomUI != null)
         {
             zoomUI.OnDragEnd();
         }
     }
     
-    // ÖØĞ´ ReturnBackAction À´Ê¹ÓÃ HandManager µÄ¶¯»­ÏµÍ³
+    // é‡å†™ ReturnBackAction æ¥ä½¿ç”¨ HandManager çš„åŠ¨ç”»ç³»ç»Ÿ
     protected override IEnumerator ReturnBackAction()
     {
         isReturning = true;
         isDragging = false;
         dragController.Status = 0;
         
-        // Á¢¼´Í¨Öª HandManager ÖØĞÂÕûÀíÊÖÅÆÎ»ÖÃ
-        if (handManager != null)
-        {
-            handManager.RefreshCardPositions();
-        }
-        
-        // µÈ´ı HandManager µÄ¶¯»­Íê³É
+        // ç­‰å¾… HandManager çš„åŠ¨ç”»å®Œæˆ
         yield return new WaitForSeconds(0.25f);
         
         isReturning = false;
@@ -170,10 +164,6 @@ public class MaskCard : DragUnit
                 
                 Debug.Log($"[MaskCard] Successfully submitted SwitchMask command for {targetUnit.gameObject.name}");
                 
-                if (handManager != null)
-                {
-                    handManager.RemoveCard(gameObject);
-                }
                 
                 Destroy(gameObject);
             }
