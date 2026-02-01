@@ -4,21 +4,26 @@ using UnityEngine;
 
 public class MaskBodyCult : Mask
 {
-<<<<<<< Updated upstream
-    public MaskBodyCult() : base(maskName: "ÈËÌåÅÉµÄÃæ¾ß", switchCost: 1, maxHealth: 8, atk: 3, atkCost: 2)
+    public MaskBodyCult() : base(
+        maskName: "ÈËÌåÅÉµÄÃæ¾ß",
+        switchCost: 1,
+        maxHealth: 8,
+        atk: 3,
+        atkCost: 2,
+        description: "´÷+Æô+»Ù£ºËùÓÐ¼º·½½ÇÉ«»Ø¸´2µãÌåÁ¦ºÍÃæ¾ßÄÍ¾Ã¡£¹¥£º½¦Éä¹¥»÷Ä¿±ê¼°ÏàÁÚµÐÈË¡£",
+        hasActivateAbility: true)
     {
 
-=======
-    public MaskBodyCult() : base(maskName: "é€†å¡å·´æ‹‰è®¡æ•°å™¨", switchCost: 1, maxHealth: 8, atk: 3, atkCost: 2)
-    {
-        MaskIcon = Resources.Load<Sprite>("Image/CardImage/16");
-        MaskObject = Resources.Load<Sprite>("Image/Mask/Mask16");
->>>>>>> Stashed changes
     }
 
     public override IEnumerator Attack(UnitController controller, BattleUnit target)
     {
         yield return AttackSplash(controller, target);
+        UsageAfterAttack();
+        if (controller.BoundUnit != null)
+        {
+            controller.BoundUnit.HealthDisplay(0);
+        }
     }
 
     public override void OnEquip(BattleUnit unit)
@@ -62,11 +67,7 @@ public class MaskBodyCult : Mask
             }
         }
 
-<<<<<<< Updated upstream
         Debug.Log($"[MaskBodyCult] {user.gameObject.name} µÄÉíÌå³ç°ÝÃæ¾ßÉúÐ§£¬ËùÓÐ¼º·½½ÇÉ«»Ø¸´2µãÌåÁ¦ºÍÃæ¾ßÄÍ¾Ã£¡");
-=======
-        Debug.Log($"[MaskBodyCult] {user.gameObject.name} çš„èº«ä½“å´‡æ‹œé¢å…·ç”Ÿæ•ˆï¼Œæ‰€æœ‰å·±æ–¹è§’è‰²å›žå¤2ç‚¹ä½“åŠ›å’Œé¢å…·è€ä¹…ï¼");
->>>>>>> Stashed changes
     }
 
     private List<BattleUnit> GetAllyUnits(Team allyTeam)

@@ -4,27 +4,36 @@ using UnityEngine;
 
 public class MaskCandleHandler : Mask
 {
-<<<<<<< Updated upstream
-    public MaskCandleHandler() : base(maskName: "±üÖòÈËµÄÃæ¾ß", switchCost: 1, maxHealth: 11, atk: 5, atkCost: 1)
+    public MaskCandleHandler() : base(
+        maskName: "±üÖòÈËµÄÃæ¾ß",
+        switchCost: 1,
+        maxHealth: 11,
+        atk: 5,
+        atkCost: 1,
+        description: "Æô£ºÈôÃæ¾ßÄÍ¾Ã¡Ü4£¬¶ÔËùÓĞµĞÈËÔì³É3µãÈºÌåÉËº¦£¬È»ºó»Ø¸´´ËÃæ¾ß3µãÄÍ¾Ã¡£",
+        hasActivateAbility: true)
     {
-
-=======
-    public MaskCandleHandler() : base(maskName: "ç§‰çƒ›äºº", switchCost: 1, maxHealth: 11, atk: 5, atkCost: 1)
+    }
+    
+    /// <summary>
+    /// ÅĞ¶Ïµ±Ç°ÊÇ·ñ¿ÉÒÔÊ¹ÓÃÆôĞ§¹û
+    /// Ìõ¼ş£º»ù´¡ÅĞ¶Ï + ÄÍ¾Ã¡Ü4
+    /// </summary>
+    public override bool CanUseActivateNow()
     {
-        MaskIcon = Resources.Load<Sprite>("Image/CardImage/18");
-        MaskObject = Resources.Load<Sprite>("Image/Mask/Mask18");
->>>>>>> Stashed changes
+        // ÏÈ¼ì²é»ù´¡Ìõ¼ş
+        if (!base.CanUseActivateNow())
+            return false;
+        
+        // ¶îÍâÌõ¼ş£ºÄÍ¾Ã±ØĞë¡Ü4
+        return CurrentHealth <= 4;
     }
 
     public override IEnumerator Activate(UnitController controller)
     {
         if (CurrentHealth <= 4)
         {
-<<<<<<< Updated upstream
             Debug.Log($"[MaskCandleHandler] Ãæ¾ßÄÍ¾Ã ¡Ü 4£¬´¥·¢ÈºÌåÉËº¦Ğ§¹û£¡");
-=======
-            Debug.Log($"[MaskCandleHandler] é¢å…·è€ä¹… â‰¤ 4ï¼Œè§¦å‘ç¾¤ä½“ä¼¤å®³æ•ˆæœï¼");
->>>>>>> Stashed changes
 
             Team enemyTeam = controller.BoundUnit.UnitTeam == Team.Player ? Team.Enemy : Team.Player;
             List<BattleUnit> enemies = GetEnemyUnits(enemyTeam);
@@ -34,28 +43,16 @@ public class MaskCandleHandler : Mask
                 if (enemy.IsAlive())
                 {
                     enemy.ApplyHealthChange(-3);
-<<<<<<< Updated upstream
                     Debug.Log($"[MaskCandleHandler] ¶Ô {enemy.gameObject.name} Ôì³É 3 µãÉËº¦£¡");
-=======
-                    Debug.Log($"[MaskCandleHandler] å¯¹ {enemy.gameObject.name} é€ æˆ 3 ç‚¹ä¼¤å®³ï¼");
->>>>>>> Stashed changes
                 }
             }
 
             RepairMask(3);
-<<<<<<< Updated upstream
             Debug.Log($"[MaskCandleHandler] Ãæ¾ß»Ø¸´ 3 µãÄÍ¾Ã£¬µ±Ç°ÄÍ¾Ã: {CurrentHealth}/{MaxHealth}");
         }
         else
         {
             Debug.Log($"[MaskCandleHandler] Ãæ¾ßÄÍ¾Ã > 4 ({CurrentHealth}/{MaxHealth})£¬Ğ§¹ûÎ´´¥·¢");
-=======
-            Debug.Log($"[MaskCandleHandler] é¢å…·å›å¤ 3 ç‚¹è€ä¹…ï¼Œå½“å‰è€ä¹…: {CurrentHealth}/{MaxHealth}");
-        }
-        else
-        {
-            Debug.Log($"[MaskCandleHandler] é¢å…·è€ä¹… > 4 ({CurrentHealth}/{MaxHealth})ï¼Œæ•ˆæœæœªè§¦å‘");
->>>>>>> Stashed changes
         }
 
         yield return base.Activate(controller);

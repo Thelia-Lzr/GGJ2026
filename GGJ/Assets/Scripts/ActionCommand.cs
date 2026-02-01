@@ -3,7 +3,8 @@ using System.Collections.Generic;
 public enum ActionType
 {
     Attack,
-    SwitchMask
+    SwitchMask,
+    ActivateMask
 }
 
 public class ActionCommand
@@ -38,6 +39,12 @@ public class ActionCommand
         if (ActionType == ActionType.Attack)
         {
             if (Target == null || !Target.IsAlive())
+                return false;
+        }
+        
+        if (ActionType == ActionType.ActivateMask)
+        {
+            if (MaskData == null || !MaskData.CanUseActivateNow())
                 return false;
         }
         

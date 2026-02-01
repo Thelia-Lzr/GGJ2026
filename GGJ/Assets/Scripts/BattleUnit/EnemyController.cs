@@ -13,8 +13,8 @@ public enum AIBehaviorType
 public class EnemyController : UnitController
 {
     [Header("Enemy AI Settings")]
-    [SerializeField] protected AIBehaviorType behaviorType = AIBehaviorType.Random;
-    [SerializeField] protected float thinkDelay = 1f;
+    protected AIBehaviorType behaviorType = AIBehaviorType.Random;
+    protected float thinkDelay = 1f;
     
     protected List<BattleUnit> potentialTargets = new List<BattleUnit>();
     protected Dictionary<ResourceType, int> resources = new Dictionary<ResourceType, int>();
@@ -140,6 +140,18 @@ public class EnemyController : UnitController
                 if (command.MaskData != null)
                 {
                     SwitchMask(command.MaskData, command.ResourceCost);
+                }
+                break;
+            
+            case ActionType.ActivateMask:
+                if (command.MaskData != null)
+                {
+                    Debug.Log($"[EnemyController] 执行面具启效果: {command.MaskData.MaskName}");
+                    yield return command.MaskData.Activate(this);
+                }
+                else
+                {
+                    Debug.LogWarning("[EnemyController] ActivateMask 命令缺少 MaskData");
                 }
                 break;
             

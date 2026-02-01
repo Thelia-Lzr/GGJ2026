@@ -10,8 +10,6 @@ using UnityEngine;
 public class EnemyBuffer : EnemyController
 {
     [Header("Buffer Enemy Settings")]
-    private int initialHealth = 25;
-    private int initialAttack = 5;
     private int buffAmount = 2;
     
     protected override void Awake()
@@ -21,6 +19,9 @@ public class EnemyBuffer : EnemyController
     
     private void Start()
     {
+        initialHealth = 25;
+        initialAttack = 5;
+        
         if (boundUnit != null)
         {
             boundUnit.Initialize(this, initialHealth, initialHealth, initialAttack, 5);

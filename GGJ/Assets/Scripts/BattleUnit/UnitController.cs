@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Runtime.CompilerServices;
 
 public abstract class UnitController : MonoBehaviour
 {
@@ -19,17 +20,21 @@ public abstract class UnitController : MonoBehaviour
     public event Action<Mask, Mask> OnMaskSwitched;
     public event Action<ActionCommand> OnActionConfirmed;
 
+    private GameObject currentActionCircle;
+
     public BattleUnit BoundUnit => boundUnit;
     public Mask CurrentMask => currentMask;
     public bool CanAct => canAct && !isStunned && boundUnit != null && boundUnit.IsAlive();
 
     //初始属性定义
-    private int initialAttack = 10;
-    private int initialDefense = 5;
-    private int initialMaxHealth = 100;
-    private int initialHealth = 50;
+    protected int initialAttack = 10;
+    protected int initialDefense = 5;
+    protected int initialMaxHealth = 100;
+    protected int initialHealth = 50;
 
     public int attackCount { get; protected set; }
+ 
+
 
 
     protected virtual void Awake()
@@ -45,6 +50,12 @@ public abstract class UnitController : MonoBehaviour
     {
         BindUnit(boundUnit);
     }
+    
+    protected virtual void OnDestroy()
+    {
+        UnsubscribeFromStatusEvents();
+    }
+    
     public virtual void BindUnit(BattleUnit unit)
     {
         boundUnit = unit;
@@ -52,7 +63,36 @@ public abstract class UnitController : MonoBehaviour
         if (boundUnit != null)
         {
             boundUnit.Initialize(this,initialMaxHealth,initialHealth,initialAttack,initialDefense);
+            SubscribeToStatusEvents();
         }
+    }
+    
+    protected void SubscribeToStatusEvents()
+    {
+        if (boundUnit != null)
+        {
+            boundUnit.OnStatusApplied += OnStatusAppliedHandler;
+            boundUnit.OnStatusRemoved += OnStatusRemovedHandler;
+        }
+    }
+    
+    protected void UnsubscribeFromStatusEvents()
+    {
+        if (boundUnit != null)
+        {
+            boundUnit.OnStatusApplied -= OnStatusAppliedHandler;
+            boundUnit.OnStatusRemoved -= OnStatusRemovedHandler;
+        }
+    }
+    
+    protected virtual void OnStatusAppliedHandler(StatusEffect effect)
+    {
+        // 子类可重写此方法来处理特定状态的应用
+    }
+    
+    protected virtual void OnStatusRemovedHandler(StatusEffect effect)
+    {
+        // 子类可重写此方法来处理特定状态的移除
     }
     
     
@@ -108,6 +148,30 @@ public abstract class UnitController : MonoBehaviour
         if (boundUnit != null)
         {
             boundUnit.SetMask(currentMask);
+            
+            // 如果是玩家回合且新面具有启效果，立即刷新黄圈
+            if (RoundManager.Instance != null && 
+                RoundManager.Instance.CurrentActiveTeam == Team.Player &&
+                boundUnit.UnitTeam == Team.Player &&
+                currentMask.HasActivateAbility)
+            {
+                // 先移除旧黄圈
+                boundUnit.HideActivateCircle();
+                
+                // 刷新启效果状态：重置本回合可用标记
+                currentMask.CanUseActivateThisRound = true;
+                
+                // 检查是否满足所有条件后显示黄圈
+                if (currentMask.CanUseActivateNow())
+                {
+                    boundUnit.ShowActivateCircle();
+                    Debug.Log($"[UnitController] 戴上新面具 {currentMask.MaskName}，刷新启效果黄圈");
+                }
+                else
+                {
+                    Debug.Log($"[UnitController] 戴上新面具 {currentMask.MaskName}，但不满足启效果条件");
+                }
+            }
         }
         
         if (cost > 0)
@@ -118,6 +182,25 @@ public abstract class UnitController : MonoBehaviour
         OnMaskSwitched?.Invoke(oldMask, newMask);
         
         return true;
+    }
+    
+    public virtual void RemoveBrokenMask()
+    {
+        if (currentMask == null || !currentMask.IsBroken)
+            return;
+        
+        Debug.Log($"[UnitController] 移除破损面具: {currentMask.MaskName}");
+        
+        Mask brokenMask = currentMask;
+        brokenMask.OnUnequip(boundUnit);
+        currentMask = null;
+        
+        if (boundUnit != null)
+        {
+            boundUnit.ClearMask();
+        }
+        
+        OnMaskSwitched?.Invoke(brokenMask, null);
     }
     
     public List<ActionCommand> GetAvailableActions()
@@ -201,6 +284,13 @@ public abstract class UnitController : MonoBehaviour
         {
             currentMask.OnTurnEnd();
         }
+        
+        // 清理现有的ActionCircle
+        if (currentActionCircle != null)
+        {
+            Destroy(currentActionCircle);
+            currentActionCircle = null;
+        }
     }
     
     public void SetStunned(bool stunned)
@@ -228,9 +318,18 @@ public abstract class UnitController : MonoBehaviour
         //可以改为ResoruceManager来管理
         if (attackCount > 0)
         {
-            GameObject actionCircle = Instantiate(ResourceController.Instance.GetPrefab("ActionCircle"), transform);
-            ActionCircle aC = actionCircle.GetComponent<ActionCircle>();
+            if (currentActionCircle != null)
+            {
+                Debug.Log($"[UnitController] {gameObject.name} already has an ActionCircle, skipping creation.");
+                return;
+            }
+            
+            currentActionCircle = Instantiate(ResourceController.Instance.GetPrefab("ActionCircle"), transform);
+            currentActionCircle.name = "ActionCircle"; // 确保名字正确
+            ActionCircle aC = currentActionCircle.GetComponent<ActionCircle>();
             aC.Initialize(this);
+            
+            Debug.Log($"[UnitController] {gameObject.name} 创建ActionCircle（攻击圈）");
         }
 
     }
@@ -278,6 +377,18 @@ public abstract class UnitController : MonoBehaviour
                 if (command.MaskData != null)
                 {
                     SwitchMask(command.MaskData, command.ResourceCost);
+                }
+                break;
+            
+            case ActionType.ActivateMask:
+                if (command.MaskData != null)
+                {
+                    Debug.Log($"[UnitController] 执行面具启效果: {command.MaskData.MaskName}");
+                    yield return command.MaskData.Activate(this);
+                }
+                else
+                {
+                    Debug.LogWarning("[UnitController] ActivateMask 命令缺少 MaskData");
                 }
                 break;
             

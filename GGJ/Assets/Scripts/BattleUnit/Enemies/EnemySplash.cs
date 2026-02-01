@@ -9,9 +9,6 @@ using UnityEngine;
 /// </summary>
 public class EnemySplash : EnemyController
 {
-    [Header("Splash Enemy Settings")]
-    private int initialHealth = 25;
-    private int initialAttack = 3;
     
     protected override void Awake()
     {
@@ -20,6 +17,9 @@ public class EnemySplash : EnemyController
     
     private void Start()
     {
+        initialHealth = 25;
+        initialAttack = 3;
+        
         if (boundUnit != null)
         {
             boundUnit.Initialize(this, initialHealth, initialHealth, initialAttack, 5);

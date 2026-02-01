@@ -3,6 +3,8 @@ using UnityEngine;
 using System;
 using TMPro;
 using UnityEngine.UI;
+using System.IO;
+using Unity.VisualScripting;
 
 public enum Team
 {
@@ -32,6 +34,8 @@ public class BattleUnit : MonoBehaviour
     private Mask currentMask;
     private List<StatusEffect> activeStatusEffects = new List<StatusEffect>();
     
+    private GameObject currentActivateCircle;
+    
     public event Action<int> OnHealthChanged;
     public event Action<StatusEffect> OnStatusApplied;
     public event Action<StatusEffect> OnStatusRemoved;
@@ -50,6 +54,13 @@ public class BattleUnit : MonoBehaviour
     //护盾文本
     [field: SerializeField]
     public GameObject ShellText { get; private set; }
+
+    //UI
+    public List<GameObject> BuffUI = new List<GameObject>();
+
+    //护盾图标
+    [field: SerializeField]
+    public GameObject ShellIcon { get; private set; }
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
     public int Attack => attack;
@@ -67,6 +78,15 @@ public class BattleUnit : MonoBehaviour
     {
         
     }
+    
+    private void LateUpdate()
+    {
+        if (UIText != null)
+        {
+            UIText.GetComponent<RectTransform>().anchoredPosition = Camera.main.WorldToScreenPoint(transform.position);
+        }
+    }
+    
     public void Initialize(UnitController unitController, int MaxHealth,int CurrentHealth,int Atk,int Def)
     {
         controller = unitController;
@@ -78,6 +98,7 @@ public class BattleUnit : MonoBehaviour
         //UI
         OnHealthChanged += HealthDisplay;
         OnHealthChanged += HealthChangeDisplay;
+        OnStatusApplied += BuffUIDisplay;
         if (UIText == null)
         {
             UIText = new GameObject("uitext");
@@ -88,7 +109,7 @@ public class BattleUnit : MonoBehaviour
         UIText.GetComponent<RectTransform>().anchorMax = new Vector2(0, 0);
         UIText.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0);
         UIText.GetComponent<RectTransform>().localScale = Vector3.one;
-        UIText.GetComponent<RectTransform>().sizeDelta =new Vector2(250,300);
+        UIText.GetComponent<RectTransform>().sizeDelta =new Vector2(150,180);
         HealthDisplay(0);
     }
     
@@ -96,16 +117,26 @@ public class BattleUnit : MonoBehaviour
     {
         currentMask = mask;
         OnMaskChanged?.Invoke(mask);
+        HealthDisplay(0);
     }
     
     public void ClearMask()
     {
         currentMask = null;
         OnMaskChanged?.Invoke(null);
+        HealthDisplay(0);
     }
     public virtual void ApplyHealthChange(int amount)
     {
         if (!IsAlive()) return;
+        
+        if (amount < 0 && currentMask != null && !currentMask.IsBroken)
+        {
+            int overflow = currentMask.TakeDamage(-amount);
+            amount = -overflow;
+            HealthDisplay(0);
+        }
+        
         currentHealth = Mathf.Max(0, currentHealth + amount);
 
         OnHealthChanged?.Invoke(amount);
@@ -130,7 +161,7 @@ public class BattleUnit : MonoBehaviour
                 textTranform.anchorMin = new Vector2(0, 1);
                 textTranform.anchorMax = new Vector2(0, 1);
                 textTranform.anchoredPosition = new Vector2(0, 0);
-                textTranform.sizeDelta = new Vector2(50, 50);
+                textTranform.sizeDelta = new Vector2(30, 30);
                 textTranform.localScale = Vector3.one;
                 Image image = healthIcon.AddComponent<Image>();
                 image.sprite = resourceController.Sprites[0];
@@ -143,11 +174,11 @@ public class BattleUnit : MonoBehaviour
                 textTranform.pivot = new Vector2(0, 1);
                 textTranform.anchorMin = new Vector2(0, 1);
                 textTranform.anchorMax = new Vector2(0, 1);
-                textTranform.anchoredPosition = new Vector2(50, 0);
-                textTranform.sizeDelta = new Vector2(200, 50);
+                textTranform.anchoredPosition = new Vector2(30, 0);
+                textTranform.sizeDelta = new Vector2(120, 30);
                 textTranform.localScale = Vector3.one;
                 TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
-                text.fontSize = 50;
+                text.fontSize = 30;
                 text.font = textFont;
                 text.alignment = TextAlignmentOptions.MidlineLeft;
                 HealthText = newText;
@@ -155,17 +186,18 @@ public class BattleUnit : MonoBehaviour
             //图片
             if (true)
             {
-                GameObject healthIcon = new GameObject("HealthIcon");
+                GameObject healthIcon = new GameObject("ShellIcon");
                 RectTransform textTranform = healthIcon.AddComponent<RectTransform>();
                 textTranform.SetParent(UIText.GetComponent<RectTransform>());
                 textTranform.pivot = new Vector2(0, 1);
                 textTranform.anchorMin = new Vector2(0, 1);
                 textTranform.anchorMax = new Vector2(0, 1);
-                textTranform.anchoredPosition = new Vector2(130, 0);
-                textTranform.sizeDelta = new Vector2(50, 50);
+                textTranform.anchoredPosition = new Vector2(75, 0);
+                textTranform.sizeDelta = new Vector2(30, 30);
                 textTranform.localScale = Vector3.one;
                 Image image = healthIcon.AddComponent<Image>();
                 image.sprite = resourceController.Sprites[2];
+                ShellIcon = healthIcon;
             }
             if (true)
             {
@@ -175,11 +207,11 @@ public class BattleUnit : MonoBehaviour
                 textTranform.pivot = new Vector2(0, 1);
                 textTranform.anchorMin = new Vector2(0, 1);
                 textTranform.anchorMax = new Vector2(0, 1);
-                textTranform.anchoredPosition = new Vector2(180, 0);
-                textTranform.sizeDelta = new Vector2(200, 50);
+                textTranform.anchoredPosition = new Vector2(105, 0);
+                textTranform.sizeDelta = new Vector2(120, 30);
                 textTranform.localScale = Vector3.one;
                 TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
-                text.fontSize = 50;
+                text.fontSize = 30;
                 text.font = textFont;
                 text.alignment = TextAlignmentOptions.MidlineLeft;
                 ShellText = newText;
@@ -187,14 +219,18 @@ public class BattleUnit : MonoBehaviour
 
         }
         HealthText.GetComponent<TextMeshProUGUI>().text = CurrentHealth.ToString();
+        
+        // 根据是否有面具来显示/隐藏护盾UI
         if (currentMask != null)
         {
+            if (ShellIcon != null) ShellIcon.SetActive(true);
+            if (ShellText != null) ShellText.SetActive(true);
             ShellText.GetComponent<TextMeshProUGUI>().text = currentMask.CurrentHealth.ToString();
-
         }
         else
         {
-            ShellText.GetComponent<TextMeshProUGUI>().text = "" + 0;
+            if (ShellIcon != null) ShellIcon.SetActive(false);
+            if (ShellText != null) ShellText.SetActive(false);
         }
     }
     public void HealthChangeDisplay(int amount)
@@ -202,6 +238,62 @@ public class BattleUnit : MonoBehaviour
         GameObject newDisplay = Instantiate(resourceController.GetPrefab("HealthChangeDisplay"));
         newDisplay.GetComponent<RectTransform>().SetParent(UIText.GetComponent<RectTransform>());
         newDisplay.GetComponent<HealthChangeDisplay>().Intial(amount);
+    }
+    public void BuffUIDisplay(StatusEffect newEffect)
+    {
+        GameObject[] BuffUITemp=new GameObject[BuffUI.Count];
+        for(int i = 0; i < BuffUITemp.Length; i++)
+        {
+            BuffUITemp[i]= BuffUI[i];
+        }
+        for (int i = 0; i < BuffUITemp.Length; i++)
+        {
+            Destroy(BuffUITemp[i]);
+        }
+        BuffUI.Clear();
+        //刷新UI显示
+        for(int i = 0;i < activeStatusEffects.Count; i++)
+        {
+            StatusEffect effect=activeStatusEffects[i];
+            GameObject newUI = new GameObject("BuffUI");
+            RectTransform UITranform = newUI.AddComponent<RectTransform>();
+            UITranform.SetParent(UIText.GetComponent<RectTransform>());
+            UITranform.pivot = new Vector2(0, 1);
+            UITranform.anchorMin = new Vector2(0, 1);
+            UITranform.anchorMax = new Vector2(0, 1);
+            UITranform.sizeDelta = new Vector2(30, 30);
+            UITranform.localScale = Vector3.one;
+            //75,-90
+            UITranform.anchoredPosition = new Vector2(40 * i, 40);
+            BuffUI.Add(newUI);
+
+            Image image = UITranform.AddComponent<Image>();
+            switch (effect.StatusId)
+            {
+                case "Add2Atk":
+
+                    break;
+                case "Minus2Atk":
+                    Debug.LogWarning("!");
+                    break;
+                case "Stunned":
+
+                    break;
+                case "Enraged":
+
+                    break;
+            }
+            if (controller is EnemyTank tank)
+            {
+                if(tank.JudgeCharge())
+                {
+                    //显示UI
+                }
+            }
+
+
+
+        }
     }
     public void ApplyStatus(StatusEffect effect)
     {
@@ -294,6 +386,62 @@ public class BattleUnit : MonoBehaviour
         }
         
         OnTurnEnded?.Invoke();
+    }
+    
+    public void ShowActivateCircle()
+    {
+        // 检查面具是否当前可以使用启效果
+        if (currentMask == null || !currentMask.CanUseActivateNow())
+            return;
+        
+        if (currentActivateCircle != null)
+        {
+            Debug.Log($"[BattleUnit] {gameObject.name} 已有ActivateCircle（黄圈），跳过创建");
+            return;
+        }
+        
+        Debug.Log($"[BattleUnit] 为 {gameObject.name} 创建ActivateCircle（启效果黄圈）");
+        
+        // 从ActivateCircleManager获取预制体
+        if (ActivateCircleManager.Instance != null)
+        {
+            GameObject prefab = ActivateCircleManager.Instance.GetActivateCirclePrefab();
+            if (prefab != null)
+            {
+                currentActivateCircle = Instantiate(prefab, transform);
+                currentActivateCircle.transform.localPosition = new Vector3(0, 0.65f, 0);
+                
+                ActivateCircle circle = currentActivateCircle.GetComponent<ActivateCircle>();
+                if (circle != null)
+                {
+                    circle.Initialize(this);
+                }
+                else
+                {
+                    Debug.LogError("[BattleUnit] ActivateCircle预制体上没有ActivateCircle组件！");
+                    Destroy(currentActivateCircle);
+                    currentActivateCircle = null;
+                }
+            }
+            else
+            {
+                Debug.LogError("[BattleUnit] 未能从ActivateCircleManager获取预制体！");
+            }
+        }
+        else
+        {
+            Debug.LogError("[BattleUnit] ActivateCircleManager实例不存在！");
+        }
+    }
+    
+    public void HideActivateCircle()
+    {
+        if (currentActivateCircle != null)
+        {
+            Debug.Log($"[BattleUnit] 移除 {gameObject.name} 的ActivateCircle（启效果黄圈）");
+            Destroy(currentActivateCircle);
+            currentActivateCircle = null;
+        }
     }
     
     private void Die()

@@ -10,8 +10,6 @@ using UnityEngine;
 public class EnemyHealer : EnemyController
 {
     [Header("Healer Enemy Settings")]
-    private int initialHealth = 15;
-    private int initialAttack = 5;
     private int healAmount = 2;
     
     protected override void Awake()
@@ -21,6 +19,9 @@ public class EnemyHealer : EnemyController
     
     private void Start()
     {
+        initialHealth = 15;
+        initialAttack = 5;
+        
         if (boundUnit != null)
         {
             boundUnit.Initialize(this, initialHealth, initialHealth, initialAttack, 5);

@@ -34,8 +34,8 @@ public class AudioTester : MonoBehaviour
         }
 
         // --- SFX 测试 ---
-        // 按 空格：测试指定名字的音效
-        if (Input.GetKeyDown(KeyCode.Space))
+        // 按 3：测试指定名字的音效（改为数字3，避免与抽卡的空格键冲突）
+        if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             Debug.Log($"<color=yellow>【测试】尝试播放音效: {hammerClipName} (分类: {attackType})</color>");
             AudioManager.Instance.PlaySFX(attackType, hammerClipName);
@@ -70,6 +70,6 @@ public class AudioTester : MonoBehaviour
         // 这里的自检需要保证 AudioManager 里的变量是 public 的才能访问
         // 如果报错，可以暂时注释掉这段 Start 里的内容
         Debug.Log("✅ 自检成功：AudioManager 实例已就绪。");
-        Debug.Log("操作指南：[1]两段BGM  [2]普通BGM  [空格]指定音效  [R]随机音效  [S]停止");
+        Debug.Log("操作指南：[1]两段BGM  [2]普通BGM  [3]指定音效  [R]随机音效  [S]停止");
     }
 }

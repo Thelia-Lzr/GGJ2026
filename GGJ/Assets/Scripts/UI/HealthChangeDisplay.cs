@@ -17,24 +17,25 @@ public class HealthChangeDisplay : MonoBehaviour
     }
     public IEnumerator Display(int amount)
     {
-        time = Random.Range(0.5f, 1f);
+        time = Random.Range(0.3f, 0.7f);
         RectTransform rectTransform = GetComponent<RectTransform>();
-        rectTransform.anchoredPosition = new Vector2(100,200);
+        rectTransform.anchoredPosition = new Vector2(100,100);
         rectTransform.localScale = new Vector3(1, 1, 1);
-        var movePosition = new Vector2(Random.Range(-1f, 1f),Random.Range(2f, 3f));
+        var movePosition = new Vector2(Random.Range(-0.3f, 0.3f),Random.Range(0.5f, 0.7f));
         //Debug.Log(movePosition);
         TextMeshProUGUI text = GetComponent<TextMeshProUGUI>();
         if (amount > 0)
         {
             text.text = "+"+amount.ToString()+"!";
-
+            text.color = Color.green;
         }
         else
         {
             text.text = amount.ToString()+"!";
+            text.color = Color.red;
+
         }
-        text.color = Color.red;
-        text.fontSize = Random.Range(80,150);
+        text.fontSize = Random.Range(40,60);
         while (time>0)
         {
             time-=Time.deltaTime;

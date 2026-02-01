@@ -1,21 +1,18 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// µĞÈË£¨¹¥»÷µ¥ÈËÀà£©¼æÈâ¶Ü
-/// Health: 30 | Atk: 5 | ¹¥»÷ÀàĞÍ: µ¥Ìå
-/// ĞĞÎª: µ¥ÌåAtk or ĞîÁ¦2»ØºÏ µ¥Ìå2.6Atk
+/// æ•Œäººï¼ˆæ”»å‡»å•äººç±»ï¼‰å…¼è‚‰ç›¾
+/// Health: 30 | Atk: 5 | æ”»å‡»ç±»å‹: å•ä½“
+/// è¡Œä¸º: å•ä½“Atk or è“„åŠ›2å›åˆ å•ä½“2.6Atk
 /// </summary>
 public class EnemyTank : EnemyController
 {
     [Header("Tank Enemy Settings")]
     [SerializeField] private int chargeCounter = 0;
-    [SerializeField] private int chargeTime = 2;
+    [SerializeField] private int chargeTime = 1;
     [SerializeField] private float chargeMultiplier = 2.6f;
-    
-    private int initialHealth = 30;
-    private int initialAttack = 5;
     
     protected override void Awake()
     {
@@ -24,9 +21,33 @@ public class EnemyTank : EnemyController
     
     private void Start()
     {
+        initialHealth = 30;
+        initialAttack = 5;
+        
         if (boundUnit != null)
         {
             boundUnit.Initialize(this, initialHealth, initialHealth, initialAttack, 5);
+        }
+    }
+    
+    protected override void OnStatusAppliedHandler(StatusEffect effect)
+    {
+        base.OnStatusAppliedHandler(effect);
+        
+        if (effect is Stunned)
+        {
+            Debug.Log($"[EnemyTank] {gameObject.name} è¢«çœ©æ™•ï¼è“„åŠ›è®¡æ•°å™¨é‡ç½®ã€‚");
+            chargeCounter = 0;
+        }
+    }
+    
+    protected override void OnStatusRemovedHandler(StatusEffect effect)
+    {
+        base.OnStatusRemovedHandler(effect);
+        
+        if (effect is Stunned)
+        {
+            Debug.Log($"[EnemyTank] {gameObject.name} çœ©æ™•è§£é™¤ã€‚");
         }
     }
     
@@ -36,7 +57,7 @@ public class EnemyTank : EnemyController
         
         if (enemyUnits.Count == 0)
         {
-            Debug.LogWarning($"{gameObject.name}: Ã»ÓĞ¿É¹¥»÷µÄµĞ¶Ôµ¥Î»");
+            Debug.LogWarning($"{gameObject.name}: æ²¡æœ‰å¯æ”»å‡»çš„æ•Œå¯¹å•ä½");
             return null;
         }
         
@@ -52,33 +73,33 @@ public class EnemyTank : EnemyController
         {
             attackCount--;
             
-            // Èç¹ûÒÑ¾­ĞîÁ¦ÂúÁË£¬±ØĞëÊÍ·ÅĞîÁ¦¹¥»÷
+            // å¦‚æœå·²ç»è“„åŠ›æ»¡äº†ï¼Œå¿…é¡»é‡Šæ”¾è“„åŠ›æ”»å‡»
             if (chargeCounter >= chargeTime)
             {
-                Debug.Log($"[EnemyTank] {gameObject.name} ÊÍ·ÅĞîÁ¦¹¥»÷£¡");
+                Debug.Log($"[EnemyTank] {gameObject.name} é‡Šæ”¾è“„åŠ›æ”»å‡»ï¼");
                 yield return AttackSingle(command.Target, chargeMultiplier);
                 chargeCounter = 0;
             }
-            // Èç¹ûÕıÔÚĞîÁ¦ÖĞ£¨µ«Î´Âú£©£¬¼ÌĞøĞîÁ¦
+            // å¦‚æœæ­£åœ¨è“„åŠ›ä¸­ï¼ˆä½†æœªæ»¡ï¼‰ï¼Œç»§ç»­è“„åŠ›
             else if (chargeCounter > 0 && chargeCounter < chargeTime)
             {
                 chargeCounter++;
-                Debug.Log($"[EnemyTank] {gameObject.name} ¼ÌĞøĞîÁ¦ ({chargeCounter}/{chargeTime})");
+                Debug.Log($"[EnemyTank] {gameObject.name} ç»§ç»­è“„åŠ› ({chargeCounter}/{chargeTime})");
                 yield return new WaitForSeconds(0.5f);
             }
-            // Èç¹ûÎ´ÔÚĞîÁ¦×´Ì¬£¬Ëæ»úÑ¡ÔñÆÕÍ¨¹¥»÷»ò¿ªÊ¼ĞîÁ¦
+            // å¦‚æœæœªåœ¨è“„åŠ›çŠ¶æ€ï¼Œéšæœºé€‰æ‹©æ™®é€šæ”»å‡»æˆ–å¼€å§‹è“„åŠ›
             else
             {
                 if (Random.value > 0.5f)
                 {
-                    // ¿ªÊ¼ĞîÁ¦
+                    // å¼€å§‹è“„åŠ›
                     chargeCounter++;
-                    Debug.Log($"[EnemyTank] {gameObject.name} ¿ªÊ¼ĞîÁ¦ ({chargeCounter}/{chargeTime})");
+                    Debug.Log($"[EnemyTank] {gameObject.name} å¼€å§‹è“„åŠ› ({chargeCounter}/{chargeTime})");
                     yield return new WaitForSeconds(0.5f);
                 }
                 else
                 {
-                    // ÆÕÍ¨¹¥»÷
+                    // æ™®é€šæ”»å‡»
                     yield return AttackSingle(command.Target);
                 }
             }
@@ -117,5 +138,13 @@ public class EnemyTank : EnemyController
     {
         int randomIndex = Random.Range(0, targets.Count);
         return targets[randomIndex];
+    }
+    public bool JudgeCharge()
+    {
+        if (chargeTime !=0)
+        {
+            return true;
+        }
+        return false;
     }
 }

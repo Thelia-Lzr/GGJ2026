@@ -1,45 +1,83 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class DragUnit : MonoBehaviour
 {
     protected Vector3 startPosition;
-    private DragController dragController => DragController.Instance;
-    private Vector3 mouseOffset;
-    private bool isDragging;
+    protected DragController dragController => DragController.Instance;
+    protected Vector3 mouseOffset;
+    protected bool isDragging;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         startPosition = transform.position;
     }
-    private void Start()
+    protected virtual void Start()
     {
 
     }
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
 
     }
-    private void OnMouseDown()
+    protected virtual void OnMouseDown()
     {
         if (dragController.Status != 0) return;
+        
+        if (RoundManager.Instance != null && RoundManager.Instance.GetActiveTeam() != Team.Player)
+        {
+            return;
+        }
+        
+        // 只响应左键（按钮0），忽略右键
+        if (!Input.GetMouseButton(0))
+        {
+            return;
+        }
+        
+        // 更新起始位置为当前位置（而非实例化时的位置）
+        startPosition = transform.position;
+        
         isDragging = true;
         mouseOffset = GetWorldMousePosition() - transform.position;
     }
-    private void OnMouseDrag()
+    protected virtual void OnMouseDrag()
     {
         if (dragController.Status != 0) return;
+        
+        if (RoundManager.Instance != null && RoundManager.Instance.GetActiveTeam() != Team.Player)
+        {
+            return;
+        }
+        
+        // 只在左键拖拽时执行
+        if (!Input.GetMouseButton(0))
+        {
+            return;
+        }
 
         if (isDragging)
         {
             transform.position = GetWorldMousePosition() - mouseOffset;
         }
     }
-    private void OnMouseUp()
+    protected virtual void OnMouseUp()
     {
         if (dragController.Status != 0) return;
+        
+        if (RoundManager.Instance != null && RoundManager.Instance.GetActiveTeam() != Team.Player)
+        {
+            return;
+        }
+        
+        // 只在左键抬起时执行
+        if (!Input.GetMouseButtonUp(0))
+        {
+            return;
+        }
 
         if (isDragging)
         {
@@ -53,7 +91,6 @@ public class DragUnit : MonoBehaviour
                 dragController.Status = 1;
                 StartCoroutine(ReturnBackAction());
             }
-
         }
     }
     protected virtual void afterMatch()
@@ -64,25 +101,23 @@ public class DragUnit : MonoBehaviour
     {
         return dragController.JudgeCollider(transform.position);
     }
-    private Vector3 GetWorldMousePosition()
+    protected Vector3 GetWorldMousePosition()
     {
         Vector3 mouseScreenPos = Input.mousePosition;
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
         mouseWorldPos.z = 0;
         return mouseWorldPos;
     }
-    public IEnumerator ReturnBackAction()
+    protected virtual IEnumerator ReturnBackAction()
     {
-        float speed = DragController.RETURNSPEED;
-        float minDistance = 0.01f;
+        float duration = 0.3f;
         
-        while (Vector3.Distance(transform.position, startPosition) > minDistance)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, startPosition, speed * Time.deltaTime);
-            yield return null;
-        }
+        // 使用 DOTween 移动，这样与 HandManager 的动画系统一致
+        transform.DOMove(startPosition, duration).SetEase(Ease.OutQuad);
         
-        transform.position = startPosition;
+        // 等待动画完成
+        yield return new WaitForSeconds(duration);
+        
         isDragging = false;
         dragController.Status = 0;
     }

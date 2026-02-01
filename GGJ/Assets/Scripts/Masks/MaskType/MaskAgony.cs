@@ -4,21 +4,25 @@ using UnityEngine;
 
 public class MaskAgony : Mask
 {
-<<<<<<< Updated upstream
-    public MaskAgony() : base(maskName: "Í´¿àµÄÃæ¾ß", switchCost: 1, maxHealth: 6, atk: 3, atkCost: 1)
+    public MaskAgony() : base(
+        maskName: "Í´¿àµÄÃæ¾ß",
+        switchCost: 1,
+        maxHealth: 6,
+        atk: 3,
+        atkCost: 1,
+        description: "´÷£ºÑ£ÔÎ1ÃûËæ»úµÐÈË¡£¹¥£º½¦Éä¹¥»÷Ä¿±ê¼°ÏàÁÚµÐÈË¡£")
     {
 
-=======
-    public MaskAgony() : base(maskName: "æŠ˜ç£¨å¼€å§‹ï¼", switchCost: 1, maxHealth: 6, atk: 3, atkCost: 1)
-    {
-        MaskIcon = Resources.Load<Sprite>("Image/CardImage/15");
-        MaskObject = Resources.Load<Sprite>("Image/Mask/Mask15");
->>>>>>> Stashed changes
     }
 
     public override IEnumerator Attack(UnitController controller, BattleUnit target)
     {
         yield return AttackSplash(controller, target);
+        UsageAfterAttack();
+        if (controller.BoundUnit != null)
+        {
+            controller.BoundUnit.HealthDisplay(0);
+        }
     }
 
     public override void OnEquip(BattleUnit unit)
@@ -35,11 +39,7 @@ public class MaskAgony : Mask
             
             target.ApplyStatus(new Stunned(1));
             
-<<<<<<< Updated upstream
             Debug.Log($"[MaskAgony] {unit.gameObject.name} ×°±¸Í´¿àÃæ¾ß£¬Ñ£ÔÎÁË {target.gameObject.name}£¡");
-=======
-            Debug.Log($"[MaskAgony] {unit.gameObject.name} è£…å¤‡ç—›è‹¦é¢å…·ï¼Œçœ©æ™•äº† {target.gameObject.name}ï¼");
->>>>>>> Stashed changes
         }
     }
 

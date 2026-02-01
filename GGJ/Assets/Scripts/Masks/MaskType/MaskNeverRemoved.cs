@@ -5,16 +5,16 @@ using UnityEngine;
 
 public class MaskNeverRemoved : Mask
 {
-<<<<<<< Updated upstream
-    public MaskNeverRemoved() : base(maskName: "´Ó²»ÕªÏÂµÄÃæ¾ß", switchCost: 1, maxHealth: 8, atk: 5, atkCost: 0)
+    public MaskNeverRemoved() : base(
+        maskName: "´Ó²»ÕªÏÂµÄÃæ¾ß",
+        switchCost: 1,
+        maxHealth: 8,
+        atk: 5,
+        atkCost: 0,
+        description: "Æô£ºËùÓÐ¼º·½½ÇÉ«¹¥»÷Á¦+2£¨³ÖÐø1»ØºÏ£©¡£¹¥»÷²»ÏûºÄÃæ¾ßÄÍ¾Ã¡£",
+        hasActivateAbility: true)
     {
 
-=======
-    public MaskNeverRemoved() : base(maskName: "ç‰›æˆ˜å£«ä»Žä¸æ‘˜ä¸‹è‡ªå·±çš„é¢å…·ï¼", switchCost: 1, maxHealth: 8, atk: 5, atkCost: 0)
-    {
-        MaskIcon = Resources.Load<Sprite>("Image/CardImage/14");
-        MaskObject = Resources.Load<Sprite>("Image/Mask/Mask14");
->>>>>>> Stashed changes
     }
     public override IEnumerator Activate(UnitController controller)
     {
