@@ -12,7 +12,7 @@ public abstract class UnitController : MonoBehaviour
     [SerializeField] private int attackCountGains = 1;
     
     [Header("Visual Settings")]
-    [Tooltip("角色图片Sprite，如果为空会尝试从Resources/Image/Character/类名加载")]
+    [Tooltip("��ɫͼƬSprite�����Ϊ�ջ᳢�Դ�Resources/Image/Character/��������")]
     [SerializeField] protected Sprite characterSprite;
 
     protected bool isStunned = false;
@@ -32,14 +32,14 @@ public abstract class UnitController : MonoBehaviour
     public Sprite CharacterSprite => characterSprite;
     
     /// <summary>
-    /// 设置角色图片（用于动态创建时）
+    /// ���ý�ɫͼƬ�����ڶ�̬����ʱ��
     /// </summary>
     public void SetCharacterSprite(Sprite sprite)
     {
         characterSprite = sprite;
     }
 
-    //初始属性定义
+    //��ʼ���Զ���
     protected int initialAttack = 10;
     protected int initialDefense = 5;
     protected int initialMaxHealth = 100;
@@ -59,20 +59,20 @@ public abstract class UnitController : MonoBehaviour
             Debug.LogWarning($"UnitController on {gameObject.name} could not find AnimationHandler in scene!");
         }
         
-        // 如果没有设置Sprite，尝试从Resources加载
+        // ���û������Sprite�����Դ�Resources����
         if (characterSprite == null)
         {
             string className = GetType().Name;
             characterSprite = Resources.Load<Sprite>($"Image/Char/{className}");
             if (characterSprite == null)
             {
-                Debug.LogWarning($"[UnitController] 无法加载角色图片: Image/Char/{className}");
+                Debug.LogWarning($"[UnitController] �޷����ؽ�ɫͼƬ: Image/Char/{className}");
             }
         }
     }
     private void Start()
     {
-        // 只有当boundUnit还未绑定时才尝试绑定（兼容Inspector预设置的情况）
+        // ֻ�е�boundUnit��δ��ʱ�ų��԰󶨣�����InspectorԤ���õ������
         if (boundUnit != null && !isBound)
         {
             BindUnit(boundUnit);
@@ -88,7 +88,7 @@ public abstract class UnitController : MonoBehaviour
     
     public virtual void BindUnit(BattleUnit unit)
     {
-        if (isBound && unit == boundUnit) return; // 防止重复绑定
+        if (isBound && unit == boundUnit) return; // ��ֹ�ظ���
         
         boundUnit = unit;
         isBound = true;
@@ -122,24 +122,24 @@ public abstract class UnitController : MonoBehaviour
     
     protected virtual void OnDeathHandler()
     {
-        // 销毁UI元素
+        // ����UIԪ��
         if (boundUnit != null && boundUnit.UIText != null)
         {
             Destroy(boundUnit.UIText);
         }
         
-        // 销毁单位GameObject
+        // ���ٵ�λGameObject
         Destroy(gameObject);
     }
     
     protected virtual void OnStatusAppliedHandler(StatusEffect effect)
     {
-        // 子类可重写此方法来处理特定状态的应用
+        // �������д�˷����������ض�״̬��Ӧ��
     }
     
     protected virtual void OnStatusRemovedHandler(StatusEffect effect)
     {
-        // 子类可重写此方法来处理特定状态的移除
+        // �������д�˷����������ض�״̬���Ƴ�
     }
     
     
@@ -170,7 +170,7 @@ public abstract class UnitController : MonoBehaviour
     public void AddAttackCount(int amount)
     {
         attackCount += amount;
-        Debug.Log($"[UnitController] {gameObject.name} 攻击次数增加 {amount}，当前: {attackCount}");
+        Debug.Log($"[UnitController] {gameObject.name} ������������ {amount}����ǰ: {attackCount}");
     }
 
     public virtual bool SwitchMask(Mask newMask, int cost)
@@ -191,32 +191,32 @@ public abstract class UnitController : MonoBehaviour
         currentMask = newMask;
         currentMask.OnEquip(boundUnit);
         
-        // 将面具信息同步到 BattleUnit 用于渲染
+        // �������Ϣͬ���� BattleUnit ������Ⱦ
         if (boundUnit != null)
         {
             boundUnit.SetMask(currentMask);
             
-            // 如果是玩家回合且新面具有启效果，立即刷新黄圈
+            // �������һغ������������Ч��������ˢ�»�Ȧ
             if (RoundManager.Instance != null && 
                 RoundManager.Instance.CurrentActiveTeam == Team.Player &&
                 boundUnit.UnitTeam == Team.Player &&
                 currentMask.HasActivateAbility)
             {
-                // 先移除旧黄圈
+                // ���Ƴ��ɻ�Ȧ
                 boundUnit.HideActivateCircle();
                 
-                // 刷新启效果状态：重置本回合可用标记
+                // ˢ����Ч��״̬�����ñ��غϿ��ñ��
                 currentMask.CanUseActivateThisRound = true;
                 
-                // 检查是否满足所有条件后显示黄圈
+                // ����Ƿ�����������������ʾ��Ȧ
                 if (currentMask.CanUseActivateNow())
                 {
                     boundUnit.ShowActivateCircle();
-                    Debug.Log($"[UnitController] 戴上新面具 {currentMask.MaskName}，刷新启效果黄圈");
+                    Debug.Log($"[UnitController] ��������� {currentMask.MaskName}��ˢ����Ч����Ȧ");
                 }
                 else
                 {
-                    Debug.Log($"[UnitController] 戴上新面具 {currentMask.MaskName}，但不满足启效果条件");
+                    Debug.Log($"[UnitController] ��������� {currentMask.MaskName}������������Ч������");
                 }
             }
         }
@@ -236,7 +236,7 @@ public abstract class UnitController : MonoBehaviour
         if (currentMask == null || !currentMask.IsBroken)
             return;
         
-        Debug.Log($"[UnitController] 移除破损面具: {currentMask.MaskName}");
+        Debug.Log($"[UnitController] �Ƴ��������: {currentMask.MaskName}");
         
         Mask brokenMask = currentMask;
         brokenMask.OnUnequip(boundUnit);
@@ -332,7 +332,7 @@ public abstract class UnitController : MonoBehaviour
             currentMask.OnTurnEnd();
         }
         
-        // 清理现有的ActionCircle
+        // �������е�ActionCircle
         if (currentActionCircle != null)
         {
             Destroy(currentActionCircle);
@@ -362,8 +362,10 @@ public abstract class UnitController : MonoBehaviour
     }
     public void InitActionCircle()
     {
-        //可以改为ResoruceManager来管理
-        if (attackCount > 0)
+        // ����Ƿ�����ж����й����������б�ŭ״̬��
+        bool canAct = attackCount > 0 || (boundUnit != null && boundUnit.HasStatus<Enraged>());
+        
+        if (canAct)
         {
             if (currentActionCircle != null)
             {
@@ -372,11 +374,11 @@ public abstract class UnitController : MonoBehaviour
             }
             
             currentActionCircle = Instantiate(ResourceController.Instance.GetPrefab("ActionCircle"), transform);
-            currentActionCircle.name = "ActionCircle"; // 确保名字正确
+            currentActionCircle.name = "ActionCircle"; // ȷ��������ȷ
             ActionCircle aC = currentActionCircle.GetComponent<ActionCircle>();
             aC.Initialize(this);
             
-            Debug.Log($"[UnitController] {gameObject.name} 创建ActionCircle（攻击圈）");
+            Debug.Log($"[UnitController] {gameObject.name} ����ActionCircle������Ȧ��");
         }
 
     }
@@ -409,7 +411,25 @@ public abstract class UnitController : MonoBehaviour
         switch (command.ActionType)
         {
             case ActionType.Attack:
-                attackCount--;
+                // ����Ƿ��б�ŭ״̬
+                bool hasEnraged = boundUnit != null && boundUnit.HasStatus<Enraged>();
+                
+                if (hasEnraged)
+                {
+                    // ���ı�ŭ״̬���ǹ���������ֱ���Ƴ���ŭ״̬��
+                    StatusEffect enragedEffect = boundUnit.GetStatus<Enraged>();
+                    if (enragedEffect != null)
+                    {
+                        boundUnit.RemoveStatus(enragedEffect);
+                        Debug.Log($"[UnitController] {gameObject.name} ���ı�ŭ״̬�����Ƴ���");
+                    }
+                }
+                else
+                {
+                    // �������Ĺ�������
+                    attackCount--;
+                }
+                
                 if (currentMask != null)
                 {
                     yield return currentMask.Attack(this, command.Target);
@@ -417,6 +437,21 @@ public abstract class UnitController : MonoBehaviour
                 else
                 {
                     yield return Attack(command.Target);
+                }
+                
+                // ���������Ƿ��й���������ŭ״̬������������³�ʼ���ж�Ȧ
+                bool canActAgain = attackCount > 0 || (boundUnit != null && boundUnit.HasStatus<Enraged>());
+                if (canActAgain && boundUnit != null && boundUnit.IsAlive())
+                {
+                    // ���ٵ�ǰ�ж�Ȧ
+                    if (currentActionCircle != null)
+                    {
+                        Destroy(currentActionCircle);
+                        currentActionCircle = null;
+                    }
+                    // ���³�ʼ���ж�Ȧ
+                    InitActionCircle();
+                    Debug.Log($"[UnitController] {gameObject.name} �������Կ��ж������³�ʼ���ж�Ȧ");
                 }
                 break;
             
@@ -430,12 +465,12 @@ public abstract class UnitController : MonoBehaviour
             case ActionType.ActivateMask:
                 if (command.MaskData != null)
                 {
-                    Debug.Log($"[UnitController] 执行面具启效果: {command.MaskData.MaskName}");
+                    Debug.Log($"[UnitController] ִ�������Ч��: {command.MaskData.MaskName}");
                     yield return command.MaskData.Activate(this);
                 }
                 else
                 {
-                    Debug.LogWarning("[UnitController] ActivateMask 命令缺少 MaskData");
+                    Debug.LogWarning("[UnitController] ActivateMask ����ȱ�� MaskData");
                 }
                 break;
             

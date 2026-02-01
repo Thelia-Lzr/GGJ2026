@@ -38,7 +38,7 @@ public class MaskHilichurl : Mask
 
         if (targetWasKilled)
         {
-            Debug.Log($"[MaskHilichurl] {controller.gameObject.name} 击杀了 {target.gameObject.name}，触发暴怒效果！");
+            //Debug.Log($"[MaskHilichurl] {controller.gameObject.name} 击杀了 {target.gameObject.name}，触发暴怒效果！");
             
             EnrageAllAllies(controller.BoundUnit);
             
