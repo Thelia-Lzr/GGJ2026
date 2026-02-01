@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Runtime.CompilerServices;
 
 public abstract class UnitController : MonoBehaviour
 {
@@ -18,6 +19,8 @@ public abstract class UnitController : MonoBehaviour
     public event Action<ActionCommand> OnActionPerformed;
     public event Action<Mask, Mask> OnMaskSwitched;
     public event Action<ActionCommand> OnActionConfirmed;
+
+    private GameObject currentActionCircle;
 
     public BattleUnit BoundUnit => boundUnit;
     public Mask CurrentMask => currentMask;
@@ -220,6 +223,13 @@ public abstract class UnitController : MonoBehaviour
         {
             currentMask.OnTurnEnd();
         }
+        
+        // 清理现有的ActionCircle
+        if (currentActionCircle != null)
+        {
+            Destroy(currentActionCircle);
+            currentActionCircle = null;
+        }
     }
     
     public void SetStunned(bool stunned)
@@ -247,8 +257,14 @@ public abstract class UnitController : MonoBehaviour
         //可以改为ResoruceManager来管理
         if (attackCount > 0)
         {
-            GameObject actionCircle = Instantiate(ResourceController.Instance.GetPrefab("ActionCircle"), transform);
-            ActionCircle aC = actionCircle.GetComponent<ActionCircle>();
+            if (currentActionCircle != null)
+            {
+                Debug.Log($"[UnitController] {gameObject.name} already has an ActionCircle, skipping creation.");
+                return;
+            }
+            
+            currentActionCircle = Instantiate(ResourceController.Instance.GetPrefab("ActionCircle"), transform);
+            ActionCircle aC = currentActionCircle.GetComponent<ActionCircle>();
             aC.Initialize(this);
         }
 

@@ -39,7 +39,17 @@ public class HandManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) TryDrawCard();
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            if (RoundManager.Instance != null && 
+                RoundManager.Instance.GetActiveTeam() == Team.Player && 
+                RoundManager.Instance.IsBattleActive() &&
+                DragController.Instance != null &&
+                DragController.Instance.Status == 0)
+            {
+                TryDrawCard();
+            }
+        }
     }
 
     private void InitializeDeck()

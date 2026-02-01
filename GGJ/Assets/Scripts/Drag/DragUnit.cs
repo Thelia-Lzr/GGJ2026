@@ -27,6 +27,11 @@ public class DragUnit : MonoBehaviour
     {
         if (dragController.Status != 0) return;
         
+        if (RoundManager.Instance != null && RoundManager.Instance.GetActiveTeam() != Team.Player)
+        {
+            return;
+        }
+        
         // 更新起始位置为当前位置（而非实例化时的位置）
         startPosition = transform.position;
         
@@ -36,6 +41,11 @@ public class DragUnit : MonoBehaviour
     protected virtual void OnMouseDrag()
     {
         if (dragController.Status != 0) return;
+        
+        if (RoundManager.Instance != null && RoundManager.Instance.GetActiveTeam() != Team.Player)
+        {
+            return;
+        }
 
         if (isDragging)
         {
@@ -45,6 +55,11 @@ public class DragUnit : MonoBehaviour
     protected virtual void OnMouseUp()
     {
         if (dragController.Status != 0) return;
+        
+        if (RoundManager.Instance != null && RoundManager.Instance.GetActiveTeam() != Team.Player)
+        {
+            return;
+        }
 
         if (isDragging)
         {
