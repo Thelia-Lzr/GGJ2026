@@ -3,100 +3,100 @@ using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// ¡¾È«¾ÖÒôÆµ¹ÜÀíÆ÷¡¿
-/// Ö°Ôð£ºÍ³Ò»¹ÜÀí BGM£¨Á½¶ÎÊ½/ÆÕÍ¨Ñ­»·£©Óë SFX ¶ÔÏó³Ø¡£
-/// Ð­×÷ËµÃ÷£º
-/// 1. BGM£ºÔÚ Inspector ¶ÔÓ¦µÄÁ½¸ö BGM ÁÐ±íÖÐÅäÖÃ³¡¾°ÒôÆµ¡£
-/// 2. SFX£ºÔÚ SfxCategory ÁÐ±íÖÐÍ¨¹ýÃû×Ö¹ÜÀíÒôÐ§£¬Ö§³Ö¡°Ò»Àà¶àÒôÆµ¡±Ëæ»ú²¥·Å¡£
-/// 3. µ÷ÓÃ£ºBGM Ê¹ÓÃ³¡¾°Ãûµ÷ÓÃ£¬SFX Ê¹ÓÃ·ÖÀàÃ¶¾Ù»ò¾ßÌåÆ¬¶ÎÃûµ÷ÓÃ¡£
+/// ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+/// Ö°ï¿½ï¿½Í³Ò»ï¿½ï¿½ï¿½ï¿½ BGMï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½/ï¿½ï¿½Í¨Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ SFX ï¿½ï¿½ï¿½ï¿½Ø¡ï¿½
+/// Ð­ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½
+/// 1. BGMï¿½ï¿½ï¿½ï¿½ Inspector ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ BGM ï¿½Ð±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã³ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½
+/// 2. SFXï¿½ï¿½ï¿½ï¿½ SfxCategory ï¿½Ð±ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½Ö§ï¿½Ö¡ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¡ï¿½
+/// 3. ï¿½ï¿½ï¿½Ã£ï¿½BGM Ê¹ï¿½Ã³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½SFX Ê¹ï¿½Ã·ï¿½ï¿½ï¿½Ã¶ï¿½Ù»ï¿½ï¿½ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¡ï¿½
 /// </summary>
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance;
 
-    #region --- Êý¾Ý½á¹¹¶¨Òå ---
+    #region --- ï¿½ï¿½ï¿½Ý½á¹¹ï¿½ï¿½ï¿½ï¿½ ---
 
-    /// <summary> ÀàÐÍ 1£ºÁ½¶ÎÊ½ BGM£¨Intro + Loop£© </summary>
+    /// <summary> ï¿½ï¿½ï¿½ï¿½ 1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ BGMï¿½ï¿½Intro + Loopï¿½ï¿½ </summary>
     [System.Serializable]
     public class TwoPartBgmData
     {
-        public string bgmName;      // ³¡¾°Ê¶±ðÃû£¬Èç "Lobby"
-        public AudioClip introClip; // ¿ªÍ·¶Î
-        public AudioClip loopClip;  // Ñ­»·¶Î
+        public string bgmName;      // ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ "Lobby"
+        public AudioClip introClip; // ï¿½ï¿½Í·ï¿½ï¿½
+        public AudioClip loopClip;  // Ñ­ï¿½ï¿½ï¿½ï¿½
     }
 
-    /// <summary> ÀàÐÍ 2£ºÆÕÍ¨Ñ­»· BGM£¨Ö±½Ó Loop£© </summary>
+    /// <summary> ï¿½ï¿½ï¿½ï¿½ 2ï¿½ï¿½ï¿½ï¿½Í¨Ñ­ï¿½ï¿½ BGMï¿½ï¿½Ö±ï¿½ï¿½ Loopï¿½ï¿½ </summary>
     [System.Serializable]
     public class NormalBgmData
     {
-        public string bgmName;      // ³¡¾°Ê¶±ðÃû£¬Èç "Plot"
-        public AudioClip clip;      // Ñ­»·ÒôÆµ
+        public string bgmName;      // ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ "Plot"
+        public AudioClip clip;      // Ñ­ï¿½ï¿½ï¿½ï¿½Æµ
     }
 
-    /// <summary> SFX ·ÖÀà¹ÜÀí£ºÍ¨¹ý·ÖÀà´æ·ÅÒôÆµ£¬Ö§³Ö°´Ãû²éÕÒ </summary>
+    /// <summary> SFX ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½Ö§ï¿½Ö°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ </summary>
     [System.Serializable]
     public class SfxCategory
     {
-        public SfxType sfxType;           // ·ÖÀàÃ¶¾Ù
-        public List<AudioClip> clips;     // ¸Ã·ÖÀàÏÂµÄËùÓÐÒôÆµÎÄ¼þ
+        public SfxType sfxType;           // ï¿½ï¿½ï¿½ï¿½Ã¶ï¿½ï¿½
+        public List<AudioClip> clips;     // ï¿½Ã·ï¿½ï¿½ï¿½ï¿½Âµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½Ä¼ï¿½
     }
 
     public enum SfxType
     {
-        Attack,     // °üº¬´¸×Ó¡¢µ¶µÈËùÓÐ¹¥»÷Éù
-        Hurt,       // ÊÜ»÷
-        Card,       // ³éÅÆ¡¢Ñ¡ÅÆ
-        Mask,       // Ãæ¾ß×°±¸¡¢ÆÆËé
-        Skill,      // ÔöÒæ¡¢ÌØÐ§
-        UI          // µã»÷¡¢½»»¥
+        Attack,     // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¹ï¿½ï¿½ï¿½ï¿½ï¿½
+        Hurt,       // ï¿½Ü»ï¿½
+        Card,       // ï¿½ï¿½ï¿½Æ¡ï¿½Ñ¡ï¿½ï¿½
+        Mask,       // ï¿½ï¿½ï¿½×°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        Skill,      // ï¿½ï¿½ï¿½æ¡¢ï¿½ï¿½Ð§
+        UI          // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     }
     #endregion
 
-    #region --- Inspector ×ÊÔ´ÁÐ±í ---
+    #region --- Inspector ï¿½ï¿½Ô´ï¿½Ð±ï¿½ ---
 
-    [Header("BGM ÀàÐÍ 1£ºÁ½¶ÎÊ½ (Intro + Loop)")]
+    [Header("BGM ï¿½ï¿½ï¿½ï¿½ 1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ (Intro + Loop)")]
     public List<TwoPartBgmData> twoPartBgmList;
 
-    [Header("BGM ÀàÐÍ 2£ºÆÕÍ¨Ñ­»· (Normal Loop)")]
+    [Header("BGM ï¿½ï¿½ï¿½ï¿½ 2ï¿½ï¿½ï¿½ï¿½Í¨Ñ­ï¿½ï¿½ (Normal Loop)")]
     public List<NormalBgmData> normalBgmList;
 
-    [Header("SFX ·ÖÀà×ÊÔ´¿â (Ö§³Ö°´Ãû²éÕÒ)")]
+    [Header("SFX ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ (Ö§ï¿½Ö°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)")]
     public List<SfxCategory> sfxCategories;
 
-    [Header("È«¾ÖÒôÁ¿ÅäÖÃ")]
+    [Header("È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")]
     [Range(0f, 1f)] public float masterVolume = 1.0f;
     [Range(0f, 1f)] public float bgmVolume = 0.6f;
     [Range(0f, 1f)] public float sfxVolume = 0.8f;
 
-    [Header("ºËÐÄÒýÓÃ")]
-    [SerializeField] private AudioSource bgmSource;   // ÍÏÈë³¡¾°ÖÐµÄ±³¾°ÒôÀÖÔ´
-    [SerializeField] private AudioSource sfxPrefab;   // ÍÏÈëÒôÐ§Ô¤ÖÆÌå (´øAudioSource×é¼þ)
+    [Header("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")]
+    [SerializeField] private AudioSource bgmSource;   // ï¿½ï¿½ï¿½ë³¡ï¿½ï¿½ï¿½ÐµÄ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´
+    [SerializeField] private AudioSource sfxPrefab;   // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§Ô¤ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½AudioSourceï¿½ï¿½ï¿½)
     #endregion
 
     private List<AudioSource> _sfxPool = new List<AudioSource>();
     private string _currentBgmName = "";
 
-    #region --- ¹«¿ªµ÷ÓÃ½Ó¿Ú ---
+    #region --- ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã½Ó¿ï¿½ ---
 
-    /// <summary> ²¥·ÅÁ½¶ÎÊ½ BGM </summary>
+    /// <summary> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ BGM </summary>
     public void PlayTwoPartBGM(string bgmName)
     {
         TwoPartBgmData data = twoPartBgmList.Find(b => b.bgmName == bgmName);
-        if (data == null) { Debug.LogError($"[Audio] Î´ÕÒµ½Á½¶ÎÊ½BGM: {bgmName}"); return; }
+        if (data == null) { Debug.LogError($"[Audio] Î´ï¿½Òµï¿½ï¿½ï¿½ï¿½ï¿½Ê½BGM: {bgmName}"); return; }
         ExecuteBgmPlay(data.introClip, data.loopClip, bgmName, true);
     }
 
-    /// <summary> ²¥·ÅÆÕÍ¨Ñ­»· BGM </summary>
+    /// <summary> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨Ñ­ï¿½ï¿½ BGM </summary>
     public void PlayNormalBGM(string bgmName)
     {
         NormalBgmData data = normalBgmList.Find(b => b.bgmName == bgmName);
-        if (data == null) { Debug.LogError($"[Audio] Î´ÕÒµ½ÆÕÍ¨BGM: {bgmName}"); return; }
+        if (data == null) { Debug.LogError($"[Audio] Î´ï¿½Òµï¿½ï¿½ï¿½Í¨BGM: {bgmName}"); return; }
         ExecuteBgmPlay(null, data.clip, bgmName, false);
     }
 
     /// <summary> 
-    /// ¸ù¾Ý·ÖÀàºÍÒôÆµÎÄ¼þÃû²¥·ÅÒôÐ§
-    /// µ÷ÓÃÊ¾Àý£ºPlaySFX(SfxType.Attack, "sfx_atk_hammer");
+    /// ï¿½ï¿½ï¿½Ý·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§
+    /// ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½PlaySFX(SfxType.Attack, "sfx_atk_hammer");
     /// </summary>
     public void PlaySFX(SfxType type, string clipName)
     {
@@ -110,10 +110,10 @@ public class AudioManager : MonoBehaviour
                 return;
             }
         }
-        Debug.LogWarning($"[Audio] ÔÚ·ÖÀà {type} ÖÐÕÒ²»µ½ÃûÎª {clipName} µÄÒôÐ§");
+        Debug.LogWarning($"[Audio] ï¿½Ú·ï¿½ï¿½ï¿½ {type} ï¿½ï¿½ï¿½Ò²ï¿½ï¿½ï¿½ï¿½ï¿½Îª {clipName} ï¿½ï¿½ï¿½ï¿½Ð§");
     }
 
-    /// <summary> Ëæ»ú²¥·Å·ÖÀàÏÂµÄÒ»¸öÒôÐ§£¨ÊÊÓÃÓÚ¶àÖÖÊÜ»÷ÉùËæ»úÇÐ»»£© </summary>
+    /// <summary> ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å·ï¿½ï¿½ï¿½ï¿½Âµï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½Ü»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ </summary>
     public void PlayRandomSFX(SfxType type)
     {
         SfxCategory category = sfxCategories.Find(s => s.sfxType == type);
@@ -132,19 +132,17 @@ public class AudioManager : MonoBehaviour
     }
     #endregion
 
-    #region --- ºËÐÄµ×²ãÂß¼­ ---
+    #region --- ï¿½ï¿½ï¿½Äµ×²ï¿½ï¿½ß¼ï¿½ ---
 
     private void Awake()
     {
         if (Instance == null) { Instance = this; DontDestroyOnLoad(gameObject); InitializePool(); }
         else { Destroy(gameObject); }
-
-
     }
 
     private void InitializePool()
     {
-        if (sfxPrefab == null) { Debug.LogError("ÇëÔÚInspectorÖÐÖ¸¶¨Sfx Prefab"); return; }
+        if (sfxPrefab == null) { Debug.LogError("ï¿½ï¿½ï¿½ï¿½Inspectorï¿½ï¿½Ö¸ï¿½ï¿½Sfx Prefab"); return; }
         for (int i = 0; i < 10; i++) CreatePoolObject();
     }
 
@@ -192,7 +190,7 @@ public class AudioManager : MonoBehaviour
            AudioSource source = GetAvailableSFX();
            source.clip = clip;
            source.volume = sfxVolume * masterVolume;
-           source.pitch = Random.Range(0.95f, 1.05f); // Ëæ»úÎ¢µ÷Òôµ÷£¬Ôö¼Ó´ò»÷¸Ð
+           source.pitch = Random.Range(0.95f, 1.05f); // ï¿½ï¿½ï¿½Î¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó´ï¿½ï¿½ï¿½ï¿½
            source.Play();
            yield return new WaitForSeconds(clip.length);
            if (source != null) source.gameObject.SetActive(false);
