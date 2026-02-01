@@ -158,6 +158,11 @@ public class MaskCard : DragUnit
                 
                 Debug.Log($"[MaskCard] Successfully submitted SwitchMask command for {targetUnit.gameObject.name}");
                 
+                // 先从 HandManager 中移除这张卡，然后再销毁
+                if (handManager != null)
+                {
+                    handManager.RemoveCard(gameObject);
+                }
                 
                 Destroy(gameObject);
             }

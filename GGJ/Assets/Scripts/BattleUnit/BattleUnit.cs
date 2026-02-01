@@ -99,7 +99,7 @@ public class BattleUnit : MonoBehaviour
         OnHealthChanged += HealthDisplay;
         OnHealthChanged += HealthChangeDisplay;
         OnStatusApplied += BuffUIDisplay;
-        OnTurnStarted += BuffUIDisplayTurn;
+        OnTurnEnded += BuffUIDisplayTurn;
         if (UIText == null)
         {
             UIText = new GameObject("uitext");
