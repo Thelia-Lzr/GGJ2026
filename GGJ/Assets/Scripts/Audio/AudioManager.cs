@@ -3,100 +3,100 @@ using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// ��ȫ����Ƶ��������
-/// ְ��ͳһ���� BGM������ʽ/��ͨѭ������ SFX ����ء�
-/// Э��˵����
-/// 1. BGM���� Inspector ��Ӧ������ BGM �б������ó�����Ƶ��
-/// 2. SFX���� SfxCategory �б���ͨ�����ֹ�����Ч��֧�֡�һ�����Ƶ��������š�
-/// 3. ���ã�BGM ʹ�ó��������ã�SFX ʹ�÷���ö�ٻ����Ƭ�������á�
+/// 【全局音频管理器】
+/// 职责：统一管理 BGM（两段式/普通循环）与 SFX 对象池。
+/// 协作说明：
+/// 1. BGM：在 Inspector 对应的两个 BGM 列表中配置场景音频。
+/// 2. SFX：在 SfxCategory 列表中通过名字管理音效，支持“一类多音频”随机播放。
+/// 3. 调用：BGM 使用场景名调用，SFX 使用分类枚举或具体片段名调用。
 /// </summary>
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance;
 
-    #region --- ���ݽṹ���� ---
+    #region --- 数据结构定义 ---
 
-    /// <summary> ���� 1������ʽ BGM��Intro + Loop�� </summary>
+    /// <summary> 类型 1：两段式 BGM（Intro + Loop） </summary>
     [System.Serializable]
     public class TwoPartBgmData
     {
-        public string bgmName;      // ����ʶ�������� "Lobby"
-        public AudioClip introClip; // ��ͷ��
-        public AudioClip loopClip;  // ѭ����
+        public string bgmName;      // 场景识别名，如 "Lobby"
+        public AudioClip introClip; // 开头段
+        public AudioClip loopClip;  // 循环段
     }
 
-    /// <summary> ���� 2����ͨѭ�� BGM��ֱ�� Loop�� </summary>
+    /// <summary> 类型 2：普通循环 BGM（直接 Loop） </summary>
     [System.Serializable]
     public class NormalBgmData
     {
-        public string bgmName;      // ����ʶ�������� "Plot"
-        public AudioClip clip;      // ѭ����Ƶ
+        public string bgmName;      // 场景识别名，如 "Plot"
+        public AudioClip clip;      // 循环音频
     }
 
-    /// <summary> SFX ���������ͨ����������Ƶ��֧�ְ������� </summary>
+    /// <summary> SFX 分类管理：通过分类存放音频，支持按名查找 </summary>
     [System.Serializable]
     public class SfxCategory
     {
-        public SfxType sfxType;           // ����ö��
-        public List<AudioClip> clips;     // �÷����µ�������Ƶ�ļ�
+        public SfxType sfxType;           // 分类枚举
+        public List<AudioClip> clips;     // 该分类下的所有音频文件
     }
 
     public enum SfxType
     {
-        Attack,     // �������ӡ��������й�����
-        Hurt,       // �ܻ�
-        Card,       // ���ơ�ѡ��
-        Mask,       // ���װ��������
-        Skill,      // ���桢��Ч
-        UI          // ���������
+        Attack,     // 包含锤子、刀等所有攻击声
+        Hurt,       // 受击
+        Card,       // 抽牌、选牌
+        Mask,       // 面具装备、破碎
+        Skill,      // 增益、特效
+        UI          // 点击、交互
     }
     #endregion
 
-    #region --- Inspector ��Դ�б� ---
+    #region --- Inspector 资源列表 ---
 
-    [Header("BGM ���� 1������ʽ (Intro + Loop)")]
+    [Header("BGM 类型 1：两段式 (Intro + Loop)")]
     public List<TwoPartBgmData> twoPartBgmList;
 
-    [Header("BGM ���� 2����ͨѭ�� (Normal Loop)")]
+    [Header("BGM 类型 2：普通循环 (Normal Loop)")]
     public List<NormalBgmData> normalBgmList;
 
-    [Header("SFX ������Դ�� (֧�ְ�������)")]
+    [Header("SFX 分类资源库 (支持按名查找)")]
     public List<SfxCategory> sfxCategories;
 
-    [Header("ȫ����������")]
+    [Header("全局音量配置")]
     [Range(0f, 1f)] public float masterVolume = 1.0f;
     [Range(0f, 1f)] public float bgmVolume = 0.6f;
     [Range(0f, 1f)] public float sfxVolume = 0.8f;
 
-    [Header("��������")]
-    [SerializeField] private AudioSource bgmSource;   // ���볡���еı�������Դ
-    [SerializeField] private AudioSource sfxPrefab;   // ������ЧԤ���� (��AudioSource���)
+    [Header("核心引用")]
+    [SerializeField] private AudioSource bgmSource;   // 拖入场景中的背景音乐源
+    [SerializeField] private AudioSource sfxPrefab;   // 拖入音效预制体 (带AudioSource组件)
     #endregion
 
     private List<AudioSource> _sfxPool = new List<AudioSource>();
     private string _currentBgmName = "";
 
-    #region --- �������ýӿ� ---
+    #region --- 公开调用接口 ---
 
-    /// <summary> ��������ʽ BGM </summary>
+    /// <summary> 播放两段式 BGM </summary>
     public void PlayTwoPartBGM(string bgmName)
     {
         TwoPartBgmData data = twoPartBgmList.Find(b => b.bgmName == bgmName);
-        if (data == null) { Debug.LogError($"[Audio] δ�ҵ�����ʽBGM: {bgmName}"); return; }
+        if (data == null) { Debug.LogError($"[Audio] 未找到两段式BGM: {bgmName}"); return; }
         ExecuteBgmPlay(data.introClip, data.loopClip, bgmName, true);
     }
 
-    /// <summary> ������ͨѭ�� BGM </summary>
+    /// <summary> 播放普通循环 BGM </summary>
     public void PlayNormalBGM(string bgmName)
     {
         NormalBgmData data = normalBgmList.Find(b => b.bgmName == bgmName);
-        if (data == null) { Debug.LogError($"[Audio] δ�ҵ���ͨBGM: {bgmName}"); return; }
+        if (data == null) { Debug.LogError($"[Audio] 未找到普通BGM: {bgmName}"); return; }
         ExecuteBgmPlay(null, data.clip, bgmName, false);
     }
 
     /// <summary> 
-    /// ���ݷ������Ƶ�ļ���������Ч
-    /// ����ʾ����PlaySFX(SfxType.Attack, "sfx_atk_hammer");
+    /// 根据分类和音频文件名播放音效
+    /// 调用示例：PlaySFX(SfxType.Attack, "sfx_atk_hammer");
     /// </summary>
     public void PlaySFX(SfxType type, string clipName)
     {
@@ -110,10 +110,10 @@ public class AudioManager : MonoBehaviour
                 return;
             }
         }
-        Debug.LogWarning($"[Audio] �ڷ��� {type} ���Ҳ�����Ϊ {clipName} ����Ч");
+        Debug.LogWarning($"[Audio] 在分类 {type} 中找不到名为 {clipName} 的音效");
     }
 
-    /// <summary> ������ŷ����µ�һ����Ч�������ڶ����ܻ�������л��� </summary>
+    /// <summary> 随机播放分类下的一个音效（适用于多种受击声随机切换） </summary>
     public void PlayRandomSFX(SfxType type)
     {
         SfxCategory category = sfxCategories.Find(s => s.sfxType == type);
@@ -132,7 +132,7 @@ public class AudioManager : MonoBehaviour
     }
     #endregion
 
-    #region --- ���ĵײ��߼� ---
+    #region --- 核心底层逻辑 ---
 
     private void Awake()
     {
@@ -142,7 +142,7 @@ public class AudioManager : MonoBehaviour
 
     private void InitializePool()
     {
-        if (sfxPrefab == null) { Debug.LogError("����Inspector��ָ��Sfx Prefab"); return; }
+        if (sfxPrefab == null) { Debug.LogError("请在Inspector中指定Sfx Prefab"); return; }
         for (int i = 0; i < 10; i++) CreatePoolObject();
     }
 
@@ -186,16 +186,15 @@ public class AudioManager : MonoBehaviour
     }
 
     private IEnumerator PlaySfxRoutine(AudioClip clip)
-       {
-           AudioSource source = GetAvailableSFX();
-           source.clip = clip;
-           source.volume = sfxVolume * masterVolume;
-           source.pitch = Random.Range(0.95f, 1.05f); // ���΢�����������Ӵ����
-           source.Play();
-           yield return new WaitForSeconds(clip.length);
-           if (source != null) source.gameObject.SetActive(false);
-       }
-
+    {
+        AudioSource source = GetAvailableSFX();
+        source.clip = clip;
+        source.volume = sfxVolume * masterVolume;
+        source.pitch = Random.Range(0.95f, 1.05f); // 随机微调音调，增加打击感
+        source.Play();
+        yield return new WaitForSeconds(clip.length);
+        if (source != null) source.gameObject.SetActive(false);
+    }
 
     private AudioSource GetAvailableSFX()
     {

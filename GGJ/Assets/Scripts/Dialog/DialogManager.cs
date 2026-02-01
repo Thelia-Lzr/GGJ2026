@@ -37,6 +37,9 @@ public class Dialogmanager : MonoBehaviour
     [Header("6. 背景切换")]
     public Image backgroundDisplay;
     public List<Sprite> backgroundSprites = new List<Sprite>();
+    [Header("7. 缩放补偿设置")]
+    [Range(0.1f, 2.0f)] public float playerScale = 0.6f;  // 主角缩放
+    [Range(0.1f, 2.0f)] public float shadowScale = 0.8f;  // 杂鱼/兜底缩放 (你新立绘大，就调小这个)
 
     void Awake()
     {
@@ -48,7 +51,16 @@ public class Dialogmanager : MonoBehaviour
     void Start()
     {
         // 1. 纯粹绑定按钮，不写任何 PlayData
-        if (nextButton != null)
+
+        if (SceneController.Instance != null)
+        {
+            // 直接问控制器：轮到哪个剧本了？控制器给完索引后会自动+1
+            dialogIndex = SceneController.Instance.GetAndIncrementStoryIndex();
+            Debug.Log($"<color=green>【剧情顺序】当前自动加载第 {dialogIndex} 个剧本</color>");
+        }
+
+        PlayData(dialogIndex);
+        if (nextButton != null)
         {
             nextButton.onClick.RemoveAllListeners(); // 先清空，防止 Inspector 里重复绑定
             nextButton.onClick.AddListener(OnClickNext);
@@ -72,20 +84,20 @@ public class Dialogmanager : MonoBehaviour
         if (AudioManager.Instance != null)
         {
             Debug.Log("AudioManager 实例存在，正在发送播放请求");
-            // 这里替换成你修正后的那行 PlaySFX 代码
-            AudioManager.Instance.PlaySFX(AudioManager.SfxType.UI, "sfx_ui_click_button");
+            AudioManager.Instance.PlaySFX(AudioManager.SfxType.UI, "sfx_ui_click_button");
         }
         else
         {
             Debug.LogError("找不到 AudioManager 实例！请检查场景里有没有挂脚本。");
         }
-        // 剧情播完后，点击输出测试信息
-        if (isFinished)
+        // 剧情播完后，点击输出测试信息
+        if (isFinished)
         {
-            Debug.Log("<color=orange>【逻辑测试】此处应跳转至战斗场景，当前执行：输出日志</color>");
-            // 等你写好战斗场景后，再取消下面这行的注释：
-            // UnityEngine.SceneManagement.SceneManager.LoadScene("BattleScene"); 
-            return;
+            if (SceneController.Instance != null)
+            {
+                SceneController.Instance.GoToBattle();
+            }
+            return;
         }
 
         if (typewriterCoroutine != null)
@@ -145,28 +157,43 @@ public class Dialogmanager : MonoBehaviour
         string pos = _pos.Trim();
         currentFullContent = _content.Trim();
 
+        // 1. 匹配立绘
         Sprite targetSprite = null;
         for (int i = 0; i < charNames.Count; i++)
         {
-            if (csvPureName != "" && (csvPureName.Contains(PureName(charNames[i]))))
+            string configName = PureName(charNames[i]);
+            if (!string.IsNullOrEmpty(csvPureName) && !string.IsNullOrEmpty(configName))
             {
-                if (i < charSprites.Count) { targetSprite = charSprites[i]; break; }
+                if (csvPureName.Contains(configName) || configName.Contains(csvPureName))
+                {
+                    if (i < charSprites.Count) { targetSprite = charSprites[i]; break; }
+                }
             }
         }
 
-        bool isNarrator = (pos == "中") || csvPureName.Contains("旁白");
+        // 2. 判定旁白：只有在没找到立绘且位置是“中”时，才视为旁白
+        bool isNarrator = (pos == "中" && targetSprite == null) || csvPureName.Contains("旁白") || csvPureName.Contains("传颂者");
+
+        // 3. 兜底立绘
         if (targetSprite == null && !isNarrator) targetSprite = shadowSprite;
 
+        // 4. 【统一处理名字】
+        // 无论什么情况，名字只显示在 nameText 组件上
         nameText.text = _name.Trim();
+
         if (typewriterCoroutine != null) StopCoroutine(typewriterCoroutine);
 
-        string displayText = isNarrator ? $"【{_name.Trim()}】：{currentFullContent}" : currentFullContent;
+        // 5. 【统一处理内容】
+        // 彻底去掉内容框里的名字拼接，内容框只显示纯台词
+        // 这样就不可能出现双重括号或重复名字了
+        string displayText = currentFullContent;
+
         typewriterCoroutine = StartCoroutine(TypeText(displayText));
 
+        // 6. 渲染立绘
         ApplyRender(targetSprite, pos, isNarrator);
 
-        // 仅在第一句剧情（dialogIndex=0）时播放BGM，和UI完全同步
-        if (dialogIndex == 0 && AudioManager.Instance != null)
+        if (dialogIndex == 0 && AudioManager.Instance != null)
         {
             AudioManager.Instance.PlayNormalBGM("Plot");
         }
@@ -179,34 +206,30 @@ public class Dialogmanager : MonoBehaviour
         Color active = Color.white;
         Color inactive = new Color(0.3f, 0.3f, 0.3f, 1f);
 
-        // 1. 定义两个精准的缩放值
-        Vector3 playerScale = new Vector3(0.6f, 0.6f, 1f); // 你原本主角的缩放
-        Vector3 shadowScale = new Vector3(0.3f, 0.42f, 1f); // 杂鱼放大的缩放 (根据需要调这个数)
+        // 使用面板上的变量，方便随时调整
+        Vector3 pScale = new Vector3(playerScale, playerScale, 1f);
+        Vector3 sScale = new Vector3(shadowScale, shadowScale, 1f);
 
-        // 2. 判定：当前传入的是否是兜底杂鱼
         bool isShadow = (sprite != null && shadowSprite != null && sprite.name == shadowSprite.name);
 
         if (isNarrator)
         {
             imageLeft.DOColor(inactive, 0.2f); imageRight.DOColor(inactive, 0.2f);
+            // 旁白时，建议把立绘缩得更小或者保持原样
         }
         else if (pos == "左")
         {
             if (sprite != null) imageLeft.sprite = sprite;
             imageLeft.DOColor(active, 0.2f);
             imageRight.DOColor(inactive, 0.2f);
-
-            // 核心逻辑：是杂鱼就用 1.2，不是杂鱼（主角）就强制回 0.6
-            imageLeft.transform.localScale = isShadow ? shadowScale : playerScale;
+            imageLeft.transform.localScale = isShadow ? sScale : pScale;
         }
         else if (pos == "右")
         {
             if (sprite != null) imageRight.sprite = sprite;
             imageRight.DOColor(active, 0.2f);
             imageLeft.DOColor(inactive, 0.2f);
-
-            // 核心逻辑：同上
-            imageRight.transform.localScale = isShadow ? shadowScale : playerScale;
+            imageRight.transform.localScale = isShadow ? sScale : pScale;
         }
     }
     private void ChangeBackground(int index)
