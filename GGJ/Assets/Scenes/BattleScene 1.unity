@@ -239,6 +239,7 @@ MonoBehaviour:
   <HealthText>k__BackingField: {fileID: 0}
   <ShellText>k__BackingField: {fileID: 0}
   BuffUI: []
+  <ShellIcon>k__BackingField: {fileID: 0}
 --- !u!114 &498456019
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -362,6 +363,7 @@ MonoBehaviour:
   <HealthText>k__BackingField: {fileID: 0}
   <ShellText>k__BackingField: {fileID: 0}
   BuffUI: []
+  <ShellIcon>k__BackingField: {fileID: 0}
 --- !u!114 &604869639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1286,6 +1288,7 @@ MonoBehaviour:
   <HealthText>k__BackingField: {fileID: 0}
   <ShellText>k__BackingField: {fileID: 0}
   BuffUI: []
+  <ShellIcon>k__BackingField: {fileID: 0}
 --- !u!114 &1514763363
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1420,6 +1423,7 @@ MonoBehaviour:
   <HealthText>k__BackingField: {fileID: 0}
   <ShellText>k__BackingField: {fileID: 0}
   BuffUI: []
+  <ShellIcon>k__BackingField: {fileID: 0}
 --- !u!212 &1826066613
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1482,7 +1486,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -6.93, y: 2.98, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
