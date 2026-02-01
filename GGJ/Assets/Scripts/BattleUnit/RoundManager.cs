@@ -413,8 +413,9 @@ public class RoundManager : MonoBehaviour
                     }
                     
                     
-                    // 只为玩家单位初始化 ActionCircle
-                    if (controller.attackCount > 0 && currentActiveTeam == Team.Player)
+                    // 只为玩家单位初始化 ActionCircle（考虑暴怒状态）
+                    bool canAct = controller.attackCount > 0 || unit.HasStatus<Enraged>();
+                    if (canAct && currentActiveTeam == Team.Player)
                     {
                         controller.InitActionCircle();
                         DebugLog($"  → {unit.gameObject.name} 初始化 ActionCircle");
@@ -598,16 +599,16 @@ public class RoundManager : MonoBehaviour
         
         if (unit != null)
         {
-            if (destroyGameObject)
+            // 销毁UI
+            if (unit.UIText != null)
             {
-                DebugLog($"[RoundManager] 🗑️ 完全销毁GameObject: {unitName}");
-                Destroy(unit.gameObject);
+                DebugLog($"[RoundManager] 🗑️ 销毁UI: {unitName}");
+                Destroy(unit.UIText);
             }
-            else
-            {
-                DebugLog($"[RoundManager] 🔒 禁用GameObject: {unitName}");
-                unit.gameObject.SetActive(false);
-            }
+            
+            // 单位本身只禁用，不销毁，以便接收检测
+            DebugLog($"[RoundManager] 🔒 禁用GameObject: {unitName}");
+            unit.gameObject.SetActive(false);
         }
         else
         {
@@ -631,16 +632,16 @@ public class RoundManager : MonoBehaviour
                 cleanedCount++;
                 string unitName = unit.gameObject.name;
                 
-                if (destroyGameObject)
+                // 销毁UI
+                if (unit.UIText != null)
                 {
-                    DebugLog($"  🗑️ 销毁: {unitName}");
-                    Destroy(unit.gameObject);
+                    DebugLog($"  🗑️ 销毁UI: {unitName}");
+                    Destroy(unit.UIText);
                 }
-                else
-                {
-                    DebugLog($"  🔒 禁用: {unitName}");
-                    unit.gameObject.SetActive(false);
-                }
+                
+                // 单位本身只禁用，不销毁，以便接收检测
+                DebugLog($"  🔒 禁用: {unitName}");
+                unit.gameObject.SetActive(false);
             }
         }
         

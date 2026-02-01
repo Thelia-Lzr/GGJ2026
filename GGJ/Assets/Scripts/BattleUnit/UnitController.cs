@@ -362,8 +362,10 @@ public abstract class UnitController : MonoBehaviour
     }
     public void InitActionCircle()
     {
-        //可以改为ResoruceManager来管理
-        if (attackCount > 0)
+        // 检查是否可以行动（有攻击次数或有暴怒状态）
+        bool canAct = attackCount > 0 || (boundUnit != null && boundUnit.HasStatus<Enraged>());
+        
+        if (canAct)
         {
             if (currentActionCircle != null)
             {
@@ -409,7 +411,25 @@ public abstract class UnitController : MonoBehaviour
         switch (command.ActionType)
         {
             case ActionType.Attack:
-                attackCount--;
+                // 检查是否有暴怒状态
+                bool hasEnraged = boundUnit != null && boundUnit.HasStatus<Enraged>();
+                
+                if (hasEnraged)
+                {
+                    // 消耗暴怒状态而非攻击次数（直接移除暴怒状态）
+                    StatusEffect enragedEffect = boundUnit.GetStatus<Enraged>();
+                    if (enragedEffect != null)
+                    {
+                        boundUnit.RemoveStatus(enragedEffect);
+                        Debug.Log($"[UnitController] {gameObject.name} 消耗暴怒状态（已移除）");
+                    }
+                }
+                else
+                {
+                    // 正常消耗攻击次数
+                    attackCount--;
+                }
+                
                 if (currentMask != null)
                 {
                     yield return currentMask.Attack(this, command.Target);
@@ -417,6 +437,21 @@ public abstract class UnitController : MonoBehaviour
                 else
                 {
                     yield return Attack(command.Target);
+                }
+                
+                // 攻击后检查是否还有攻击次数或暴怒状态，如果有则重新初始化行动圈
+                bool canActAgain = attackCount > 0 || (boundUnit != null && boundUnit.HasStatus<Enraged>());
+                if (canActAgain && boundUnit != null && boundUnit.IsAlive())
+                {
+                    // 销毁当前行动圈
+                    if (currentActionCircle != null)
+                    {
+                        Destroy(currentActionCircle);
+                        currentActionCircle = null;
+                    }
+                    // 重新初始化行动圈
+                    InitActionCircle();
+                    Debug.Log($"[UnitController] {gameObject.name} 攻击后仍可行动，重新初始化行动圈");
                 }
                 break;
             
