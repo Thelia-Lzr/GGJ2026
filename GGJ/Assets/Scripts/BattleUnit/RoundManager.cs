@@ -184,6 +184,13 @@ public class RoundManager : MonoBehaviour
         DebugLog("[RoundManager] 步骤5: 启动第一回合");
         StartRound();
         
+        // 战斗开始时抽3张卡
+        DebugLog("[RoundManager] 步骤6: 抽取初始手牌");
+        if (HandManager.Instance != null)
+        {
+            HandManager.Instance.DrawInitialCards(3);
+        }
+        
         DebugLog("[RoundManager] InitializeBattle() COMPLETE ✅");
         DebugLog("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     }
