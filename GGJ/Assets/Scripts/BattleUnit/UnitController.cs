@@ -12,8 +12,11 @@ public abstract class UnitController : MonoBehaviour
     [SerializeField] private int attackCountGains = 1;
     
     [Header("Visual Settings")]
-    [Tooltip("½ÇÉ«Í¼Æ¬Sprite£¬Èç¹ûÎª¿Õ»á³¢ÊÔ´ÓResources/Image/Character/ÀàÃû¼ÓÔØ")]
+    [Tooltip("è§’è‰²å›¾ç‰‡Spriteï¼Œå¦‚æœä¸ºç©ºä¼šå°è¯•ä»Resources/Image/Character/ç±»ååŠ è½½")]
     [SerializeField] protected Sprite characterSprite;
+    protected SpriteRenderer spriteRenderer; // å¼•ç”¨èº«ä¸Šçš„æ¸²æŸ“å™¨
+    private Sprite idleSprite; // ç”¨äºä¿å­˜åˆå§‹çš„ A å›¾ç‰‡
+    [SerializeField] protected Sprite movingSprite; // åœ¨ Inspector ä¸­è®¾ç½®å›¾ç‰‡ B
 
     protected bool isStunned = false;
     protected bool canAct = true;
@@ -32,14 +35,14 @@ public abstract class UnitController : MonoBehaviour
     public Sprite CharacterSprite => characterSprite;
     
     /// <summary>
-    /// ÉèÖÃ½ÇÉ«Í¼Æ¬£¨ÓÃÓÚ¶¯Ì¬´´½¨Ê±£©
+    /// è®¾ç½®è§’è‰²å›¾ç‰‡ï¼ˆç”¨äºåŠ¨æ€åˆ›å»ºæ—¶ï¼‰
     /// </summary>
     public void SetCharacterSprite(Sprite sprite)
     {
         characterSprite = sprite;
     }
 
-    //³õÊ¼ÊôĞÔ¶¨Òå
+    //åˆå§‹å±æ€§å®šä¹‰
     protected int initialAttack = 10;
     protected int initialDefense = 5;
     protected int initialMaxHealth = 100;
@@ -58,21 +61,21 @@ public abstract class UnitController : MonoBehaviour
         {
             Debug.LogWarning($"UnitController on {gameObject.name} could not find AnimationHandler in scene!");
         }
-        
-        // Èç¹ûÃ»ÓĞÉèÖÃSprite£¬³¢ÊÔ´ÓResources¼ÓÔØ
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        // å¦‚æœæ²¡æœ‰è®¾ç½®Spriteï¼Œå°è¯•ä»ResourcesåŠ è½½
         if (characterSprite == null)
         {
             string className = GetType().Name;
             characterSprite = Resources.Load<Sprite>($"Image/Char/{className}");
             if (characterSprite == null)
             {
-                Debug.LogWarning($"[UnitController] ÎŞ·¨¼ÓÔØ½ÇÉ«Í¼Æ¬: Image/Char/{className}");
+                Debug.LogWarning($"[UnitController] æ— æ³•åŠ è½½è§’è‰²å›¾ç‰‡: Image/Char/{className}");
             }
         }
     }
     private void Start()
     {
-        // Ö»ÓĞµ±boundUnit»¹Î´°ó¶¨Ê±²Å³¢ÊÔ°ó¶¨£¨¼æÈİInspectorÔ¤ÉèÖÃµÄÇé¿ö£©
+        // åªæœ‰å½“boundUnitè¿˜æœªç»‘å®šæ—¶æ‰å°è¯•ç»‘å®šï¼ˆå…¼å®¹Inspectoré¢„è®¾ç½®çš„æƒ…å†µï¼‰
         if (boundUnit != null && !isBound)
         {
             BindUnit(boundUnit);
@@ -88,7 +91,7 @@ public abstract class UnitController : MonoBehaviour
     
     public virtual void BindUnit(BattleUnit unit)
     {
-        if (isBound && unit == boundUnit) return; // ·ÀÖ¹ÖØ¸´°ó¶¨
+        if (isBound && unit == boundUnit) return; // é˜²æ­¢é‡å¤ç»‘å®š
         
         boundUnit = unit;
         isBound = true;
@@ -122,24 +125,24 @@ public abstract class UnitController : MonoBehaviour
     
     protected virtual void OnDeathHandler()
     {
-        // Ïú»ÙUIÔªËØ
+        // é”€æ¯UIå…ƒç´ 
         if (boundUnit != null && boundUnit.UIText != null)
         {
             Destroy(boundUnit.UIText);
         }
         
-        // Ïú»Ùµ¥Î»GameObject
+        // é”€æ¯å•ä½GameObject
         Destroy(gameObject);
     }
     
     protected virtual void OnStatusAppliedHandler(StatusEffect effect)
     {
-        // ×ÓÀà¿ÉÖØĞ´´Ë·½·¨À´´¦ÀíÌØ¶¨×´Ì¬µÄÓ¦ÓÃ
+        // å­ç±»å¯é‡å†™æ­¤æ–¹æ³•æ¥å¤„ç†ç‰¹å®šçŠ¶æ€çš„åº”ç”¨
     }
     
     protected virtual void OnStatusRemovedHandler(StatusEffect effect)
     {
-        // ×ÓÀà¿ÉÖØĞ´´Ë·½·¨À´´¦ÀíÌØ¶¨×´Ì¬µÄÒÆ³ı
+        // å­ç±»å¯é‡å†™æ­¤æ–¹æ³•æ¥å¤„ç†ç‰¹å®šçŠ¶æ€çš„ç§»é™¤
     }
     
     
@@ -170,7 +173,7 @@ public abstract class UnitController : MonoBehaviour
     public void AddAttackCount(int amount)
     {
         attackCount += amount;
-        Debug.Log($"[UnitController] {gameObject.name} ¹¥»÷´ÎÊıÔö¼Ó {amount}£¬µ±Ç°: {attackCount}");
+        Debug.Log($"[UnitController] {gameObject.name} æ”»å‡»æ¬¡æ•°å¢åŠ  {amount}ï¼Œå½“å‰: {attackCount}");
     }
 
     public virtual bool SwitchMask(Mask newMask, int cost)
@@ -191,32 +194,32 @@ public abstract class UnitController : MonoBehaviour
         currentMask = newMask;
         currentMask.OnEquip(boundUnit);
         
-        // ½«Ãæ¾ßĞÅÏ¢Í¬²½µ½ BattleUnit ÓÃÓÚäÖÈ¾
+        // å°†é¢å…·ä¿¡æ¯åŒæ­¥åˆ° BattleUnit ç”¨äºæ¸²æŸ“
         if (boundUnit != null)
         {
             boundUnit.SetMask(currentMask);
             
-            // Èç¹ûÊÇÍæ¼Ò»ØºÏÇÒĞÂÃæ¾ßÓĞÆôĞ§¹û£¬Á¢¼´Ë¢ĞÂ»ÆÈ¦
+            // å¦‚æœæ˜¯ç©å®¶å›åˆä¸”æ–°é¢å…·æœ‰å¯æ•ˆæœï¼Œç«‹å³åˆ·æ–°é»„åœˆ
             if (RoundManager.Instance != null && 
                 RoundManager.Instance.CurrentActiveTeam == Team.Player &&
                 boundUnit.UnitTeam == Team.Player &&
                 currentMask.HasActivateAbility)
             {
-                // ÏÈÒÆ³ı¾É»ÆÈ¦
+                // å…ˆç§»é™¤æ—§é»„åœˆ
                 boundUnit.HideActivateCircle();
                 
-                // Ë¢ĞÂÆôĞ§¹û×´Ì¬£ºÖØÖÃ±¾»ØºÏ¿ÉÓÃ±ê¼Ç
+                // åˆ·æ–°å¯æ•ˆæœçŠ¶æ€ï¼šé‡ç½®æœ¬å›åˆå¯ç”¨æ ‡è®°
                 currentMask.CanUseActivateThisRound = true;
                 
-                // ¼ì²éÊÇ·ñÂú×ãËùÓĞÌõ¼şºóÏÔÊ¾»ÆÈ¦
+                // æ£€æŸ¥æ˜¯å¦æ»¡è¶³æ‰€æœ‰æ¡ä»¶åæ˜¾ç¤ºé»„åœˆ
                 if (currentMask.CanUseActivateNow())
                 {
                     boundUnit.ShowActivateCircle();
-                    Debug.Log($"[UnitController] ´÷ÉÏĞÂÃæ¾ß {currentMask.MaskName}£¬Ë¢ĞÂÆôĞ§¹û»ÆÈ¦");
+                    Debug.Log($"[UnitController] æˆ´ä¸Šæ–°é¢å…· {currentMask.MaskName}ï¼Œåˆ·æ–°å¯æ•ˆæœé»„åœˆ");
                 }
                 else
                 {
-                    Debug.Log($"[UnitController] ´÷ÉÏĞÂÃæ¾ß {currentMask.MaskName}£¬µ«²»Âú×ãÆôĞ§¹ûÌõ¼ş");
+                    Debug.Log($"[UnitController] æˆ´ä¸Šæ–°é¢å…· {currentMask.MaskName}ï¼Œä½†ä¸æ»¡è¶³å¯æ•ˆæœæ¡ä»¶");
                 }
             }
         }
@@ -236,7 +239,7 @@ public abstract class UnitController : MonoBehaviour
         if (currentMask == null || !currentMask.IsBroken)
             return;
         
-        Debug.Log($"[UnitController] ÒÆ³ıÆÆËğÃæ¾ß: {currentMask.MaskName}");
+        Debug.Log($"[UnitController] ç§»é™¤ç ´æŸé¢å…·: {currentMask.MaskName}");
         
         Mask brokenMask = currentMask;
         brokenMask.OnUnequip(boundUnit);
@@ -332,7 +335,7 @@ public abstract class UnitController : MonoBehaviour
             currentMask.OnTurnEnd();
         }
         
-        // ÇåÀíÏÖÓĞµÄActionCircle
+        // æ¸…ç†ç°æœ‰çš„ActionCircle
         if (currentActionCircle != null)
         {
             Destroy(currentActionCircle);
@@ -349,20 +352,32 @@ public abstract class UnitController : MonoBehaviour
     {
         canAct = can;
     }
-    public IEnumerator MoveTo(Vector2 targetPosition,float time)
+    public IEnumerator MoveTo(Vector2 targetPosition, float time)
     {
-        var movePosition =((Vector3)targetPosition-transform.position)/time;
-        while (time>0)
+        // 1. å¼€å§‹ç§»åŠ¨ï¼šæ¢æˆå›¾ç‰‡ B
+        if (movingSprite != null && spriteRenderer != null)
         {
-            time-=Time.deltaTime;
-            transform.position += movePosition*Time.deltaTime;
+            spriteRenderer.sprite = movingSprite;
+        }
+
+        var movePosition = ((Vector3)targetPosition - transform.position) / time;
+        while (time > 0)
+        {
+            time -= Time.deltaTime;
+            transform.position += movePosition * Time.deltaTime;
             yield return null;
         }
         transform.position = targetPosition;
+
+        // 2. ç§»åŠ¨ç»“æŸï¼šæ¢å›å›¾ç‰‡ A (idleSprite)
+        if (idleSprite != null && spriteRenderer != null)
+        {
+            spriteRenderer.sprite = idleSprite;
+        }
     }
     public void InitActionCircle()
     {
-        //¿ÉÒÔ¸ÄÎªResoruceManagerÀ´¹ÜÀí
+        //å¯ä»¥æ”¹ä¸ºResoruceManageræ¥ç®¡ç†
         if (attackCount > 0)
         {
             if (currentActionCircle != null)
@@ -372,11 +387,11 @@ public abstract class UnitController : MonoBehaviour
             }
             
             currentActionCircle = Instantiate(ResourceController.Instance.GetPrefab("ActionCircle"), transform);
-            currentActionCircle.name = "ActionCircle"; // È·±£Ãû×ÖÕıÈ·
+            currentActionCircle.name = "ActionCircle"; // ç¡®ä¿åå­—æ­£ç¡®
             ActionCircle aC = currentActionCircle.GetComponent<ActionCircle>();
             aC.Initialize(this);
             
-            Debug.Log($"[UnitController] {gameObject.name} ´´½¨ActionCircle£¨¹¥»÷È¦£©");
+            Debug.Log($"[UnitController] {gameObject.name} åˆ›å»ºActionCircleï¼ˆæ”»å‡»åœˆï¼‰");
         }
 
     }
@@ -430,12 +445,12 @@ public abstract class UnitController : MonoBehaviour
             case ActionType.ActivateMask:
                 if (command.MaskData != null)
                 {
-                    Debug.Log($"[UnitController] Ö´ĞĞÃæ¾ßÆôĞ§¹û: {command.MaskData.MaskName}");
+                    Debug.Log($"[UnitController] æ‰§è¡Œé¢å…·å¯æ•ˆæœ: {command.MaskData.MaskName}");
                     yield return command.MaskData.Activate(this);
                 }
                 else
                 {
-                    Debug.LogWarning("[UnitController] ActivateMask ÃüÁîÈ±ÉÙ MaskData");
+                    Debug.LogWarning("[UnitController] ActivateMask å‘½ä»¤ç¼ºå°‘ MaskData");
                 }
                 break;
             
@@ -444,4 +459,5 @@ public abstract class UnitController : MonoBehaviour
                 break;
         }
     }
+
 }
