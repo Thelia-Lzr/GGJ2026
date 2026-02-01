@@ -33,6 +33,8 @@ public abstract class UnitController : MonoBehaviour
     protected int initialHealth = 50;
 
     public int attackCount { get; protected set; }
+ 
+
 
 
     protected virtual void Awake()

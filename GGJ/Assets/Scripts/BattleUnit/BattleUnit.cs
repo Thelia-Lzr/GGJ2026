@@ -3,6 +3,8 @@ using UnityEngine;
 using System;
 using TMPro;
 using UnityEngine.UI;
+using System.IO;
+using Unity.VisualScripting;
 
 public enum Team
 {
@@ -52,6 +54,10 @@ public class BattleUnit : MonoBehaviour
     //护盾文本
     [field: SerializeField]
     public GameObject ShellText { get; private set; }
+
+    //UI
+    public List<GameObject> BuffUI = new List<GameObject>();
+
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
     public int Attack => attack;
@@ -89,6 +95,7 @@ public class BattleUnit : MonoBehaviour
         //UI
         OnHealthChanged += HealthDisplay;
         OnHealthChanged += HealthChangeDisplay;
+        OnStatusApplied += BuffUIDisplay;
         if (UIText == null)
         {
             UIText = new GameObject("uitext");
@@ -223,6 +230,62 @@ public class BattleUnit : MonoBehaviour
         GameObject newDisplay = Instantiate(resourceController.GetPrefab("HealthChangeDisplay"));
         newDisplay.GetComponent<RectTransform>().SetParent(UIText.GetComponent<RectTransform>());
         newDisplay.GetComponent<HealthChangeDisplay>().Intial(amount);
+    }
+    public void BuffUIDisplay(StatusEffect newEffect)
+    {
+        GameObject[] BuffUITemp=new GameObject[BuffUI.Count];
+        for(int i = 0; i < BuffUITemp.Length; i++)
+        {
+            BuffUITemp[i]= BuffUI[i];
+        }
+        for (int i = 0; i < BuffUITemp.Length; i++)
+        {
+            Destroy(BuffUITemp[i]);
+        }
+        BuffUI.Clear();
+        //刷新UI显示
+        for(int i = 0;i < activeStatusEffects.Count; i++)
+        {
+            StatusEffect effect=activeStatusEffects[i];
+            GameObject newUI = new GameObject("BuffUI");
+            RectTransform UITranform = newUI.AddComponent<RectTransform>();
+            UITranform.SetParent(UIText.GetComponent<RectTransform>());
+            UITranform.pivot = new Vector2(0, 1);
+            UITranform.anchorMin = new Vector2(0, 1);
+            UITranform.anchorMax = new Vector2(0, 1);
+            UITranform.sizeDelta = new Vector2(30, 30);
+            UITranform.localScale = Vector3.one;
+            //75,-90
+            UITranform.anchoredPosition = new Vector2(40 * i, 40);
+            BuffUI.Add(newUI);
+
+            Image image = UITranform.AddComponent<Image>();
+            switch (effect.StatusId)
+            {
+                case "Add2Atk":
+
+                    break;
+                case "Minus2Atk":
+                    Debug.LogWarning("!");
+                    break;
+                case "Stunned":
+
+                    break;
+                case "Enraged":
+
+                    break;
+            }
+            if (controller is EnemyTank tank)
+            {
+                if(tank.JudgeCharge())
+                {
+                    //显示UI
+                }
+            }
+
+
+
+        }
     }
     public void ApplyStatus(StatusEffect effect)
     {

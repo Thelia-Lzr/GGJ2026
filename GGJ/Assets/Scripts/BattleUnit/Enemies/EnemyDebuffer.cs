@@ -1,11 +1,11 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// µĞÈË£¨¸¨ÖúdebuffÀà£©
-/// Health: 20 | Atk: 5 | ¹¥»÷ÀàĞÍ: µ¥Ìå
-/// ĞĞÎª: µ¥Ìå1Atk or Ä¿±ê±¾»ØºÏ¹¥»÷Á¦-2
+/// æ•Œäººï¼ˆè¾…åŠ©debuffç±»ï¼‰
+/// Health: 20 | Atk: 5 | æ”»å‡»ç±»å‹: å•ä½“
+/// è¡Œä¸º: å•ä½“1Atk or ç›®æ ‡æœ¬å›åˆæ”»å‡»åŠ›-2
 /// </summary>
 public class EnemyDebuffer : EnemyController
 {
@@ -34,7 +34,7 @@ public class EnemyDebuffer : EnemyController
         
         if (enemyUnits.Count == 0)
         {
-            Debug.LogWarning($"{gameObject.name}: Ã»ÓĞ¿É¹¥»÷µÄµĞ¶Ôµ¥Î»");
+            Debug.LogWarning($"{gameObject.name}: æ²¡æœ‰å¯æ”»å‡»çš„æ•Œå¯¹å•ä½");
             return null;
         }
         
@@ -50,16 +50,16 @@ public class EnemyDebuffer : EnemyController
         {
             attackCount--;
             
-            // Ëæ»úÑ¡Ôñ£ºÆÕÍ¨¹¥»÷ or ¸øÄ¿±ê¼õ¹¥»÷Á¦
+            // éšæœºé€‰æ‹©ï¼šæ™®é€šæ”»å‡» or ç»™ç›®æ ‡å‡æ”»å‡»åŠ›
             if (Random.value > 0.5f && command.Target != null)
             {
-                // ¸øÄ¿±ê¼õ¹¥»÷Á¦
-                Debug.Log($"[EnemyDebuffer] {gameObject.name} ¸ø {command.Target.gameObject.name} ½µµÍ¹¥»÷Á¦ (-{debuffAmount})");
+                // ç»™ç›®æ ‡å‡æ”»å‡»åŠ›
+                Debug.Log($"[EnemyDebuffer] {gameObject.name} ç»™ {command.Target.gameObject.name} é™ä½æ”»å‡»åŠ› (-{debuffAmount})");
                 yield return DebuffTarget(command.Target);
             }
             else
             {
-                // ÆÕÍ¨µ¥Ìå¹¥»÷
+                // æ™®é€šå•ä½“æ”»å‡»
                 yield return AttackSingle(command.Target, 1f);
             }
         }
@@ -74,7 +74,7 @@ public class EnemyDebuffer : EnemyController
         if (target != null && target.IsAlive())
         {
             target.ApplyStatus(new Minus2AtkEffect(1));
-            Debug.Log($"[EnemyDebuffer] {target.gameObject.name} ¹¥»÷Á¦½µµÍ {debuffAmount}");
+            Debug.Log($"[EnemyDebuffer] {target.gameObject.name} æ”»å‡»åŠ›é™ä½ {debuffAmount}");
         }
         
         yield return new WaitForSeconds(0.5f);
