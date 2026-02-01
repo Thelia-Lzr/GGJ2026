@@ -26,6 +26,9 @@ public class AnimationHandler : MonoBehaviour
     private Queue<ActionQueueItem> actionQueue = new Queue<ActionQueueItem>();
     private bool isProcessing = false;
     
+    public bool IsProcessing => isProcessing;
+    public int QueueCount => actionQueue.Count;
+    
     private void Awake()
     {
         if (instance != null && instance != this)

@@ -3,26 +3,6 @@
 /// <summary>
 /// 音频系统全功能诊断测试器
 /// </summary>
-
-/// <summary>
-///  类型1：BGM播放/停止调用示例
-///  自动播放Lobby的Intro前奏，播放完毕后无缝切换至Loop段无限循环
-/// AudioManager.Instance.PlayTwoPartBGM("Lobby");
-
-/// 类型2：普通无限循环BGM（单片段循环）
-/// 适用场景：剧情、对话、简易场景背景音等，直接单片段无限循环播放
-/// 直接循环播放Plot对应的单片段音频
-/// AudioManager.Instance.PlayNormalBGM("Plot");
-
-/// 停止当前所有正在播放的背景音乐（两段式/普通循环均适用）
-/// AudioManager.Instance.StopBGM();
-
-///类型3：音效
-/// 方法A：指定文件名播放
-/// // 示例：播放Attack分类下名为sfx_atk_hammer的音效（前提：该文件已拖入Attack分类的音效列表）
-/// AudioManager.Instance.PlaySFX(AudioManager.SfxType.Attack, "sfx_atk_hammer");
-/// </summary>
-
 public class AudioTester : MonoBehaviour
 {
     [Header("BGM 测试名称 (需与 Inspector 中一致)")]
@@ -54,8 +34,8 @@ public class AudioTester : MonoBehaviour
         }
 
         // --- SFX 测试 ---
-        // 按 空格：测试指定名字的音效
-        if (Input.GetKeyDown(KeyCode.Space))
+        // 按 3：测试指定名字的音效（改为数字3，避免与抽卡的空格键冲突）
+        if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             Debug.Log($"<color=yellow>【测试】尝试播放音效: {hammerClipName} (分类: {attackType})</color>");
             AudioManager.Instance.PlaySFX(attackType, hammerClipName);
@@ -90,6 +70,6 @@ public class AudioTester : MonoBehaviour
         // 这里的自检需要保证 AudioManager 里的变量是 public 的才能访问
         // 如果报错，可以暂时注释掉这段 Start 里的内容
         Debug.Log("✅ 自检成功：AudioManager 实例已就绪。");
-        Debug.Log("操作指南：[1]两段BGM  [2]普通BGM  [空格]指定音效  [R]随机音效  [S]停止");
+        Debug.Log("操作指南：[1]两段BGM  [2]普通BGM  [3]指定音效  [R]随机音效  [S]停止");
     }
 }

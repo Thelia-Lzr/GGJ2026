@@ -21,10 +21,11 @@ public class ResourceController: MonoBehaviour
     [SerializeField] private List<PrefabEntry> prefabList = new List<PrefabEntry>();
     
     private Dictionary<string, GameObject> prefabs;
-
+    public List<Sprite> Sprites;
+    public List<Sprite> StatusSprites;
+    public List<Sprite> MaskSprites;
     private void Awake()
     {
-        FONT = Resources.Load<TMP_FontAsset>("FONT/simsunSDF");
         
         // 将列表转换为字典
         prefabs = new Dictionary<string, GameObject>();
@@ -35,7 +36,29 @@ public class ResourceController: MonoBehaviour
                 prefabs[entry.key] = entry.prefab;
             }
         }
-        
+        Sprites = new List<Sprite>();
+        Sprites.Add(Resources.Load<Sprite>("Image/Icon/Health"));
+        Sprites.Add(Resources.Load<Sprite>("Image/Icon/Attack"));
+        Sprites.Add(Resources.Load<Sprite>("Image/Icon/Shell"));
+        Sprites.Add(Resources.Load<Sprite>("Image/UI/AttackShow"));
+        Sprites.Add(Resources.Load<Sprite>("Image/UI/AttackDisplay"));
+        StatusSprites =new List<Sprite>();
+        StatusSprites.Add(Resources.Load<Sprite>("Image/Icon/Dizzy"));
+        StatusSprites.Add(Resources.Load<Sprite>("Image/Icon/Ready"));
+        StatusSprites.Add(Resources.Load<Sprite>("Image/Icon/Angry"));
+        StatusSprites.Add(Resources.Load<Sprite>("Image/Icon/AttackUp"));
+        StatusSprites.Add(Resources.Load<Sprite>("Image/Icon/AttackDown"));
+        MaskSprites =new List<Sprite>();
+        //痛苦面具
+        MaskSprites.Add(Resources.Load<Sprite>("Image/Mask/MaskAgony"));
+        //
+        MaskSprites.Add(Resources.Load<Sprite>("Image/Mask/MaskBodyCult"));
+        MaskSprites.Add(Resources.Load<Sprite>("Image/Mask/MaskCandleHandler"));
+        MaskSprites.Add(Resources.Load<Sprite>("Image/Mask/MaskEndField"));
+        MaskSprites.Add(Resources.Load<Sprite>("Image/Mask/MaskFlame"));
+        MaskSprites.Add(Resources.Load<Sprite>("Image/Mask/MaskHilichurl,"));
+        MaskSprites.Add(Resources.Load<Sprite>("Image/Mask/MaskNeverRemoved"));
+        MaskSprites.Add(Resources.Load<Sprite>("Image/Mask/MaskOblivionis"));
         if (Instance == null)
         {
             Instance = this;

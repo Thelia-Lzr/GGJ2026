@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Linq;
 
 /// <summary>
 /// 回合管理器：核心战斗流程驱动中心，负责回合切换、资源分配、战斗状态判定
@@ -54,6 +55,9 @@ public class RoundManager : MonoBehaviour
     private int roundCounter = 0;
     private int playerRoundCounter = 0;
     private int enemyRoundCounter = 0;
+    
+    // 公开属性：获取当前活跃的队伍
+    public Team CurrentActiveTeam => currentActiveTeam;
     #endregion
 
     #region 事件定义（衔接显示层）
@@ -180,6 +184,13 @@ public class RoundManager : MonoBehaviour
         DebugLog("[RoundManager] 步骤5: 启动第一回合");
         StartRound();
         
+        // 战斗开始时抽3张卡
+        DebugLog("[RoundManager] 步骤6: 抽取初始手牌");
+        if (HandManager.Instance != null)
+        {
+            HandManager.Instance.DrawInitialCards(3);
+        }
+        
         DebugLog("[RoundManager] InitializeBattle() COMPLETE ✅");
         DebugLog("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     }
@@ -233,6 +244,20 @@ public class RoundManager : MonoBehaviour
                 {
                     Debug.LogWarning($"  ⚠️ {unit.gameObject.name} 的 Controller 为空！");
                 }
+                
+                // 玩家回合开始时，重置面具的CanUseActivateThisRound并显示黄圈
+                if (currentActiveTeam == Team.Player && unit.CurrentMask != null)
+                {
+                    // 每回合开始时重置"本回合可用"标记
+                    unit.CurrentMask.CanUseActivateThisRound = unit.CurrentMask.HasActivateAbility;
+                    
+                    // 检查是否满足所有条件（包括额外条件如耐久）
+                    if (unit.CurrentMask.CanUseActivateNow())
+                    {
+                        DebugLog($"  → {unit.gameObject.name} 显示ActivateCircle");
+                        unit.ShowActivateCircle();
+                    }
+                }
             }
         }
 
@@ -245,6 +270,10 @@ public class RoundManager : MonoBehaviour
         {
             DebugLog($"[RoundManager] 步骤3: 触发敌方行动预告");
             TriggerEnemyActionPreview();
+            
+            // 3.5 执行敌方行动
+            DebugLog($"[RoundManager] 步骤3.5: 启动敌方行动执行协程");
+            StartCoroutine(ExecuteEnemyActions());
         }
         else
         {
@@ -293,6 +322,18 @@ public class RoundManager : MonoBehaviour
                 {
                     DebugLog($"  → 调用 {unit.gameObject.name}.Controller.OnTurnEnd()");
                     unit.Controller.OnTurnEnd(); // 控制器逻辑结算（如资源重置）
+                }
+                
+                // 玩家回合结束时，将所有CanUseActivateThisRound设为false并移除黄圈
+                if (currentActiveTeam == Team.Player)
+                {
+                    if (unit.CurrentMask != null)
+                    {
+                        unit.CurrentMask.CanUseActivateThisRound = false;
+                        DebugLog($"  → {unit.gameObject.name} CanUseActivateThisRound 设为 false");
+                    }
+                    unit.HideActivateCircle();
+                    DebugLog($"  → {unit.gameObject.name} 隐藏ActivateCircle");
                 }
             }
         }
@@ -366,10 +407,18 @@ public class RoundManager : MonoBehaviour
                 if (controller != null)
                 {
                     DebugLog($"  → {unit.gameObject.name}.Controller.GetAttackCount()");
-                    controller.GetAttackCount();
-                    if (controller.attackCount > 0)
+                    if (!unit.HasStatus<Stunned>())
+                    {
+                        controller.GetAttackCount();
+                    }
+                    
+                    
+                    // 只为玩家单位初始化 ActionCircle（考虑暴怒状态）
+                    bool canAct = controller.attackCount > 0 || unit.HasStatus<Enraged>();
+                    if (canAct && currentActiveTeam == Team.Player)
                     {
                         controller.InitActionCircle();
+                        DebugLog($"  → {unit.gameObject.name} 初始化 ActionCircle");
                     }
                 }
                 else
@@ -550,16 +599,16 @@ public class RoundManager : MonoBehaviour
         
         if (unit != null)
         {
-            if (destroyGameObject)
+            // 销毁UI
+            if (unit.UIText != null)
             {
-                DebugLog($"[RoundManager] 🗑️ 完全销毁GameObject: {unitName}");
-                Destroy(unit.gameObject);
+                DebugLog($"[RoundManager] 🗑️ 销毁UI: {unitName}");
+                Destroy(unit.UIText);
             }
-            else
-            {
-                DebugLog($"[RoundManager] 🔒 禁用GameObject: {unitName}");
-                unit.gameObject.SetActive(false);
-            }
+            
+            // 单位本身只禁用，不销毁，以便接收检测
+            DebugLog($"[RoundManager] 🔒 禁用GameObject: {unitName}");
+            unit.gameObject.SetActive(false);
         }
         else
         {
@@ -583,16 +632,16 @@ public class RoundManager : MonoBehaviour
                 cleanedCount++;
                 string unitName = unit.gameObject.name;
                 
-                if (destroyGameObject)
+                // 销毁UI
+                if (unit.UIText != null)
                 {
-                    DebugLog($"  🗑️ 销毁: {unitName}");
-                    Destroy(unit.gameObject);
+                    DebugLog($"  🗑️ 销毁UI: {unitName}");
+                    Destroy(unit.UIText);
                 }
-                else
-                {
-                    DebugLog($"  🔒 禁用: {unitName}");
-                    unit.gameObject.SetActive(false);
-                }
+                
+                // 单位本身只禁用，不销毁，以便接收检测
+                DebugLog($"  🔒 禁用: {unitName}");
+                unit.gameObject.SetActive(false);
             }
         }
         
@@ -693,6 +742,82 @@ public class RoundManager : MonoBehaviour
         }
         
         DebugLog($"[RoundManager] TriggerEnemyActionPreview() COMPLETE - 生成 {previewCount} 个预告");
+    }
+    
+    /// <summary>执行所有敌方单位的行动（随机顺序）</summary>
+    private System.Collections.IEnumerator ExecuteEnemyActions()
+    {
+        DebugLog($"[RoundManager] ExecuteEnemyActions() START");
+        
+        List<BattleUnit> enemies = GetAllUnitsByTeam(Team.Enemy);
+        
+        // 随机打乱敌方行动顺序
+        List<BattleUnit> shuffledEnemies = ShuffleEnemyOrder(enemies);
+        
+        DebugLog($"  敌方单位数: {shuffledEnemies.Count}");
+        DebugLog($"  行动顺序: {string.Join(" -> ", shuffledEnemies.Select(e => e.gameObject.name))}");
+        
+        // 依次执行每个敌方单位的所有攻击
+        foreach (var enemyUnit in shuffledEnemies)
+        {
+            if (enemyUnit.IsAlive() && enemyUnit.Controller is EnemyController enemyController)
+            {
+                DebugLog($"  → {enemyUnit.gameObject.name} 开始行动，攻击次数: {enemyController.attackCount}");
+                
+                // 循环执行该敌人的所有攻击次数
+                while (enemyController.attackCount > 0 && enemyUnit.IsAlive())
+                {
+                    DebugLog($"    ├─ {enemyUnit.gameObject.name} 剩余攻击次数: {enemyController.attackCount}");
+                    
+                    // 获取AI决策
+                    ActionCommand decision = enemyController.AI();
+                    
+                    if (decision != null && enemyController.CanPerformAction(decision))
+                    {
+                        // 执行攻击
+                        enemyController.ConfirmAction(decision);
+                        
+                        // 等待当前攻击完成
+                        yield return new WaitUntil(() => !AnimationHandler.Instance.IsProcessing);
+                        
+                        DebugLog($"    └─ 攻击完成");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"    └─ {enemyUnit.gameObject.name} 无法执行行动，跳过剩余攻击");
+                        break;
+                    }
+                    
+                    // 短暂延迟，避免过快
+                    yield return new WaitForSeconds(0.2f);
+                }
+                
+                DebugLog($"  ✅ {enemyUnit.gameObject.name} 所有攻击完成");
+            }
+        }
+        
+        DebugLog($"[RoundManager] ExecuteEnemyActions() COMPLETE - 所有敌方行动完成");
+        
+        // 所有敌方行动完成后，自动结束回合
+        DebugLog($"[RoundManager] 自动结束敌方回合");
+        EndRound();
+    }
+    
+    /// <summary>随机打乱敌方单位的行动顺序</summary>
+    private List<BattleUnit> ShuffleEnemyOrder(List<BattleUnit> enemies)
+    {
+        List<BattleUnit> shuffled = new List<BattleUnit>(enemies);
+        
+        // Fisher-Yates 洗牌算法
+        for (int i = shuffled.Count - 1; i > 0; i--)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, i + 1);
+            BattleUnit temp = shuffled[i];
+            shuffled[i] = shuffled[randomIndex];
+            shuffled[randomIndex] = temp;
+        }
+        
+        return shuffled;
     }
     #endregion
 

@@ -10,10 +10,12 @@ public class PlayerController : UnitController
     private ActionCommand pendingAction;
     
     public event Action OnTurnStartRequested;
-    public event Action<ActionCommand> OnActionConfirmed;
     
     public bool IsWaitingForInput => waitingForInput;
-    
+
+    //面具
+    public GameObject MaskImage;
+
     protected override void Awake()
     {
         base.Awake();
@@ -62,6 +64,19 @@ public class PlayerController : UnitController
         
         RaiseActionPerformed(command);
     }
+
+    public override IEnumerator Attack(BattleUnit target)
+    {
+        if(currentMask == null)
+        {
+            return base.Attack(target);
+        }
+        else
+        {
+            return currentMask.Attack(this,target);
+        }
+        
+    }
     
     public override void TakeTurn()
     {
@@ -92,55 +107,15 @@ public class PlayerController : UnitController
         pendingAction = command;
     }
     
-    public void ConfirmAction(ActionCommand command)
-    {
-        if (!waitingForInput)
-            return;
-        
-        if (command == null || !CanPerformAction(command))
+    public override void ConfirmAction(ActionCommand command)
+    {   
+        base.ConfirmAction(command);
+        if(attackCount > 0)
         {
-            Debug.LogWarning("Cannot confirm action.");
-            return;
+            InitActionCircle();
         }
-        
-        waitingForInput = false;
-        
-        PerformAction(command);
-        
-        if (animationHandler != null)
-        {
-            IEnumerator actionCoroutine = GetActionCoroutine(command);
-            animationHandler.SubmitAction(actionCoroutine, command, this);
-        }
-        else
-        {
-            Debug.LogWarning("AnimationHandler is not set!");
-        }
-        
-        OnActionConfirmed?.Invoke(command);
     }
     
-    protected virtual IEnumerator GetActionCoroutine(ActionCommand command)
-    {
-        switch (command.ActionType)
-        {
-            case ActionType.Attack:
-                attackCount--;
-                yield return Attack(command.Target);
-                break;
-            
-            case ActionType.SwitchMask:
-                if (command.MaskData != null)
-                {
-                    SwitchMask(command.MaskData, command.ResourceCost);
-                }
-                break;
-            
-            default:
-                Debug.LogWarning($"Unknown action type: {command.ActionType}");
-                break;
-        }
-    }
     
 
     public override bool SwitchMask(Mask newMask, int cost)
@@ -150,6 +125,44 @@ public class PlayerController : UnitController
         if (success)
         {
             Debug.Log($"Player switched to mask: {newMask.MaskName}");
+            if (MaskImage == null)
+            {
+                MaskImage = new GameObject("Mask");
+                MaskImage.transform.SetParent(transform, false);
+                MaskImage.transform.localScale = Vector3.one;
+                MaskImage.transform.localPosition = new Vector3(-0.08f, 0.49f);
+                MaskImage.AddComponent<SpriteRenderer>();
+            }
+                SpriteRenderer sprite= MaskImage.GetComponent<SpriteRenderer>();
+            sprite.sortingOrder = 4;
+                switch (newMask.MaskName)
+                {
+                    case "痛苦的面具":
+                        sprite.sprite = ResourceController.Instance.MaskSprites[0];
+                        break;
+                    case "人体派的面具":
+                        sprite.sprite = ResourceController.Instance.MaskSprites[1];
+                        break;
+                    case "秉烛人的面具":
+                        sprite.sprite = ResourceController.Instance.MaskSprites[2];
+                        break;
+                    case "拉线工人的面罩":
+                        sprite.sprite = ResourceController.Instance.MaskSprites[3];
+                        break;
+                    case "火焰少女的面具":
+                        sprite.sprite = ResourceController.Instance.MaskSprites[4];
+                        break;
+                    case "丘丘人的面具":
+                        sprite.sprite = ResourceController.Instance.MaskSprites[5];
+                        break;
+                    case "从不摘下的面具":
+                        sprite.sprite = ResourceController.Instance.MaskSprites[6];
+                        break;
+                    case "难崩的假面":
+                        sprite.sprite = ResourceController.Instance.MaskSprites[7];
+                        break;
+                }
+               
         }
         
         return success;

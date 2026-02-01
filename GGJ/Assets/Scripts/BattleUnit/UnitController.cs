@@ -2,13 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Runtime.CompilerServices;
 
 public abstract class UnitController : MonoBehaviour
 {
     [Header("Controller Settings")]
-    [SerializeField] protected BattleUnit boundUnit;
+    [SerializeField] public BattleUnit boundUnit;
     [SerializeField] protected Mask currentMask;
     [SerializeField] private int attackCountGains = 1;
+    
+    [Header("Visual Settings")]
+    [Tooltip("瑙掕壊鍥剧墖Sprite锛屽鏋滀负绌轰細灏濊瘯浠嶳esources/Image/Character/绫诲悕鍔犺浇")]
+    [SerializeField] protected Sprite characterSprite;
 
     protected bool isStunned = false;
     protected bool canAct = true;
@@ -17,18 +22,32 @@ public abstract class UnitController : MonoBehaviour
 
     public event Action<ActionCommand> OnActionPerformed;
     public event Action<Mask, Mask> OnMaskSwitched;
+    public event Action<ActionCommand> OnActionConfirmed;
+
+    private GameObject currentActionCircle;
 
     public BattleUnit BoundUnit => boundUnit;
     public Mask CurrentMask => currentMask;
     public bool CanAct => canAct && !isStunned && boundUnit != null && boundUnit.IsAlive();
+    public Sprite CharacterSprite => characterSprite;
+    
+    /// <summary>
+    /// 璁剧疆瑙掕壊鍥剧墖锛堢敤浜庡姩鎬佸垱寤烘椂锛?
+    /// </summary>
+    public void SetCharacterSprite(Sprite sprite)
+    {
+        characterSprite = sprite;
+    }
 
-    //初始属性定义
-    private int initialAttack = 10;
-    private int initialDefense = 5;
-    private int initialMaxHealth = 100;
-    private int initialHealth = 50;
+    //鍒濆灞炴�у畾涔?
+    protected int initialAttack = 10;
+    protected int initialDefense = 5;
+    protected int initialMaxHealth = 100;
+    protected int initialHealth = 50;
 
     public int attackCount { get; protected set; }
+ 
+
 
 
     protected virtual void Awake()
@@ -39,19 +58,88 @@ public abstract class UnitController : MonoBehaviour
         {
             Debug.LogWarning($"UnitController on {gameObject.name} could not find AnimationHandler in scene!");
         }
+        
+        // 濡傛灉娌℃湁璁剧疆Sprite锛屽皾璇曚粠Resources鍔犺浇
+        if (characterSprite == null)
+        {
+            string className = GetType().Name;
+            characterSprite = Resources.Load<Sprite>($"Image/Char/{className}");
+            if (characterSprite == null)
+            {
+                Debug.LogWarning($"[UnitController] 鏃犳硶鍔犺浇瑙掕壊鍥剧墖: Image/Char/{className}");
+            }
+        }
     }
     private void Start()
     {
-        BindUnit(boundUnit);
+        // 鍙湁褰揵oundUnit杩樻湭缁戝畾鏃舵墠灏濊瘯缁戝畾锛堝吋瀹笽nspector棰勮缃殑鎯呭喌锛?
+        if (boundUnit != null && !isBound)
+        {
+            BindUnit(boundUnit);
+        }
     }
+    
+    protected virtual void OnDestroy()
+    {
+        UnsubscribeFromStatusEvents();
+    }
+    
+    protected bool isBound = false;
+    
     public virtual void BindUnit(BattleUnit unit)
     {
+        if (isBound && unit == boundUnit) return; // 闃叉閲嶅缁戝畾
+        
         boundUnit = unit;
+        isBound = true;
 
         if (boundUnit != null)
         {
             boundUnit.Initialize(this,initialMaxHealth,initialHealth,initialAttack,initialDefense);
+            SubscribeToStatusEvents();
         }
+    }
+    
+    protected void SubscribeToStatusEvents()
+    {
+        if (boundUnit != null)
+        {
+            boundUnit.OnStatusApplied += OnStatusAppliedHandler;
+            boundUnit.OnStatusRemoved += OnStatusRemovedHandler;
+            boundUnit.OnDeath += OnDeathHandler;
+        }
+    }
+    
+    protected void UnsubscribeFromStatusEvents()
+    {
+        if (boundUnit != null)
+        {
+            boundUnit.OnStatusApplied -= OnStatusAppliedHandler;
+            boundUnit.OnStatusRemoved -= OnStatusRemovedHandler;
+            boundUnit.OnDeath -= OnDeathHandler;
+        }
+    }
+    
+    protected virtual void OnDeathHandler()
+    {
+        // 閿�姣乁I鍏冪礌
+        if (boundUnit != null && boundUnit.UIText != null)
+        {
+            Destroy(boundUnit.UIText);
+        }
+        
+        // 閿�姣佸崟浣岹ameObject
+        Destroy(gameObject);
+    }
+    
+    protected virtual void OnStatusAppliedHandler(StatusEffect effect)
+    {
+        // 瀛愮被鍙噸鍐欐鏂规硶鏉ュ鐞嗙壒瀹氱姸鎬佺殑搴旂敤
+    }
+    
+    protected virtual void OnStatusRemovedHandler(StatusEffect effect)
+    {
+        // 瀛愮被鍙噸鍐欐鏂规硶鏉ュ鐞嗙壒瀹氱姸鎬佺殑绉婚櫎
     }
     
     
@@ -78,6 +166,13 @@ public abstract class UnitController : MonoBehaviour
     {
         attackCount = attackCountGains;
     }
+
+    public void AddAttackCount(int amount)
+    {
+        attackCount += amount;
+        Debug.Log($"[UnitController] {gameObject.name} 鏀诲嚮娆℃暟澧炲姞 {amount}锛屽綋鍓? {attackCount}");
+    }
+
     public virtual bool SwitchMask(Mask newMask, int cost)
     {
         if (newMask == null)
@@ -96,10 +191,34 @@ public abstract class UnitController : MonoBehaviour
         currentMask = newMask;
         currentMask.OnEquip(boundUnit);
         
-        // 将面具信息同步到 BattleUnit 用于渲染
+        // 灏嗛潰鍏蜂俊鎭悓姝ュ埌 BattleUnit 鐢ㄤ簬娓叉煋
         if (boundUnit != null)
         {
             boundUnit.SetMask(currentMask);
+            
+            // 濡傛灉鏄帺瀹跺洖鍚堜笖鏂伴潰鍏锋湁鍚晥鏋滐紝绔嬪嵆鍒锋柊榛勫湀
+            if (RoundManager.Instance != null && 
+                RoundManager.Instance.CurrentActiveTeam == Team.Player &&
+                boundUnit.UnitTeam == Team.Player &&
+                currentMask.HasActivateAbility)
+            {
+                // 鍏堢Щ闄ゆ棫榛勫湀
+                boundUnit.HideActivateCircle();
+                
+                // 鍒锋柊鍚晥鏋滅姸鎬侊細閲嶇疆鏈洖鍚堝彲鐢ㄦ爣璁?
+                currentMask.CanUseActivateThisRound = true;
+                
+                // 妫�鏌ユ槸鍚︽弧瓒虫墍鏈夋潯浠跺悗鏄剧ず榛勫湀
+                if (currentMask.CanUseActivateNow())
+                {
+                    boundUnit.ShowActivateCircle();
+                    Debug.Log($"[UnitController] 鎴翠笂鏂伴潰鍏?{currentMask.MaskName}锛屽埛鏂板惎鏁堟灉榛勫湀");
+                }
+                else
+                {
+                    Debug.Log($"[UnitController] 鎴翠笂鏂伴潰鍏?{currentMask.MaskName}锛屼絾涓嶆弧瓒冲惎鏁堟灉鏉′欢");
+                }
+            }
         }
         
         if (cost > 0)
@@ -110,6 +229,25 @@ public abstract class UnitController : MonoBehaviour
         OnMaskSwitched?.Invoke(oldMask, newMask);
         
         return true;
+    }
+    
+    public virtual void RemoveBrokenMask()
+    {
+        if (currentMask == null || !currentMask.IsBroken)
+            return;
+        
+        Debug.Log($"[UnitController] 绉婚櫎鐮存崯闈㈠叿: {currentMask.MaskName}");
+        
+        Mask brokenMask = currentMask;
+        brokenMask.OnUnequip(boundUnit);
+        currentMask = null;
+        
+        if (boundUnit != null)
+        {
+            boundUnit.ClearMask();
+        }
+        
+        OnMaskSwitched?.Invoke(brokenMask, null);
     }
     
     public List<ActionCommand> GetAvailableActions()
@@ -128,6 +266,22 @@ public abstract class UnitController : MonoBehaviour
         return actions;
     }
     
+    public virtual IEnumerator MoveToTarget(BattleUnit target, float time)
+    {
+        if (target == null)
+        {
+            Debug.LogWarning("Invalid target for movement.");
+            yield break;
+        }
+        
+        Vector2 targetPosition = target.transform.position;
+        Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
+        float attackDistance = 1.5f;
+        Vector2 attackPosition = targetPosition - direction * attackDistance;
+        
+        yield return MoveTo(attackPosition, time);
+    }
+    
     public virtual IEnumerator Attack(BattleUnit target)
     {
         if (target == null || !target.IsAlive())
@@ -138,8 +292,19 @@ public abstract class UnitController : MonoBehaviour
         
         Debug.Log($"{boundUnit.gameObject.name} attacks {target.gameObject.name}");
         
+        Vector2 originalPosition = transform.position;
+        float moveTime = 0.3f;
         
-        yield return null;
+        yield return MoveToTarget(target, moveTime);
+
+        int damage = boundUnit.Attack;
+        target.ApplyHealthChange(-damage);
+        
+        yield return new WaitForSeconds(0.1f);
+        Debug.Log($"Return");
+        yield return MoveTo(originalPosition, moveTime);
+        Debug.Log($"Return/");
+
     }
     
     public virtual void OnTurnStart()
@@ -166,6 +331,13 @@ public abstract class UnitController : MonoBehaviour
         {
             currentMask.OnTurnEnd();
         }
+        
+        // 娓呯悊鐜版湁鐨凙ctionCircle
+        if (currentActionCircle != null)
+        {
+            Destroy(currentActionCircle);
+            currentActionCircle = null;
+        }
     }
     
     public void SetStunned(bool stunned)
@@ -190,13 +362,121 @@ public abstract class UnitController : MonoBehaviour
     }
     public void InitActionCircle()
     {
-        //可以改为ResoruceManager来管理
-        if (attackCount > 0)
+
+        // 检查是否可以行动（有攻击次数或有暴怒状态）
+        bool canAct = attackCount > 0 || (boundUnit != null && boundUnit.HasStatus<Enraged>());
+        if (canAct)
         {
-            GameObject actionCircle = Instantiate(ResourceController.Instance.GetPrefab("ActionCircle"), transform);
-            ActionCircle aC = actionCircle.GetComponent<ActionCircle>();
+            if (currentActionCircle != null)
+            {
+                Debug.Log($"[UnitController] {gameObject.name} already has an ActionCircle, skipping creation.");
+                return;
+            }
+            
+            currentActionCircle = Instantiate(ResourceController.Instance.GetPrefab("ActionCircle"), transform);
+            currentActionCircle.name = "ActionCircle"; // 纭繚鍚嶅瓧姝ｇ‘
+            ActionCircle aC = currentActionCircle.GetComponent<ActionCircle>();
             aC.Initialize(this);
+            
+            Debug.Log($"[UnitController] {gameObject.name} 鍒涘缓ActionCircle锛堟敾鍑诲湀锛?");
         }
 
+    }
+    
+    public virtual void ConfirmAction(ActionCommand command)
+    {
+        if (command == null || !CanPerformAction(command))
+        {
+            Debug.LogWarning("Cannot confirm action.");
+            return;
+        }
+        
+        PerformAction(command);
+        
+        if (animationHandler != null)
+        {
+            IEnumerator actionCoroutine = GetActionCoroutine(command);
+            animationHandler.SubmitAction(actionCoroutine, command, this);
+        }
+        else
+        {
+            Debug.LogWarning("AnimationHandler is not set!");
+        }
+        
+        OnActionConfirmed?.Invoke(command);
+    }
+    
+    protected virtual IEnumerator GetActionCoroutine(ActionCommand command)
+    {
+        switch (command.ActionType)
+        {
+            case ActionType.Attack:
+                // 检查是否有暴怒状态
+                bool hasEnraged = boundUnit != null && boundUnit.HasStatus<Enraged>();
+                
+                if (hasEnraged)
+                {
+                    // 消耗暴怒状态而非攻击次数（直接移除暴怒状态）
+                    StatusEffect enragedEffect = boundUnit.GetStatus<Enraged>();
+                    if (enragedEffect != null)
+                    {
+                        boundUnit.RemoveStatus(enragedEffect);
+                        Debug.Log($"[UnitController] {gameObject.name} 消耗暴怒状态（已移除）");
+                    }
+                }
+                else
+                {
+                    // 正常消耗攻击次数
+                    attackCount--;
+                }
+                
+                if (currentMask != null)
+                {
+                    yield return currentMask.Attack(this, command.Target);
+                }
+                else
+                {
+                    yield return Attack(command.Target);
+                }
+                
+                // 攻击后检查是否还有攻击次数或暴怒状态，如果有则重新初始化行动圈
+                bool canActAgain = attackCount > 0 || (boundUnit != null && boundUnit.HasStatus<Enraged>());
+                if (canActAgain && boundUnit != null && boundUnit.IsAlive())
+                {
+                    // 销毁当前行动圈
+                    if (currentActionCircle != null)
+                    {
+                        Destroy(currentActionCircle);
+                        currentActionCircle = null;
+                    }
+                    // 重新初始化行动圈
+                    InitActionCircle();
+                    Debug.Log($"[UnitController] {gameObject.name} 攻击后仍可行动，重新初始化行动圈");
+                }
+                break;
+            
+            case ActionType.SwitchMask:
+                if (command.MaskData != null)
+                {
+                    SwitchMask(command.MaskData, command.ResourceCost);
+                }
+                break;
+            
+            case ActionType.ActivateMask:
+                if (command.MaskData != null)
+                {
+                    Debug.Log($"[UnitController] 鎵ц闈㈠叿鍚晥鏋? {command.MaskData.MaskName}");
+                    yield return command.MaskData.Activate(this);
+                }
+                else
+                {
+                    Debug.LogWarning("[UnitController] ActivateMask 鍛戒护缂哄皯 MaskData");
+                }
+                break;
+            
+            default:
+                Debug.LogWarning($"Unknown action type: {command.ActionType}");
+                break;
+        }
     }
 }
