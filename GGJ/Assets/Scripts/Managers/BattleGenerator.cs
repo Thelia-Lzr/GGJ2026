@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using DG.Tweening;
 using System;
 
@@ -78,6 +79,23 @@ public class BattleGenerator : MonoBehaviour
         {
             StartBattle();
         }
+    }
+    
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ReloadScene();
+        }
+    }
+    
+    /// <summary>
+    /// 重载当前场景
+    /// </summary>
+    public void ReloadScene()
+    {
+        DOTween.KillAll();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     
     /// <summary>

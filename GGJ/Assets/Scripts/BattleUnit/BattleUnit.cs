@@ -118,7 +118,7 @@ public class BattleUnit : MonoBehaviour
         UIText.GetComponent<RectTransform>().anchorMax = new Vector2(0, 0);
         UIText.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0);
         UIText.GetComponent<RectTransform>().localScale = Vector3.one;
-        UIText.GetComponent<RectTransform>().sizeDelta =new Vector2(150,250);
+        UIText.GetComponent<RectTransform>().sizeDelta =new Vector2(300,500);
         HealthDisplay(0);
     }
     
@@ -170,25 +170,25 @@ public class BattleUnit : MonoBehaviour
                 textTranform.anchorMin = new Vector2(0, 1);
                 textTranform.anchorMax = new Vector2(0, 1);
                 textTranform.anchoredPosition = new Vector2(0, 0);
-                textTranform.sizeDelta = new Vector2(30, 30);
-                textTranform.localScale = Vector3.one;
-                Image image = healthIcon.AddComponent<Image>();
-                image.sprite = resourceController.Sprites[0];
-                HealthIcon = healthIcon;
-            }
-            if (true)
-            {
-                GameObject newText = new GameObject("healthText");
-                RectTransform textTranform = newText.AddComponent<RectTransform>();
-                textTranform.SetParent(UIText.GetComponent<RectTransform>());
-                textTranform.pivot = new Vector2(0, 1);
-                textTranform.anchorMin = new Vector2(0, 1);
-                textTranform.anchorMax = new Vector2(0, 1);
-                textTranform.anchoredPosition = new Vector2(30, 0);
-                textTranform.sizeDelta = new Vector2(120, 30);
-                textTranform.localScale = Vector3.one;
-                TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
-                text.fontSize = 30;
+                    textTranform.sizeDelta = new Vector2(60, 60);
+                    textTranform.localScale = Vector3.one;
+                    Image image = healthIcon.AddComponent<Image>();
+                    image.sprite = resourceController.Sprites[0];
+                    HealthIcon = healthIcon;
+                }
+                if (true)
+                {
+                    GameObject newText = new GameObject("healthText");
+                    RectTransform textTranform = newText.AddComponent<RectTransform>();
+                    textTranform.SetParent(UIText.GetComponent<RectTransform>());
+                    textTranform.pivot = new Vector2(0, 1);
+                    textTranform.anchorMin = new Vector2(0, 1);
+                    textTranform.anchorMax = new Vector2(0, 1);
+                    textTranform.anchoredPosition = new Vector2(60, 0);
+                    textTranform.sizeDelta = new Vector2(240, 60);
+                    textTranform.localScale = Vector3.one;
+                    TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
+                    text.fontSize = 60;
                 text.font = textFont;
                 text.alignment = TextAlignmentOptions.MidlineLeft;
                 HealthText = newText;
@@ -197,31 +197,31 @@ public class BattleUnit : MonoBehaviour
             if (true)
             {
                 GameObject shellIcon = new GameObject("ShellIcon");
-                RectTransform textTranform = shellIcon.AddComponent<RectTransform>();
-                textTranform.SetParent(UIText.GetComponent<RectTransform>());
-                textTranform.pivot = new Vector2(0, 1);
-                textTranform.anchorMin = new Vector2(0, 1);
-                textTranform.anchorMax = new Vector2(0, 1);
-                textTranform.anchoredPosition = new Vector2(75, 0);
-                textTranform.sizeDelta = new Vector2(30, 30);
-                textTranform.localScale = Vector3.one;
-                Image image = shellIcon.AddComponent<Image>();
-                image.sprite = resourceController.Sprites[2];
-                ShellIcon = shellIcon;
-            }
-            if (true)
-            {
-                GameObject newText = new GameObject("shellText");
-                RectTransform textTranform = newText.AddComponent<RectTransform>();
-                textTranform.SetParent(UIText.GetComponent<RectTransform>());
-                textTranform.pivot = new Vector2(0, 1);
-                textTranform.anchorMin = new Vector2(0, 1);
-                textTranform.anchorMax = new Vector2(0, 1);
-                textTranform.anchoredPosition = new Vector2(105, 0);
-                textTranform.sizeDelta = new Vector2(120, 30);
-                textTranform.localScale = Vector3.one;
-                TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
-                text.fontSize = 30;
+                    RectTransform textTranform = shellIcon.AddComponent<RectTransform>();
+                    textTranform.SetParent(UIText.GetComponent<RectTransform>());
+                    textTranform.pivot = new Vector2(0, 1);
+                    textTranform.anchorMin = new Vector2(0, 1);
+                    textTranform.anchorMax = new Vector2(0, 1);
+                    textTranform.anchoredPosition = new Vector2(150, 0);
+                    textTranform.sizeDelta = new Vector2(60, 60);
+                    textTranform.localScale = Vector3.one;
+                    Image image = shellIcon.AddComponent<Image>();
+                    image.sprite = resourceController.Sprites[2];
+                    ShellIcon = shellIcon;
+                }
+                if (true)
+                {
+                    GameObject newText = new GameObject("shellText");
+                    RectTransform textTranform = newText.AddComponent<RectTransform>();
+                    textTranform.SetParent(UIText.GetComponent<RectTransform>());
+                    textTranform.pivot = new Vector2(0, 1);
+                    textTranform.anchorMin = new Vector2(0, 1);
+                    textTranform.anchorMax = new Vector2(0, 1);
+                    textTranform.anchoredPosition = new Vector2(210, 0);
+                    textTranform.sizeDelta = new Vector2(240, 60);
+                    textTranform.localScale = Vector3.one;
+                    TextMeshProUGUI text = newText.AddComponent<TextMeshProUGUI>();
+                    text.fontSize = 60;
                 text.font = textFont;
                 text.alignment = TextAlignmentOptions.MidlineLeft;
                 ShellText = newText;
@@ -235,21 +235,21 @@ public class BattleUnit : MonoBehaviour
             if (HealthIcon != null)
             {
                 HealthIcon.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
-            }
-            if (HealthText != null)
-            {
-                HealthText.GetComponent<RectTransform>().anchoredPosition = new Vector2(30, 0);
+                }
+                if (HealthText != null)
+                {
+                    HealthText.GetComponent<RectTransform>().anchoredPosition = new Vector2(60, 0);
 
-            }
-            if (ShellIcon != null)
-            {
-                ShellIcon.SetActive(true);
-                ShellIcon.GetComponent<RectTransform>().anchoredPosition = new Vector2(75, 0);
-            }
-            if (ShellText != null)
-            {
-                ShellText.SetActive(true);
-                ShellText.GetComponent<RectTransform>().anchoredPosition = new Vector2(105, 0);
+                }
+                if (ShellIcon != null)
+                {
+                    ShellIcon.SetActive(true);
+                    ShellIcon.GetComponent<RectTransform>().anchoredPosition = new Vector2(150, 0);
+                }
+                if (ShellText != null)
+                {
+                    ShellText.SetActive(true);
+                    ShellText.GetComponent<RectTransform>().anchoredPosition = new Vector2(210, 0);
 
             }
             ShellText.GetComponent<TextMeshProUGUI>().text = currentMask.CurrentHealth.ToString();
@@ -258,11 +258,11 @@ public class BattleUnit : MonoBehaviour
         {
             if (HealthIcon != null)
             {
-                HealthIcon.GetComponent<RectTransform>().anchoredPosition = new Vector2(40, 0);
-            }
-            if (HealthText != null)
-            {
-                HealthText.GetComponent<RectTransform>().anchoredPosition = new Vector2(70, 0);
+                HealthIcon.GetComponent<RectTransform>().anchoredPosition = new Vector2(80, 0);
+                }
+                if (HealthText != null)
+                {
+                    HealthText.GetComponent<RectTransform>().anchoredPosition = new Vector2(140, 0);
             }
             if (ShellIcon != null)
             {
@@ -303,10 +303,10 @@ public class BattleUnit : MonoBehaviour
             UITranform.pivot = new Vector2(0, 1);
             UITranform.anchorMin = new Vector2(0, 1);
             UITranform.anchorMax = new Vector2(0, 1);
-            UITranform.sizeDelta = new Vector2(30, 30);
+            UITranform.sizeDelta = new Vector2(60, 60);
             UITranform.localScale = Vector3.one;
             //75,-90
-            UITranform.anchoredPosition = new Vector2(40 * i, 40);
+            UITranform.anchoredPosition = new Vector2(80 * i, 80);
             BuffUI.Add(newUI);
 
             Image image = UITranform.AddComponent<Image>();
@@ -362,10 +362,10 @@ public class BattleUnit : MonoBehaviour
             UITranform.pivot = new Vector2(0, 1);
             UITranform.anchorMin = new Vector2(0, 1);
             UITranform.anchorMax = new Vector2(0, 1);
-            UITranform.sizeDelta = new Vector2(30, 30);
+            UITranform.sizeDelta = new Vector2(60, 60);
             UITranform.localScale = Vector3.one;
             //75,-90
-            UITranform.anchoredPosition = new Vector2(40 * i, 40);
+            UITranform.anchoredPosition = new Vector2(80 * i, 80);
             BuffUI.Add(newUI);
 
             Image image = UITranform.AddComponent<Image>();
