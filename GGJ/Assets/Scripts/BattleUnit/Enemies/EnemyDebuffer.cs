@@ -10,8 +10,6 @@ using UnityEngine;
 public class EnemyDebuffer : EnemyController
 {
     [Header("Debuffer Enemy Settings")]
-    private int initialHealth = 20;
-    private int initialAttack = 5;
     private int debuffAmount = 2;
     
     protected override void Awake()
@@ -21,6 +19,9 @@ public class EnemyDebuffer : EnemyController
     
     private void Start()
     {
+        initialHealth = 20;
+        initialAttack = 5;
+        
         if (boundUnit != null)
         {
             boundUnit.Initialize(this, initialHealth, initialHealth, initialAttack, 5);

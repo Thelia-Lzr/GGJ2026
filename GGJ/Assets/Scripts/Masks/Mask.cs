@@ -30,14 +30,29 @@ public abstract class Mask
 
     public bool IsBroken => CurrentHealth <= 0;
 
-    public Mask(string maskName, int switchCost,int maxHealth,int atk,int atkCost)
+    public Mask(string maskName, int switchCost, int maxHealth, int atk, int atkCost, string description = "")
     {
         MaskName = maskName;
+        Description = description;
         SwitchCost = switchCost;
-        MaxHealth = 50;
+        MaxHealth = maxHealth;
         CurrentHealth = MaxHealth;
         Atk = atk;
         AtkCost = atkCost;
+        
+        // 根据类名自动加载 Sprite
+        string className = GetType().Name;
+        string spritePath = $"Image/Mask/{className}";
+        MaskIcon = Resources.Load<Sprite>(spritePath);
+        
+        if (MaskIcon == null)
+        {
+            Debug.LogWarning($"[Mask] 未能加载面具图标: {spritePath}");
+        }
+        else
+        {
+            Debug.Log($"[Mask] 成功加载面具图标: {spritePath}");
+        }
     }
 
     public virtual void OnAddedToInventory()
@@ -62,9 +77,15 @@ public abstract class Mask
     {
         equippedUnit = null;
     }
-    public virtual IEnumerator Attack(UnitController controller, BattleUnit target)//实现面具启效果
+    
+    public virtual IEnumerator Attack(UnitController controller, BattleUnit target)
     {
-        yield return AttackSingle(controller,target);
+        yield return AttackSingle(controller, target);
+        UsageAfterAttack();
+        if (controller.BoundUnit != null)
+        {
+            controller.BoundUnit.HealthDisplay(0);
+        }
     }
 
     /// <summary>
@@ -300,5 +321,10 @@ public abstract class Mask
     protected virtual void OnMaskBroken()
     {
         Debug.Log($"面具 {MaskName} 已破碎！");
+        
+        if (equippedUnit != null && equippedUnit.Controller != null)
+        {
+            equippedUnit.Controller.RemoveBrokenMask();
+        }
     }
 }

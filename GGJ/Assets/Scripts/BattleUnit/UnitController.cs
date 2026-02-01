@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Runtime.CompilerServices;
 
 public abstract class UnitController : MonoBehaviour
 {
@@ -19,15 +20,17 @@ public abstract class UnitController : MonoBehaviour
     public event Action<Mask, Mask> OnMaskSwitched;
     public event Action<ActionCommand> OnActionConfirmed;
 
+    private GameObject currentActionCircle;
+
     public BattleUnit BoundUnit => boundUnit;
     public Mask CurrentMask => currentMask;
     public bool CanAct => canAct && !isStunned && boundUnit != null && boundUnit.IsAlive();
 
     //初始属性定义
-    private int initialAttack = 10;
-    private int initialDefense = 5;
-    private int initialMaxHealth = 100;
-    private int initialHealth = 50;
+    protected int initialAttack = 10;
+    protected int initialDefense = 5;
+    protected int initialMaxHealth = 100;
+    protected int initialHealth = 50;
 
     public int attackCount { get; protected set; }
 
@@ -120,6 +123,25 @@ public abstract class UnitController : MonoBehaviour
         return true;
     }
     
+    public virtual void RemoveBrokenMask()
+    {
+        if (currentMask == null || !currentMask.IsBroken)
+            return;
+        
+        Debug.Log($"[UnitController] 移除破损面具: {currentMask.MaskName}");
+        
+        Mask brokenMask = currentMask;
+        brokenMask.OnUnequip(boundUnit);
+        currentMask = null;
+        
+        if (boundUnit != null)
+        {
+            boundUnit.ClearMask();
+        }
+        
+        OnMaskSwitched?.Invoke(brokenMask, null);
+    }
+    
     public List<ActionCommand> GetAvailableActions()
     {
         List<ActionCommand> actions = new List<ActionCommand>();
@@ -201,6 +223,13 @@ public abstract class UnitController : MonoBehaviour
         {
             currentMask.OnTurnEnd();
         }
+        
+        // 清理现有的ActionCircle
+        if (currentActionCircle != null)
+        {
+            Destroy(currentActionCircle);
+            currentActionCircle = null;
+        }
     }
     
     public void SetStunned(bool stunned)
@@ -228,8 +257,14 @@ public abstract class UnitController : MonoBehaviour
         //可以改为ResoruceManager来管理
         if (attackCount > 0)
         {
-            GameObject actionCircle = Instantiate(ResourceController.Instance.GetPrefab("ActionCircle"), transform);
-            ActionCircle aC = actionCircle.GetComponent<ActionCircle>();
+            if (currentActionCircle != null)
+            {
+                Debug.Log($"[UnitController] {gameObject.name} already has an ActionCircle, skipping creation.");
+                return;
+            }
+            
+            currentActionCircle = Instantiate(ResourceController.Instance.GetPrefab("ActionCircle"), transform);
+            ActionCircle aC = currentActionCircle.GetComponent<ActionCircle>();
             aC.Initialize(this);
         }
 
