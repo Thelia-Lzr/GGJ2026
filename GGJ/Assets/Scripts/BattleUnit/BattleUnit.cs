@@ -96,7 +96,12 @@ public class BattleUnit : MonoBehaviour
         attack = Atk;
         defense = Def;
         activeStatusEffects.Clear();
-        //UI
+        //UI - 先取消订阅防止重复
+        OnHealthChanged -= HealthDisplay;
+        OnHealthChanged -= HealthChangeDisplay;
+        OnStatusApplied -= BuffUIDisplay;
+        OnTurnEnded -= BuffUIDisplayTurn;
+        // 重新订阅
         OnHealthChanged += HealthDisplay;
         OnHealthChanged += HealthChangeDisplay;
         OnStatusApplied += BuffUIDisplay;
