@@ -125,6 +125,15 @@ public class HandManager : MonoBehaviour
         }
     }
 
+    public void DrawInitialCards(int count = 3)
+    {
+        Debug.Log($"[HandManager] Drawing {count} initial cards");
+        for (int i = 0; i < count; i++)
+        {
+            DrawCard();
+        }
+    }
+
     public void DrawCard()
     {
         if (handCards.Count >= maxHandSize)

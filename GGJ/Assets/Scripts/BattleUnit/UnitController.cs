@@ -106,6 +106,7 @@ public abstract class UnitController : MonoBehaviour
         {
             boundUnit.OnStatusApplied += OnStatusAppliedHandler;
             boundUnit.OnStatusRemoved += OnStatusRemovedHandler;
+            boundUnit.OnDeath += OnDeathHandler;
         }
     }
     
@@ -115,7 +116,20 @@ public abstract class UnitController : MonoBehaviour
         {
             boundUnit.OnStatusApplied -= OnStatusAppliedHandler;
             boundUnit.OnStatusRemoved -= OnStatusRemovedHandler;
+            boundUnit.OnDeath -= OnDeathHandler;
         }
+    }
+    
+    protected virtual void OnDeathHandler()
+    {
+        // 销毁UI元素
+        if (boundUnit != null && boundUnit.UIText != null)
+        {
+            Destroy(boundUnit.UIText);
+        }
+        
+        // 销毁单位GameObject
+        Destroy(gameObject);
     }
     
     protected virtual void OnStatusAppliedHandler(StatusEffect effect)
