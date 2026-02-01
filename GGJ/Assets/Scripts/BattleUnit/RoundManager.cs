@@ -238,11 +238,14 @@ public class RoundManager : MonoBehaviour
                     Debug.LogWarning($"  ⚠️ {unit.gameObject.name} 的 Controller 为空！");
                 }
                 
-                // 玩家回合开始时，重置面具的CanUseActivate并显示黄圈
+                // 玩家回合开始时，重置面具的CanUseActivateThisRound并显示黄圈
                 if (currentActiveTeam == Team.Player && unit.CurrentMask != null)
                 {
-                    unit.CurrentMask.CanUseActivate = unit.CurrentMask.HasActivateAbility;
-                    if (unit.CurrentMask.CanUseActivate)
+                    // 每回合开始时重置"本回合可用"标记
+                    unit.CurrentMask.CanUseActivateThisRound = unit.CurrentMask.HasActivateAbility;
+                    
+                    // 检查是否满足所有条件（包括额外条件如耐久）
+                    if (unit.CurrentMask.CanUseActivateNow())
                     {
                         DebugLog($"  → {unit.gameObject.name} 显示ActivateCircle");
                         unit.ShowActivateCircle();
@@ -314,13 +317,13 @@ public class RoundManager : MonoBehaviour
                     unit.Controller.OnTurnEnd(); // 控制器逻辑结算（如资源重置）
                 }
                 
-                // 玩家回合结束时，将所有CanUseActivate设为false并移除黄圈
+                // 玩家回合结束时，将所有CanUseActivateThisRound设为false并移除黄圈
                 if (currentActiveTeam == Team.Player)
                 {
                     if (unit.CurrentMask != null)
                     {
-                        unit.CurrentMask.CanUseActivate = false;
-                        DebugLog($"  → {unit.gameObject.name} CanUseActivate 设为 false");
+                        unit.CurrentMask.CanUseActivateThisRound = false;
+                        DebugLog($"  → {unit.gameObject.name} CanUseActivateThisRound 设为 false");
                     }
                     unit.HideActivateCircle();
                     DebugLog($"  → {unit.gameObject.name} 隐藏ActivateCircle");

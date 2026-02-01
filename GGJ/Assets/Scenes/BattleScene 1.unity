@@ -238,6 +238,7 @@ MonoBehaviour:
   <UIText>k__BackingField: {fileID: 0}
   <HealthText>k__BackingField: {fileID: 0}
   <ShellText>k__BackingField: {fileID: 0}
+  <ShellIcon>k__BackingField: {fileID: 0}
 --- !u!114 &498456019
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -360,6 +361,7 @@ MonoBehaviour:
   <UIText>k__BackingField: {fileID: 0}
   <HealthText>k__BackingField: {fileID: 0}
   <ShellText>k__BackingField: {fileID: 0}
+  <ShellIcon>k__BackingField: {fileID: 0}
 --- !u!114 &604869639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1493,6 +1495,7 @@ MonoBehaviour:
   <UIText>k__BackingField: {fileID: 0}
   <HealthText>k__BackingField: {fileID: 0}
   <ShellText>k__BackingField: {fileID: 0}
+  <ShellIcon>k__BackingField: {fileID: 0}
 --- !u!114 &1514763363
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1626,6 +1629,7 @@ MonoBehaviour:
   <UIText>k__BackingField: {fileID: 0}
   <HealthText>k__BackingField: {fileID: 0}
   <ShellText>k__BackingField: {fileID: 0}
+  <ShellIcon>k__BackingField: {fileID: 0}
 --- !u!212 &1826066613
 SpriteRenderer:
   m_ObjectHideFlags: 0

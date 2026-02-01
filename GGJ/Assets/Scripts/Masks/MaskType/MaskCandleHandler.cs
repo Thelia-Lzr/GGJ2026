@@ -14,6 +14,20 @@ public class MaskCandleHandler : Mask
         hasActivateAbility: true)
     {
     }
+    
+    /// <summary>
+    /// 判断当前是否可以使用启效果
+    /// 条件：基础判断 + 耐久≤4
+    /// </summary>
+    public override bool CanUseActivateNow()
+    {
+        // 先检查基础条件
+        if (!base.CanUseActivateNow())
+            return false;
+        
+        // 额外条件：耐久必须≤4
+        return CurrentHealth <= 4;
+    }
 
     public override IEnumerator Activate(UnitController controller)
     {
