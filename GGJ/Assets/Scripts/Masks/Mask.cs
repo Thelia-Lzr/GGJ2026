@@ -30,8 +30,22 @@ public abstract class Mask
 
     public bool IsBroken => CurrentHealth <= 0;
     
-    public bool HasActivateAbility { get; protected set; }
-    public bool CanUseActivate { get; set; }
+    // 启效果相关的三层判断
+    public bool HasActivateAbility { get; protected set; }  // 是否有启效果方法
+    public bool CanUseActivateThisRound { get; set; }  // 本回合是否还能使用（每回合重置）
+    
+    /// <summary>
+    /// 判断当前是否可以使用启效果（需要子类重写具体条件）
+    /// </summary>
+    public virtual bool CanUseActivateNow()
+    {
+        // 基础判断：必须有启效果 && 本回合未使用过 && 面具未破损
+        if (!HasActivateAbility || !CanUseActivateThisRound || IsBroken)
+            return false;
+        
+        // 子类可以重写此方法添加额外条件（如耐久<=4）
+        return true;
+    }
 
     public Mask(string maskName, int switchCost, int maxHealth, int atk, int atkCost, string description = "", bool hasActivateAbility = false)
     {
@@ -44,7 +58,7 @@ public abstract class Mask
         AtkCost = atkCost;
         
         HasActivateAbility = hasActivateAbility;
-        CanUseActivate = hasActivateAbility;
+        CanUseActivateThisRound = false; // 初始为false，回合开始时重置
         
         if (hasActivateAbility)
         {
