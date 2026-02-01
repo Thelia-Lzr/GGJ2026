@@ -3,28 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 敌人（辅助debuff类）
+/// 敌人5（辅助debuff类）
 /// Health: 20 | Atk: 5 | 攻击类型: 单体
-/// 行为: 单体1Atk or 目标本回合攻击力-2
+/// 行为: 普攻*1 or 目标获得本轮攻击力-2
 /// </summary>
 public class EnemyDebuffer : EnemyController
 {
     [Header("Debuffer Enemy Settings")]
     private int debuffAmount = 2;
     
+    // 在字段初始化时设置属性
+    protected new int initialHealth = 20;
+    protected new int initialMaxHealth = 20;
+    protected new int initialAttack = 5;
+    protected new int initialDefense = 5;
+    
     protected override void Awake()
     {
         base.Awake();
     }
     
-    private void Start()
+    public override void BindUnit(BattleUnit unit)
     {
-        initialHealth = 20;
-        initialAttack = 5;
+        if (isBound && unit == boundUnit) return;
+        
+        boundUnit = unit;
+        isBound = true;
         
         if (boundUnit != null)
         {
-            boundUnit.Initialize(this, initialHealth, initialHealth, initialAttack, 5);
+            boundUnit.Initialize(this, initialMaxHealth, initialHealth, initialAttack, initialDefense);
+            SubscribeToStatusEvents();
         }
     }
     

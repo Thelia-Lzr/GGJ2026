@@ -14,19 +14,29 @@ public class EnemyTank : EnemyController
     [SerializeField] private int chargeTime = 1;
     [SerializeField] private float chargeMultiplier = 2.6f;
     
+    // 在字段初始化时设置属性（而非Start中）
+    protected new int initialHealth = 30;
+    protected new int initialMaxHealth = 30;
+    protected new int initialAttack = 5;
+    protected new int initialDefense = 5;
+    
     protected override void Awake()
     {
         base.Awake();
     }
     
-    private void Start()
+    public override void BindUnit(BattleUnit unit)
     {
-        initialHealth = 30;
-        initialAttack = 5;
+        if (isBound && unit == boundUnit) return;
+        
+        boundUnit = unit;
+        isBound = true;
         
         if (boundUnit != null)
         {
-            boundUnit.Initialize(this, initialHealth, initialHealth, initialAttack, 5);
+            // 使用EnemyTank自己的初始属性
+            boundUnit.Initialize(this, initialMaxHealth, initialHealth, initialAttack, initialDefense);
+            SubscribeToStatusEvents();
         }
     }
     

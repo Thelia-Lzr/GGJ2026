@@ -72,6 +72,7 @@ public class BattleUnit : MonoBehaviour
     public UnitController Controller => controller;
     public Mask CurrentMask => currentMask;
     public IReadOnlyList<StatusEffect> ActiveStatusEffects => activeStatusEffects.AsReadOnly();
+    
     public void addAttack(int add)
     {
         attack += add;
@@ -454,6 +455,11 @@ public class BattleUnit : MonoBehaviour
     public void SetTeam(Team newTeam)
     {
         team = newTeam;
+    }
+    
+    public void SetLocation(Location newLocation)
+    {
+        location = newLocation;
     }
     
     public void OnTurnStart()

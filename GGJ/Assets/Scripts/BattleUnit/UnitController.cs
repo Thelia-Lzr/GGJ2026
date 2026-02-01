@@ -10,6 +10,10 @@ public abstract class UnitController : MonoBehaviour
     [SerializeField] public BattleUnit boundUnit;
     [SerializeField] protected Mask currentMask;
     [SerializeField] private int attackCountGains = 1;
+    
+    [Header("Visual Settings")]
+    [Tooltip("角色图片Sprite，如果为空会尝试从Resources/Image/Character/类名加载")]
+    [SerializeField] protected Sprite characterSprite;
 
     protected bool isStunned = false;
     protected bool canAct = true;
@@ -25,6 +29,15 @@ public abstract class UnitController : MonoBehaviour
     public BattleUnit BoundUnit => boundUnit;
     public Mask CurrentMask => currentMask;
     public bool CanAct => canAct && !isStunned && boundUnit != null && boundUnit.IsAlive();
+    public Sprite CharacterSprite => characterSprite;
+    
+    /// <summary>
+    /// 设置角色图片（用于动态创建时）
+    /// </summary>
+    public void SetCharacterSprite(Sprite sprite)
+    {
+        characterSprite = sprite;
+    }
 
     //初始属性定义
     protected int initialAttack = 10;
@@ -45,10 +58,25 @@ public abstract class UnitController : MonoBehaviour
         {
             Debug.LogWarning($"UnitController on {gameObject.name} could not find AnimationHandler in scene!");
         }
+        
+        // 如果没有设置Sprite，尝试从Resources加载
+        if (characterSprite == null)
+        {
+            string className = GetType().Name;
+            characterSprite = Resources.Load<Sprite>($"Image/Char/{className}");
+            if (characterSprite == null)
+            {
+                Debug.LogWarning($"[UnitController] 无法加载角色图片: Image/Char/{className}");
+            }
+        }
     }
     private void Start()
     {
-        BindUnit(boundUnit);
+        // 只有当boundUnit还未绑定时才尝试绑定（兼容Inspector预设置的情况）
+        if (boundUnit != null && !isBound)
+        {
+            BindUnit(boundUnit);
+        }
     }
     
     protected virtual void OnDestroy()
@@ -56,9 +84,14 @@ public abstract class UnitController : MonoBehaviour
         UnsubscribeFromStatusEvents();
     }
     
+    protected bool isBound = false;
+    
     public virtual void BindUnit(BattleUnit unit)
     {
+        if (isBound && unit == boundUnit) return; // 防止重复绑定
+        
         boundUnit = unit;
+        isBound = true;
 
         if (boundUnit != null)
         {

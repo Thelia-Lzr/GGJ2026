@@ -3,28 +3,37 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 敌人（辅助buff类）兼肉盾
+/// 敌人4（辅助buff类）兼肉盾
 /// Health: 25 | Atk: 5 | 攻击类型: 单体
-/// 行为: 单体1Atk or 全体队友本回合攻击力+2
+/// 行为: 普攻*1 or 全体队友本回合攻击力+2
 /// </summary>
 public class EnemyBuffer : EnemyController
 {
     [Header("Buffer Enemy Settings")]
     private int buffAmount = 2;
     
+    // 在字段初始化时设置属性
+    protected new int initialHealth = 25;
+    protected new int initialMaxHealth = 25;
+    protected new int initialAttack = 5;
+    protected new int initialDefense = 5;
+    
     protected override void Awake()
     {
         base.Awake();
     }
     
-    private void Start()
+    public override void BindUnit(BattleUnit unit)
     {
-        initialHealth = 25;
-        initialAttack = 5;
+        if (isBound && unit == boundUnit) return;
+        
+        boundUnit = unit;
+        isBound = true;
         
         if (boundUnit != null)
         {
-            boundUnit.Initialize(this, initialHealth, initialHealth, initialAttack, 5);
+            boundUnit.Initialize(this, initialMaxHealth, initialHealth, initialAttack, initialDefense);
+            SubscribeToStatusEvents();
         }
     }
     
