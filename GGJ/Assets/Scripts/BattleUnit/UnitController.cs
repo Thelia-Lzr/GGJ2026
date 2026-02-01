@@ -14,9 +14,6 @@ public abstract class UnitController : MonoBehaviour
     [Header("Visual Settings")]
     [Tooltip("角色图片Sprite，如果为空会尝试从Resources/Image/Character/类名加载")]
     [SerializeField] protected Sprite characterSprite;
-    protected SpriteRenderer spriteRenderer; // 引用身上的渲染器
-    private Sprite idleSprite; // 用于保存初始的 A 图片
-    [SerializeField] protected Sprite movingSprite; // 在 Inspector 中设置图片 B
 
     protected bool isStunned = false;
     protected bool canAct = true;
@@ -61,7 +58,7 @@ public abstract class UnitController : MonoBehaviour
         {
             Debug.LogWarning($"UnitController on {gameObject.name} could not find AnimationHandler in scene!");
         }
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        
         // 如果没有设置Sprite，尝试从Resources加载
         if (characterSprite == null)
         {
@@ -352,28 +349,16 @@ public abstract class UnitController : MonoBehaviour
     {
         canAct = can;
     }
-    public IEnumerator MoveTo(Vector2 targetPosition, float time)
+    public IEnumerator MoveTo(Vector2 targetPosition,float time)
     {
-        // 1. 开始移动：换成图片 B
-        if (movingSprite != null && spriteRenderer != null)
+        var movePosition =((Vector3)targetPosition-transform.position)/time;
+        while (time>0)
         {
-            spriteRenderer.sprite = movingSprite;
-        }
-
-        var movePosition = ((Vector3)targetPosition - transform.position) / time;
-        while (time > 0)
-        {
-            time -= Time.deltaTime;
-            transform.position += movePosition * Time.deltaTime;
+            time-=Time.deltaTime;
+            transform.position += movePosition*Time.deltaTime;
             yield return null;
         }
         transform.position = targetPosition;
-
-        // 2. 移动结束：换回图片 A (idleSprite)
-        if (idleSprite != null && spriteRenderer != null)
-        {
-            spriteRenderer.sprite = idleSprite;
-        }
     }
     public void InitActionCircle()
     {
@@ -459,5 +444,4 @@ public abstract class UnitController : MonoBehaviour
                 break;
         }
     }
-
 }
