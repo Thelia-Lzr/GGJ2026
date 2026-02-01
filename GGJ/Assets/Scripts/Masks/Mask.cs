@@ -17,7 +17,7 @@ public abstract class Mask
     public string MaskName { get; protected set; }
     public string Description { get; protected set; }
     public int SwitchCost { get; protected set; }
-    public Sprite MaskIcon { get; protected set; }
+    public Sprite CardImage { get; protected set; }
 
     protected MaskAttackPattern attackPattern;
     protected BattleUnit equippedUnit;
@@ -65,18 +65,18 @@ public abstract class Mask
             Debug.Log($"[Mask] {maskName} 启效果可用");
         }
         
-        // 根据类名自动加载 Sprite
+        // 根据类名自动加载卡片图片
         string className = GetType().Name;
-        string spritePath = $"Image/Mask/{className}";
-        MaskIcon = Resources.Load<Sprite>(spritePath);
+        string spritePath = $"Image/CardImage/{className}";
+        CardImage = Resources.Load<Sprite>(spritePath);
         
-        if (MaskIcon == null)
+        if (CardImage == null)
         {
-            Debug.LogWarning($"[Mask] 未能加载面具图标: {spritePath}");
+            Debug.LogWarning($"[Mask] 未能加载卡片图片: {spritePath}");
         }
         else
         {
-            Debug.Log($"[Mask] 成功加载面具图标: {spritePath}");
+            Debug.Log($"[Mask] 成功加载卡片图片: {spritePath}");
         }
     }
 

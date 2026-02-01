@@ -6,9 +6,7 @@ using TMPro;
 public class MaskCard : DragUnit
 {
     [Header("Card Display References")]
-    [SerializeField] private TextMeshPro nameText;
-    [SerializeField] private TextMeshPro descriptionText;
-    [SerializeField] private SpriteRenderer iconSprite;
+    [SerializeField] private SpriteRenderer cardSprite;
     
     [Header("Card Data")]
     [SerializeField] private Mask mask;
@@ -53,19 +51,9 @@ public class MaskCard : DragUnit
     {
         if (mask == null) return;
         
-        if (nameText != null)
+        if (cardSprite != null && mask.CardImage != null)
         {
-            nameText.text = mask.MaskName;
-        }
-        
-        if (descriptionText != null)
-        {
-            descriptionText.text = mask.Description;
-        }
-        
-        if (iconSprite != null && mask.MaskIcon != null)
-        {
-            iconSprite.sprite = mask.MaskIcon;
+            cardSprite.sprite = mask.CardImage;
         }
     }
     
@@ -101,12 +89,18 @@ public class MaskCard : DragUnit
     protected override IEnumerator ReturnBackAction()
     {
         isReturning = true;
-        isDragging = false;
-        dragController.Status = 0;
+        
+        // 通知 HandManager 重新整理手牌位置
+        if (handManager != null)
+        {
+            handManager.RefreshCardPositions();
+        }
         
         // 等待 HandManager 的动画完成
         yield return new WaitForSeconds(0.25f);
         
+        isDragging = false;
+        dragController.Status = 0;
         isReturning = false;
     }
     
