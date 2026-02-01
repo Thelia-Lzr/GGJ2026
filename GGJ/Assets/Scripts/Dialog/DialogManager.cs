@@ -90,12 +90,16 @@ public class Dialogmanager : MonoBehaviour
         {
             Debug.LogError("找不到 AudioManager 实例！请检查场景里有没有挂脚本。");
         }
-        // 剧情播完后，点击输出测试信息
         if (isFinished)
         {
+            Debug.Log("<color=red>检测到剧情已结束，正在请求 SceneController 跳转...</color>");
             if (SceneController.Instance != null)
             {
                 SceneController.Instance.GoToBattle();
+            }
+            else
+            {
+                Debug.LogError("跳转失败：场景中不存在 SceneController 实例！");
             }
             return;
         }
