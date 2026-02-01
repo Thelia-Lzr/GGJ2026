@@ -303,49 +303,56 @@ public class BattleUnit : MonoBehaviour
             UITranform.pivot = new Vector2(0, 1);
             UITranform.anchorMin = new Vector2(0, 1);
             UITranform.anchorMax = new Vector2(0, 1);
-            UITranform.sizeDelta = new Vector2(30, 30);
+            UITranform.sizeDelta = new Vector2(50, 50);
             UITranform.localScale = Vector3.one;
             //75,-90
-            UITranform.anchoredPosition = new Vector2(40 * i, 40);
+            UITranform.anchoredPosition = new Vector2(50 * i, 40);
             BuffUI.Add(newUI);
 
             Image image = UITranform.AddComponent<Image>();
             switch (effect.StatusId)
             {
                 case "Add2Atk":
-                    Debug.LogWarning("Add2Atk");
-
+                    image.sprite = resourceController.StatusSprites[3];
                     break;
                 case "Minus2Atk":
-                    Debug.LogWarning("Minus2Atk");
+                    image.sprite = resourceController.StatusSprites[4];
                     break;
                 case "Stunned":
-                    Debug.LogWarning("Stunned");
-
+                    image.sprite = resourceController.StatusSprites[0];
                     break;
                 case "Enraged":
-                    Debug.LogWarning("Enraged");
+                    image.sprite = resourceController.StatusSprites[2];
 
                     break;
             }
-            if (controller is EnemyTank tank)
+        }
+        if (controller is EnemyTank tank)
+        {
+            if (tank.JudgeCharge())
             {
-                if (tank.JudgeCharge())
-                {
-                    //显示UI
-                }
+                GameObject newUI = new GameObject("BuffUI");
+                RectTransform UITranform = newUI.AddComponent<RectTransform>();
+                UITranform.SetParent(UIText.GetComponent<RectTransform>());
+                UITranform.pivot = new Vector2(0, 1);
+                UITranform.anchorMin = new Vector2(0, 1);
+                UITranform.anchorMax = new Vector2(0, 1);
+                UITranform.sizeDelta = new Vector2(50, 50);
+                UITranform.localScale = Vector3.one;
+                BuffUI.Add(newUI);
+                UITranform.anchoredPosition = new Vector2(50 * (BuffUI.Count - 1), 40);
+
+                Image image = UITranform.AddComponent<Image>();
+                image.sprite= resourceController.StatusSprites[1];
             }
-
-
-
         }
     }
     public void BuffUIDisplay(StatusEffect newEffect)
     {
-        GameObject[] BuffUITemp=new GameObject[BuffUI.Count];
-        for(int i = 0; i < BuffUITemp.Length; i++)
+        GameObject[] BuffUITemp = new GameObject[BuffUI.Count];
+        for (int i = 0; i < BuffUITemp.Length; i++)
         {
-            BuffUITemp[i]= BuffUI[i];
+            BuffUITemp[i] = BuffUI[i];
         }
         for (int i = 0; i < BuffUITemp.Length; i++)
         {
@@ -353,50 +360,57 @@ public class BattleUnit : MonoBehaviour
         }
         BuffUI.Clear();
         //刷新UI显示
-        for(int i = 0;i < activeStatusEffects.Count; i++)
+        for (int i = 0; i < activeStatusEffects.Count; i++)
         {
-            StatusEffect effect=activeStatusEffects[i];
+            StatusEffect effect = activeStatusEffects[i];
             GameObject newUI = new GameObject("BuffUI");
             RectTransform UITranform = newUI.AddComponent<RectTransform>();
             UITranform.SetParent(UIText.GetComponent<RectTransform>());
             UITranform.pivot = new Vector2(0, 1);
             UITranform.anchorMin = new Vector2(0, 1);
             UITranform.anchorMax = new Vector2(0, 1);
-            UITranform.sizeDelta = new Vector2(30, 30);
+            UITranform.sizeDelta = new Vector2(50, 50);
             UITranform.localScale = Vector3.one;
             //75,-90
-            UITranform.anchoredPosition = new Vector2(40 * i, 40);
+            UITranform.anchoredPosition = new Vector2(50 * i, 40);
             BuffUI.Add(newUI);
 
             Image image = UITranform.AddComponent<Image>();
             switch (effect.StatusId)
             {
                 case "Add2Atk":
-                    Debug.LogWarning("Add2Atk");
-
+                    image.sprite = resourceController.StatusSprites[3];
                     break;
                 case "Minus2Atk":
-                    Debug.LogWarning("Minus2Atk");
+                    image.sprite = resourceController.StatusSprites[4];
                     break;
                 case "Stunned":
-                    Debug.LogWarning("Stunned");
-
+                    image.sprite = resourceController.StatusSprites[0];
                     break;
                 case "Enraged":
-                    Debug.LogWarning("Enraged");
+                    image.sprite = resourceController.StatusSprites[2];
 
                     break;
             }
-            if (controller is EnemyTank tank)
+        }
+        if (controller is EnemyTank tank)
+        {
+            if (tank.JudgeCharge())
             {
-                if(tank.JudgeCharge())
-                {
-                    //显示UI
-                }
+                GameObject newUI = new GameObject("BuffUI");
+                RectTransform UITranform = newUI.AddComponent<RectTransform>();
+                UITranform.SetParent(UIText.GetComponent<RectTransform>());
+                UITranform.pivot = new Vector2(0, 1);
+                UITranform.anchorMin = new Vector2(0, 1);
+                UITranform.anchorMax = new Vector2(0, 1);
+                UITranform.sizeDelta = new Vector2(50, 50);
+                UITranform.localScale = Vector3.one;
+                BuffUI.Add(newUI);
+                UITranform.anchoredPosition = new Vector2(50 * (BuffUI.Count - 1), 40);
+
+                Image image = UITranform.AddComponent<Image>();
+                image.sprite = resourceController.StatusSprites[1];
             }
-
-
-
         }
     }
     public void ApplyStatus(StatusEffect effect)
