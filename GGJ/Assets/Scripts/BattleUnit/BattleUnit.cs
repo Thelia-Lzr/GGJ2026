@@ -310,9 +310,13 @@ public class BattleUnit : MonoBehaviour
             BuffUI.Add(newUI);
 
             Image image = UITranform.AddComponent<Image>();
+            Debug.LogError(effect.StatusId);
             switch (effect.StatusId)
             {
                 case "Add2Atk":
+                    image.sprite = resourceController.StatusSprites[3];
+                    break;
+                case "Add3Atk":
                     image.sprite = resourceController.StatusSprites[3];
                     break;
                 case "Minus2Atk":
@@ -376,9 +380,14 @@ public class BattleUnit : MonoBehaviour
             BuffUI.Add(newUI);
 
             Image image = UITranform.AddComponent<Image>();
+            Debug.LogError(effect.StatusId);
+
             switch (effect.StatusId)
             {
                 case "Add2Atk":
+                    image.sprite = resourceController.StatusSprites[3];
+                    break;
+                case "Add3Atk":
                     image.sprite = resourceController.StatusSprites[3];
                     break;
                 case "Minus2Atk":
