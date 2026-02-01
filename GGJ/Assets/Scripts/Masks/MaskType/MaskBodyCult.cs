@@ -10,7 +10,8 @@ public class MaskBodyCult : Mask
         maxHealth: 8,
         atk: 3,
         atkCost: 2,
-        description: "戴+启+毁：所有己方角色回复2点体力和面具耐久。攻：溅射攻击目标及相邻敌人。")
+        description: "戴+启+毁：所有己方角色回复2点体力和面具耐久。攻：溅射攻击目标及相邻敌人。",
+        hasActivateAbility: true)
     {
 
     }

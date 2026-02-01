@@ -10,9 +10,9 @@ public class MaskCandleHandler : Mask
         maxHealth: 11,
         atk: 5,
         atkCost: 1,
-        description: "启：若面具耐久≤4，对所有敌人造成3点群体伤害，然后回复此面具3点耐久。")
+        description: "启：若面具耐久≤4，对所有敌人造成3点群体伤害，然后回复此面具3点耐久。",
+        hasActivateAbility: true)
     {
-
     }
 
     public override IEnumerator Activate(UnitController controller)

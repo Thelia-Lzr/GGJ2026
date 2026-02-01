@@ -27,6 +27,47 @@ public class EnemyTank : EnemyController
         if (boundUnit != null)
         {
             boundUnit.Initialize(this, initialHealth, initialHealth, initialAttack, 5);
+            SubscribeToStatusEvents();
+        }
+    }
+    
+    private void OnDestroy()
+    {
+        UnsubscribeFromStatusEvents();
+    }
+    
+    private void SubscribeToStatusEvents()
+    {
+        if (boundUnit != null)
+        {
+            boundUnit.OnStatusApplied += OnStatusApplied;
+            boundUnit.OnStatusRemoved += OnStatusRemoved;
+        }
+    }
+    
+    private void UnsubscribeFromStatusEvents()
+    {
+        if (boundUnit != null)
+        {
+            boundUnit.OnStatusApplied -= OnStatusApplied;
+            boundUnit.OnStatusRemoved -= OnStatusRemoved;
+        }
+    }
+    
+    private void OnStatusApplied(StatusEffect effect)
+    {
+        if (effect is Stunned)
+        {
+            Debug.Log($"[EnemyTank] {gameObject.name} 被眩晕！蓄力计数器重置。");
+            chargeCounter = 0;
+        }
+    }
+    
+    private void OnStatusRemoved(StatusEffect effect)
+    {
+        if (effect is Stunned)
+        {
+            Debug.Log($"[EnemyTank] {gameObject.name} 眩晕解除。");
         }
     }
     

@@ -11,7 +11,8 @@ public class MaskNeverRemoved : Mask
         maxHealth: 8,
         atk: 5,
         atkCost: 0,
-        description: "启：所有己方角色攻击力+2（持续1回合）。攻击不消耗面具耐久。")
+        description: "启：所有己方角色攻击力+2（持续1回合）。攻击不消耗面具耐久。",
+        hasActivateAbility: true)
     {
 
     }

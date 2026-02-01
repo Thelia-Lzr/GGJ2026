@@ -32,6 +32,8 @@ public class BattleUnit : MonoBehaviour
     private Mask currentMask;
     private List<StatusEffect> activeStatusEffects = new List<StatusEffect>();
     
+    private GameObject currentActivateCircle;
+    
     public event Action<int> OnHealthChanged;
     public event Action<StatusEffect> OnStatusApplied;
     public event Action<StatusEffect> OnStatusRemoved;
@@ -313,6 +315,61 @@ public class BattleUnit : MonoBehaviour
         }
         
         OnTurnEnded?.Invoke();
+    }
+    
+    public void ShowActivateCircle()
+    {
+        if (currentMask == null || !currentMask.CanUseActivate)
+            return;
+        
+        if (currentActivateCircle != null)
+        {
+            Debug.Log($"[BattleUnit] {gameObject.name} 已有ActivateCircle（黄圈），跳过创建");
+            return;
+        }
+        
+        Debug.Log($"[BattleUnit] 为 {gameObject.name} 创建ActivateCircle（启效果黄圈）");
+        
+        // 从ActivateCircleManager获取预制体
+        if (ActivateCircleManager.Instance != null)
+        {
+            GameObject prefab = ActivateCircleManager.Instance.GetActivateCirclePrefab();
+            if (prefab != null)
+            {
+                currentActivateCircle = Instantiate(prefab, transform);
+                currentActivateCircle.transform.localPosition = new Vector3(0, -1.7f, 0);
+                
+                ActivateCircle circle = currentActivateCircle.GetComponent<ActivateCircle>();
+                if (circle != null)
+                {
+                    circle.Initialize(this);
+                }
+                else
+                {
+                    Debug.LogError("[BattleUnit] ActivateCircle预制体上没有ActivateCircle组件！");
+                    Destroy(currentActivateCircle);
+                    currentActivateCircle = null;
+                }
+            }
+            else
+            {
+                Debug.LogError("[BattleUnit] 未能从ActivateCircleManager获取预制体！");
+            }
+        }
+        else
+        {
+            Debug.LogError("[BattleUnit] ActivateCircleManager实例不存在！");
+        }
+    }
+    
+    public void HideActivateCircle()
+    {
+        if (currentActivateCircle != null)
+        {
+            Debug.Log($"[BattleUnit] 移除 {gameObject.name} 的ActivateCircle（启效果黄圈）");
+            Destroy(currentActivateCircle);
+            currentActivateCircle = null;
+        }
     }
     
     private void Die()
