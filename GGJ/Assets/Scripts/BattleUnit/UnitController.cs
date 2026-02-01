@@ -111,6 +111,22 @@ public abstract class UnitController : MonoBehaviour
         if (boundUnit != null)
         {
             boundUnit.SetMask(currentMask);
+            
+            // 如果是玩家回合且新面具有启效果，立即刷新黄圈（即使这回合用过）
+            if (RoundManager.Instance != null && 
+                RoundManager.Instance.CurrentActiveTeam == Team.Player &&
+                boundUnit.UnitTeam == Team.Player &&
+                currentMask.HasActivateAbility)
+            {
+                // 先移除旧黄圈
+                boundUnit.HideActivateCircle();
+                
+                // 刷新启效果状态并显示新黄圈
+                currentMask.CanUseActivate = true;
+                boundUnit.ShowActivateCircle();
+                
+                Debug.Log($"[UnitController] 戴上新面具 {currentMask.MaskName}，刷新启效果黄圈");
+            }
         }
         
         if (cost > 0)
@@ -264,8 +280,11 @@ public abstract class UnitController : MonoBehaviour
             }
             
             currentActionCircle = Instantiate(ResourceController.Instance.GetPrefab("ActionCircle"), transform);
+            currentActionCircle.name = "ActionCircle"; // 确保名字正确
             ActionCircle aC = currentActionCircle.GetComponent<ActionCircle>();
             aC.Initialize(this);
+            
+            Debug.Log($"[UnitController] {gameObject.name} 创建ActionCircle（攻击圈）");
         }
 
     }
@@ -313,6 +332,18 @@ public abstract class UnitController : MonoBehaviour
                 if (command.MaskData != null)
                 {
                     SwitchMask(command.MaskData, command.ResourceCost);
+                }
+                break;
+            
+            case ActionType.ActivateMask:
+                if (command.MaskData != null)
+                {
+                    Debug.Log($"[UnitController] 执行面具启效果: {command.MaskData.MaskName}");
+                    yield return command.MaskData.Activate(this);
+                }
+                else
+                {
+                    Debug.LogWarning("[UnitController] ActivateMask 命令缺少 MaskData");
                 }
                 break;
             

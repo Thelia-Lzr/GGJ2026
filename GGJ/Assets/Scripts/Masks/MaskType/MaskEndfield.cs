@@ -10,7 +10,8 @@ public class MaskEndfield : Mask
         maxHealth: 8,
         atk: 0,
         atkCost: 1,
-        description: "戴+启：抽1张卡。攻：群体攻击所有敌人。")
+        description: "戴+启：抽1张卡。攻：群体攻击所有敌人。",
+        hasActivateAbility: true)
     {
 
     }

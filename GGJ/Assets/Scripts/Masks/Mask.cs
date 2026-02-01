@@ -29,8 +29,11 @@ public abstract class Mask
     public int CurrentHealth { get; protected set; }
 
     public bool IsBroken => CurrentHealth <= 0;
+    
+    public bool HasActivateAbility { get; protected set; }
+    public bool CanUseActivate { get; set; }
 
-    public Mask(string maskName, int switchCost, int maxHealth, int atk, int atkCost, string description = "")
+    public Mask(string maskName, int switchCost, int maxHealth, int atk, int atkCost, string description = "", bool hasActivateAbility = false)
     {
         MaskName = maskName;
         Description = description;
@@ -39,6 +42,14 @@ public abstract class Mask
         CurrentHealth = MaxHealth;
         Atk = atk;
         AtkCost = atkCost;
+        
+        HasActivateAbility = hasActivateAbility;
+        CanUseActivate = hasActivateAbility;
+        
+        if (hasActivateAbility)
+        {
+            Debug.Log($"[Mask] {maskName} 启效果可用");
+        }
         
         // 根据类名自动加载 Sprite
         string className = GetType().Name;

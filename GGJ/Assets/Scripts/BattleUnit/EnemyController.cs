@@ -143,6 +143,18 @@ public class EnemyController : UnitController
                 }
                 break;
             
+            case ActionType.ActivateMask:
+                if (command.MaskData != null)
+                {
+                    Debug.Log($"[EnemyController] 执行面具启效果: {command.MaskData.MaskName}");
+                    yield return command.MaskData.Activate(this);
+                }
+                else
+                {
+                    Debug.LogWarning("[EnemyController] ActivateMask 命令缺少 MaskData");
+                }
+                break;
+            
             default:
                 Debug.LogWarning($"Unknown action type: {command.ActionType}");
                 break;

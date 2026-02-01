@@ -32,6 +32,12 @@ public class DragUnit : MonoBehaviour
             return;
         }
         
+        // 只响应左键（按钮0），忽略右键
+        if (!Input.GetMouseButton(0))
+        {
+            return;
+        }
+        
         // 更新起始位置为当前位置（而非实例化时的位置）
         startPosition = transform.position;
         
@@ -46,6 +52,12 @@ public class DragUnit : MonoBehaviour
         {
             return;
         }
+        
+        // 只在左键拖拽时执行
+        if (!Input.GetMouseButton(0))
+        {
+            return;
+        }
 
         if (isDragging)
         {
@@ -57,6 +69,12 @@ public class DragUnit : MonoBehaviour
         if (dragController.Status != 0) return;
         
         if (RoundManager.Instance != null && RoundManager.Instance.GetActiveTeam() != Team.Player)
+        {
+            return;
+        }
+        
+        // 只在左键抬起时执行
+        if (!Input.GetMouseButtonUp(0))
         {
             return;
         }
