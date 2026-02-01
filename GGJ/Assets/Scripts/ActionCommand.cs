@@ -44,7 +44,7 @@ public class ActionCommand
         
         if (ActionType == ActionType.ActivateMask)
         {
-            if (MaskData == null || !MaskData.CanUseActivate)
+            if (MaskData == null || !MaskData.CanUseActivateNow())
                 return false;
         }
         

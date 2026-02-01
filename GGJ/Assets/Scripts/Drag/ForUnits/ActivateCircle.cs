@@ -30,7 +30,7 @@ public class ActivateCircle : MonoBehaviour, IPointerClickHandler
         
         // 设置黄色半透明效果
         //spriteRenderer.color = new Color(1f, 1f, 0f, 0.5f);
-        spriteRenderer.sortingOrder = 0;
+        spriteRenderer.sortingOrder = 1;
         
         // 禁用Physics碰撞体（如果存在），避免干扰ActionCircle
         CircleCollider2D physicsCollider = GetComponent<CircleCollider2D>();
@@ -83,16 +83,16 @@ public class ActivateCircle : MonoBehaviour, IPointerClickHandler
         }
         
         Mask mask = boundUnit.CurrentMask;
-        if (mask == null || !mask.CanUseActivate)
+        if (mask == null || !mask.CanUseActivateNow())
         {
-            Debug.LogWarning("[ActivateCircle] Mask 为空或 CanUseActivate 为 false");
+            Debug.LogWarning("[ActivateCircle] Mask 为空或当前不满足启效果条件");
             return;
         }
         
         Debug.Log($"[ActivateCircle] 触发 {mask.MaskName} 的启效果");
         
-        // 设置为不可用
-        mask.CanUseActivate = false;
+        // 设置本回合不可再用
+        mask.CanUseActivateThisRound = false;
         isActive = false;
         
         // 提交Activate协程到AnimationHandler

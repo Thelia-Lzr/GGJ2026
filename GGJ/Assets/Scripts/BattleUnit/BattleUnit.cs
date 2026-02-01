@@ -58,6 +58,9 @@ public class BattleUnit : MonoBehaviour
     //UI
     public List<GameObject> BuffUI = new List<GameObject>();
 
+    //护盾图标
+    [field: SerializeField]
+    public GameObject ShellIcon { get; private set; }
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
     public int Attack => attack;
@@ -183,7 +186,7 @@ public class BattleUnit : MonoBehaviour
             //图片
             if (true)
             {
-                GameObject healthIcon = new GameObject("HealthIcon");
+                GameObject healthIcon = new GameObject("ShellIcon");
                 RectTransform textTranform = healthIcon.AddComponent<RectTransform>();
                 textTranform.SetParent(UIText.GetComponent<RectTransform>());
                 textTranform.pivot = new Vector2(0, 1);
@@ -194,6 +197,7 @@ public class BattleUnit : MonoBehaviour
                 textTranform.localScale = Vector3.one;
                 Image image = healthIcon.AddComponent<Image>();
                 image.sprite = resourceController.Sprites[2];
+                ShellIcon = healthIcon;
             }
             if (true)
             {
@@ -215,14 +219,18 @@ public class BattleUnit : MonoBehaviour
 
         }
         HealthText.GetComponent<TextMeshProUGUI>().text = CurrentHealth.ToString();
+        
+        // 根据是否有面具来显示/隐藏护盾UI
         if (currentMask != null)
         {
+            if (ShellIcon != null) ShellIcon.SetActive(true);
+            if (ShellText != null) ShellText.SetActive(true);
             ShellText.GetComponent<TextMeshProUGUI>().text = currentMask.CurrentHealth.ToString();
-
         }
         else
         {
-            ShellText.GetComponent<TextMeshProUGUI>().text = "" + 0;
+            if (ShellIcon != null) ShellIcon.SetActive(false);
+            if (ShellText != null) ShellText.SetActive(false);
         }
     }
     public void HealthChangeDisplay(int amount)
@@ -382,7 +390,8 @@ public class BattleUnit : MonoBehaviour
     
     public void ShowActivateCircle()
     {
-        if (currentMask == null || !currentMask.CanUseActivate)
+        // 检查面具是否当前可以使用启效果
+        if (currentMask == null || !currentMask.CanUseActivateNow())
             return;
         
         if (currentActivateCircle != null)
@@ -400,7 +409,7 @@ public class BattleUnit : MonoBehaviour
             if (prefab != null)
             {
                 currentActivateCircle = Instantiate(prefab, transform);
-                currentActivateCircle.transform.localPosition = new Vector3(0, -1.7f, 0);
+                currentActivateCircle.transform.localPosition = new Vector3(0, 0.65f, 0);
                 
                 ActivateCircle circle = currentActivateCircle.GetComponent<ActivateCircle>();
                 if (circle != null)

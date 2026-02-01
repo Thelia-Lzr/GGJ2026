@@ -50,6 +50,12 @@ public abstract class UnitController : MonoBehaviour
     {
         BindUnit(boundUnit);
     }
+    
+    protected virtual void OnDestroy()
+    {
+        UnsubscribeFromStatusEvents();
+    }
+    
     public virtual void BindUnit(BattleUnit unit)
     {
         boundUnit = unit;
@@ -57,7 +63,36 @@ public abstract class UnitController : MonoBehaviour
         if (boundUnit != null)
         {
             boundUnit.Initialize(this,initialMaxHealth,initialHealth,initialAttack,initialDefense);
+            SubscribeToStatusEvents();
         }
+    }
+    
+    protected void SubscribeToStatusEvents()
+    {
+        if (boundUnit != null)
+        {
+            boundUnit.OnStatusApplied += OnStatusAppliedHandler;
+            boundUnit.OnStatusRemoved += OnStatusRemovedHandler;
+        }
+    }
+    
+    protected void UnsubscribeFromStatusEvents()
+    {
+        if (boundUnit != null)
+        {
+            boundUnit.OnStatusApplied -= OnStatusAppliedHandler;
+            boundUnit.OnStatusRemoved -= OnStatusRemovedHandler;
+        }
+    }
+    
+    protected virtual void OnStatusAppliedHandler(StatusEffect effect)
+    {
+        // 子类可重写此方法来处理特定状态的应用
+    }
+    
+    protected virtual void OnStatusRemovedHandler(StatusEffect effect)
+    {
+        // 子类可重写此方法来处理特定状态的移除
     }
     
     
@@ -114,7 +149,7 @@ public abstract class UnitController : MonoBehaviour
         {
             boundUnit.SetMask(currentMask);
             
-            // 如果是玩家回合且新面具有启效果，立即刷新黄圈（即使这回合用过）
+            // 如果是玩家回合且新面具有启效果，立即刷新黄圈
             if (RoundManager.Instance != null && 
                 RoundManager.Instance.CurrentActiveTeam == Team.Player &&
                 boundUnit.UnitTeam == Team.Player &&
@@ -123,11 +158,19 @@ public abstract class UnitController : MonoBehaviour
                 // 先移除旧黄圈
                 boundUnit.HideActivateCircle();
                 
-                // 刷新启效果状态并显示新黄圈
-                currentMask.CanUseActivate = true;
-                boundUnit.ShowActivateCircle();
+                // 刷新启效果状态：重置本回合可用标记
+                currentMask.CanUseActivateThisRound = true;
                 
-                Debug.Log($"[UnitController] 戴上新面具 {currentMask.MaskName}，刷新启效果黄圈");
+                // 检查是否满足所有条件后显示黄圈
+                if (currentMask.CanUseActivateNow())
+                {
+                    boundUnit.ShowActivateCircle();
+                    Debug.Log($"[UnitController] 戴上新面具 {currentMask.MaskName}，刷新启效果黄圈");
+                }
+                else
+                {
+                    Debug.Log($"[UnitController] 戴上新面具 {currentMask.MaskName}，但不满足启效果条件");
+                }
             }
         }
         
