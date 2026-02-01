@@ -48,6 +48,7 @@ public class MaskCandleHandler : Mask
             }
 
             RepairMask(3);
+            controller.boundUnit.HealthDisplay(0);
             Debug.Log($"[MaskCandleHandler] 面具回复 3 点耐久，当前耐久: {CurrentHealth}/{MaxHealth}");
         }
         else
